@@ -7,21 +7,21 @@
 - [ ] Implementar TryParse de Command (general)
   - [ ] Decidir valores de ParseResult y ExecuteResult
 - [ ] Implementar parseo commando de Ticket (TicketCommand)
-  - NOTA: *dejar TryExecute vacio
+  - NOTA: dejar TryExecute vacio
 - [ ] Implementar parseo commando de Product (ProductCommand)
-  - NOTA: *dejar TryExecute vacio
+  - NOTA: dejar TryExecute vacio
 - [ ] Implementar parseo commandos auxiliares de Help, Echo, Exit (HelpCommand)
-  - NOTA: *dejar TryExecute vacio
+  - NOTA: dejar TryExecute vacio
 - [ ] Escribir clase Product 
-  - *constructor
-  - *getters
-  - *setters
-  - *toString
+  - constructor
+  - getters
+  - setters
+  - toString
 - [ ] Escribir clase Ticket
-  - *constructor
-  - *getters
-  - *setters
-  - *getProducts()/toString/print()
+  - constructor
+  - getters
+  - setters
+  - getProducts()/toString/print()
 - [ ] Escribir tests basicos (productos se crean y añaden bien, etc)
 
 ## Mas tarde
