@@ -1,30 +1,30 @@
 # La Mejor Tienda UPM 
 
 ## Tareas
-- [ ] Escribir metodo(s)/clase(s) para capturar y tokenizar input
-- [ ] Implementar ArrayDataManager (o DataManager con la estructura que hayamos decidido)
+- [ ] Julio - Escribir metodo(s)/clase(s) para capturar y tokenizar input 
+- [ ] Jinxian - Implementar ArrayDataManager (o DataManager con la estructura que hayamos decidido)
   - [ ] Decidir valores de DataResult
-- [ ] Implementar TryParse de Command (general)
+- [ ] Jose - Implementar TryParse de Command (general)
   - [ ] Decidir valores de ParseResult y ExecuteResult
-- [ ] Implementar parseo commando de Ticket (TicketCommand)
+- [ ] Andres - Implementar parseo commandos auxiliares de Help, Echo, Exit (HelpCommand)
   - NOTA: dejar TryExecute vacio
-- [ ] Implementar parseo commando de Product (ProductCommand)
-  - NOTA: dejar TryExecute vacio
-- [ ] Implementar parseo commandos auxiliares de Help, Echo, Exit (HelpCommand)
-  - NOTA: dejar TryExecute vacio
-- [ ] Escribir clase Product 
+- [ ] Andres - Escribir clase Product 
   - constructor
   - getters
   - setters
   - toString
-- [ ] Escribir clase Ticket
+- [ ] Andres - Escribir clase Ticket
   - constructor
   - getters
   - setters
   - getProducts()/toString/print()
-- [ ] Escribir tests basicos (productos se crean y añaden bien, etc)
+- [ ] Enrique - Implementar TryParse de Product (ProductCommand)
+  - NOTA: dejar TryExecute vacio
 
 ## Mas tarde
+- [ ] Implementar TryParse de Ticket (TicketCommand)
+  - NOTA: dejar TryExecute vacio
+- [ ] Escribir tests basicos (productos se crean y añaden bien, etc)
 - [ ] Escribir bucle principal del programa
 - [ ] Implementar ejecucion de comandos
 - [ ] Mensajes de usuario para los errores
