@@ -27,6 +27,7 @@
 - [ ] Escribir tests basicos (productos se crean y añaden bien, etc)
 - [ ] Escribir bucle principal del programa
 - [ ] Implementar ejecucion de comandos
+- [ ] Implementar descuentos
 - [ ] Mensajes de usuario para los errores
 
 ## Como hacer una tarea
