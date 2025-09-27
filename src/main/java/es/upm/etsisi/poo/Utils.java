@@ -1,8 +1,8 @@
 package es.upm.etsisi.poo;
 import java.lang.StringBuilder;
+import java.util.function.Predicate;
 
 public class Utils {
-
 	public static <T> String arrayToString(T[] array) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("[ ");
@@ -15,5 +15,15 @@ public class Utils {
 
 		sb.append(" ]");
 		return sb.toString();
+	}
+
+	public static Integer tryParseInt(String s) {
+		Integer value = null;
+		try {
+			value = Integer.parseInt(s);
+		} catch (Exception e) {
+		} finally {
+			return value;
+		}
 	}
 }
