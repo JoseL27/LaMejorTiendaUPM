@@ -1,15 +1,14 @@
 package es.upm.etsisi.poo;
 
-enum DataResult {
-	SUCCESS,
-	INVALID_NAME,
-	INVALID_ID,
-	INVALID_PRICE,
-	INVENTORY_FULL
-};
-
 public interface DataManager {
-	
+	enum DataResult {
+		SUCCESS,
+		INVALID_NAME,
+		INVALID_ID,
+		INVALID_PRICE,
+		INVENTORY_FULL
+	};
+
 	public DataResult createProduct(int id, String name, Product.Category category, double price);
 	// public DataResult readProduct();
 	
