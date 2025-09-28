@@ -89,13 +89,14 @@ public class ArrayDataManager implements DataManager {
      * @param name Product name (length must be less than 100)
      * @param category Product Category
      * @param price Product price (must be greater than 0)
-     * @return DataResult enum: SUCCESS, INVALID_ID, INVALID_NAME, INVALID_PRICE, INVENTORY_FULL, PRODUCT_ALREADY_EXISTS
+     * @return DataResult enum: SUCCESS, INVALID_ID, INVALID_NAME, INVALID_PRICE, INVALID_CATEGORY, INVENTORY_FULL, PRODUCT_ALREADY_EXISTS
      */
     public DataResult createProduct(int id, String name, Product.Category category, double price) {
         // Sanity checks: ID >= 0, name.length < 100, price > 0
         if (!isValidId(id)) return DataResult.INVALID_ID;
         if (!isValidName(name)) return DataResult.INVALID_NAME;
         if (!isValidPrice(price)) return DataResult.INVALID_PRICE;
+        if (category == null) return DataResult.INVALID_CATEGORY;
 
         // Check inventory full
         if (this.productAmount >= this.MAX_CAPACITY) return DataResult.INVENTORY_FULL;
