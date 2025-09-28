@@ -8,7 +8,7 @@ public class Product
 		MERCH		(0.00f),
 		PAPELERIA	(0.05f),
 		ROPA		(0.07f),
-		LIBRO		(0.01f),
+		LIBRO		(0.10f),
 		ELECTRONICA	(0.03f);
 
 		private final float discountPercent;
