@@ -1,6 +1,11 @@
 package es.upm.etsisi.poo;
 
 enum DataResult {
+	SUCCESS,
+	INVALID_NAME,
+	INVALID_ID,
+	INVALID_PRICE,
+	INVENTORY_FULL
 };
 
 public interface DataManager {
@@ -14,5 +19,5 @@ public interface DataManager {
 	
 	public DataResult deleteProduct(int id);
 
-	public DataResult listProducts(Product[] outProductsList);
+	public Product[] listProducts();
 }

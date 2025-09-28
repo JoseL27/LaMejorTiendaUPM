@@ -29,7 +29,7 @@ public class ArrayDataManager implements DataManager {
 		return null;
 	}
 
-	public DataResult listProducts(Product[] outProductsList) {
-		return null;
-	}	
+	public Product[] listProducts() {
+		return new Product[0];
+	}
 }
