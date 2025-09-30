@@ -1,25 +1,44 @@
 # La Mejor Tienda UPM 
 
 ## Tareas
-- [ ] Julio - Escribir metodo(s)/clase(s) para capturar y tokenizar input 
-- [ ] Jinxian - Implementar ArrayDataManager (o DataManager con la estructura que hayamos decidido)
-  - [ ] Decidir valores de DataResult
-- [ ] Jose - Implementar TryParse de Command (general)
-  - [ ] Decidir valores de ParseResult y ExecuteResult
-- [ ] Andres - Implementar parseo commandos auxiliares de Help, Echo, Exit (HelpCommand)
-  - NOTA: dejar TryExecute vacio
-- [ ] Andres - Escribir clase Product 
+- [x] Julio - Escribir metodo(s)/clase(s) para capturar y tokenizar input 
+- [x] Jinxian - Implementar ArrayDataManager (o DataManager con la estructura que hayamos decidido)
+  - [x] Decidir valores de DataResult
+- [x] Jose - Implementar TryParse de Command (general)
+  - [x] Decidir valores de ParseResult y ExecuteResult
+- [x] Andres - Escribir clase Product 
   - constructor
   - getters
   - setters
   - toString
+- [x] Enrique - Implementar TryParse de Product (ProductCommand)
+  - NOTA: dejar TryExecute vacio
 - [ ] Andres - Escribir clase Ticket
   - constructor
   - getters
   - setters
   - getProducts()/toString/print()
-- [ ] Enrique - Implementar TryParse de Product (ProductCommand)
+- [ ] Andres - Implementar parseo commandos auxiliares de Help, Echo, Exit (HelpCommand)
   - NOTA: dejar TryExecute vacio
+  
+## Merges de tareas
+- [x] Andres: Quitar 'Diseño ...' y 'Inventory.java'
+- [x] Jose <- Enrique
+- [x] Enrique apaga
+- [x] Jose <- main
+- [x] main <- Jose
+- [x] Julio <- main
+- [x] main <- Julio
+- [ ] Jinxian <- main
+- [ ] main <- Jinxian
+- [ ] Andres inventory dejar en local
+- [ ] Andres cambio al Ticket
+- [ ] Andres <- main
+- [ ] main <- Andres
+- [ ] Actualizar todos los inputs en main
+- [ ] Reunir tests en un main
+- [ ] Pensar JUNIT
+- [ ] Hablar sobre siguientes cosas
 
 ## Mas tarde
 - [ ] Implementar TryParse de Ticket (TicketCommand)
