@@ -37,10 +37,10 @@
 - [x] main <- Julio
 - [x] Jinxian <- main
 - [x] main <- Jinxian
-- [ ] Andres inventory dejar en local
-- [ ] Andres cambio al Ticket
-- [ ] Andres <- main
-- [ ] main <- Andres
+- [x] Andres inventory dejar en local
+- [x] Andres cambio al Ticket
+- [x] Andres <- main
+- [x] main <- Andres
 - [ ] Actualizar todos los inputs en main
 - [ ] Reunir tests en un main
 - [ ] Pensar JUNIT
