@@ -18,6 +18,7 @@ public class Product {
 
 		public float getDiscountPercent() {
 			return this.discountPercent;
+		}
 		
 		public String getLabel() {
 			return this.label;
