@@ -27,8 +27,8 @@
 - [x] Enrique apaga
 - [x] Jose <- main
 - [x] main <- Jose
-- [ ] Julio <- main
-- [ ] main <- Julio
+- [x] Julio <- main
+- [x] main <- Julio
 - [ ] Jinxian <- main
 - [ ] main <- Jinxian
 - [ ] Andres inventory dejar en local
