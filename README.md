@@ -13,7 +13,7 @@
   - toString
 - [x] Enrique - Implementar TryParse de Product (ProductCommand)
   - NOTA: dejar TryExecute vacio
-- [ ] Andres - Escribir clase Ticket
+- [x] Andres - Escribir clase Ticket
   - constructor
   - getters
   - setters
