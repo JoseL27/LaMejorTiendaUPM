@@ -23,10 +23,10 @@
   
 ## Merges de tareas
 - [ ] Andres: Volver commit del main
-- [ ] Jose <- Enrique
-- [ ] Enrique apaga
-- [ ] Jose <- main
-- [ ] main <- Jose
+- [x] Jose <- Enrique
+- [x] Enrique apaga
+- [x] Jose <- main
+- [x] main <- Jose
 - [ ] Julio <- main
 - [ ] main <- Julio
 - [ ] Jinxian <- main
