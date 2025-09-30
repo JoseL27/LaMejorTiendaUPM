@@ -223,7 +223,7 @@ public class ArrayDataManager implements DataManager {
         System.out.println("Agregar libro");
         int newProdId = 1;
         String newProdName = "Libro POO";
-        Product.Category newProdCateg = Product.Category.LIBRO;
+        Product.Category newProdCateg = Product.Category.BOOK;
         double newProdPrice = 25;
         DataResult status = adm.createProduct(newProdId, newProdName, newProdCateg, newProdPrice);
         System.out.println(adm.readProduct(newProdId));
@@ -284,7 +284,7 @@ public class ArrayDataManager implements DataManager {
         System.out.println("Agregar camiseta");
         newProdId = 2;
         newProdName = "Camiseta talla:M UPM";
-        newProdCateg = Product.Category.ROPA;
+        newProdCateg = Product.Category.CLOTHES;
         newProdPrice = 15;
         status = adm.createProduct(newProdId, newProdName, newProdCateg, newProdPrice);
         System.out.println(adm.readProduct(newProdId));
@@ -352,7 +352,7 @@ public class ArrayDataManager implements DataManager {
         System.out.println("Inserto un libro repetido y lo borro");
         newProdId = 3;
         newProdName = "Libro POO repetido Error";
-        newProdCateg = Product.Category.LIBRO;
+        newProdCateg = Product.Category.BOOK;
         newProdPrice = 25.0;
         status = adm.createProduct(newProdId, newProdName, newProdCateg, newProdPrice);
         System.out.println(adm.readProduct(newProdId));
@@ -405,7 +405,7 @@ public class ArrayDataManager implements DataManager {
         System.out.println("Nuevo ArrayDataManager y lo vamos a llevar");
         adm = new ArrayDataManager();
         for (int i = 1; i <= 200; i++) {
-            adm.createProduct(i, "Objeto", Product.Category.LIBRO, 32);
+            adm.createProduct(i, "Objeto", Product.Category.BOOK, 32);
         }
 
         // Lista de productos

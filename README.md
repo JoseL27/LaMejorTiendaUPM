@@ -29,8 +29,8 @@
 - [x] main <- Jose
 - [x] Julio <- main
 - [x] main <- Julio
-- [ ] Jinxian <- main
-- [ ] main <- Jinxian
+- [x] Jinxian <- main
+- [x] main <- Jinxian
 - [ ] Andres inventory dejar en local
 - [ ] Andres cambio al Ticket
 - [ ] Andres <- main
