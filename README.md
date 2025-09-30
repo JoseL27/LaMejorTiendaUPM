@@ -22,7 +22,7 @@
   - NOTA: dejar TryExecute vacio
   
 ## Merges de tareas
-- [ ] Andres: Volver commit del main
+- [x] Andres: Quitar 'Diseño ...' y 'Inventory.java'
 - [x] Jose <- Enrique
 - [x] Enrique apaga
 - [x] Jose <- main
