@@ -2,105 +2,136 @@ package es.upm.etsisi.poo;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Set;
 
-public class Ticket
-{
-	private final Map <Product, AtomicInteger> cart;
-	private final Map <Product.Category, AtomicInteger> counter;
+public class Ticket {
+	private class ProductInfo implements Comparable<ProductInfo> {
+		Product product;
+		int amount;
 
-	public Ticket ()
-	{
-		cart = new HashMap <Product, AtomicInteger> ( 100 );
-		counter = new HashMap <Product.Category, AtomicInteger> ();
+		public ProductInfo(Product product, int amount) {
+			this.product = product;
+			this.amount = amount;
+		}
+
+		public Product getProduct() { 
+			return this.product;
+		}
+		
+		public int getAmount() { 
+			return this.amount;
+		}
+
+		public void setProduct(Product product) { 
+			this.product = product;
+		}
+		
+		public void incrementAmount(int increment) { 
+			this.amount += increment;
+		}
+
+		@Override
+		public int compareTo(ProductInfo toCompare) {
+			return product.getName().compareTo(toCompare.getProduct().getName());
+		}
 	}
 
-	public boolean addProduct(Product product, int amount)
-	{
-		if ( cart.containsKey ( product ) )
-		{
-			cart.get ( product ).addAndGet ( amount );
-			print ();
-			return true;
+	public static final int TICKET_MAX_PRODUCTS = 100;
+	
+	private ProductInfo[] productInfos;
+	private int count;
+
+	public Ticket() {
+		productInfos = new ProductInfo[TICKET_MAX_PRODUCTS];
+		count = 0;
+	}
+
+	public boolean addProduct(Product product, int amount) {
+		boolean result = false;
+		ProductInfo foundProductInfo = findProductInfo(product.getId());
+			
+		if (foundProductInfo != null) {
+			foundProductInfo.incrementAmount(amount);
+		} else {
+			result = appendProductInfo(new ProductInfo(product, amount));
 		}
-		else if ( amount > 0 )
-		{
-			cart.put ( product, new AtomicInteger ( amount ) );
-			print ();
-			return true;
-		}
-		return false;
+
+		return result;
 	}
 	
-	public boolean removeProduct(Product product)
+	public boolean removeProduct(int id)
 	{
-		if ( cart.containsKey ( product ) )
-		{
-			cart.remove ( product );
-			print ();
+		int foundIndex = productInfoIndex(id);
+		if (foundIndex != -1) {
+			productInfos[foundIndex] = productInfos[count];
+			productInfos[count]	= null;
+			count--;
 			return true;
 		}
 		return false;
 	}
 
-	/*public TicketProduct[] getProducts()
-	{
-		//neccesary?? Nope.
-		return null;
-	}*/
-
-	private void categoryCounter()
-	{
-		for ( Product.Category c : Product.Category.values() )
-		{
-			counter.put ( c, new AtomicInteger ( 0 ) );
+	private int productInfoIndex(int id) {
+		int result = -1;
+		int index = 0;
+		while (result == -1 && index < count) {
+			ProductInfo currentProductInfo = productInfos[index];
+			if (currentProductInfo.getProduct().getId() == id) {
+				result = index;
+			}
+			index++;
 		}
-		for ( Product p : cart.keySet() )
-		{
-			counter.get ( p.category () ).addAndGet ( cart.get ( p ).get() );
-		}
+		return index;
 	}
 
-	public void print ()
-	{
-		final Set <Product> products = cart.keySet();
-		final Product[] productsArray = products.toArray ( new Product[0] );
-		Arrays.sort ( productsArray );
-		categoryCounter ();
-		double total = 0.0;
-		double discount = 0.0;
-		// inicialize counters
+	private ProductInfo findProductInfo(int id) {
+		int index = productInfoIndex(id);
+		return (index != -1) ? productInfos[index] : null;
+	}
 
-		for ( Product p : productsArray )
-		{
-			int amount = cart.get ( p ).get();
-			final double price = p.price ( amount );
-			for ( int i = 0; i < amount; i++ )
-			{
-				System.out.print ( p.toString () );
-				final double disc = p.category().getDiscountPercent();
-				if ( counter.get ( p.category () ).get () >= 2  && disc > 0 )
-				{
-					System.out.print ( "**discount -" + ( disc * 100 ) );
+	private boolean appendProductInfo(ProductInfo productInfo) {
+		if (count + 1 < productInfos.length) {
+			productInfos[count] = productInfo;
+			count++;
+			return true;
+		}
+		return false;
+	}
+
+	public String summaryString()
+	{
+		StringBuilder sb = new StringBuilder();
+
+		int total = 0;
+		int totalDiscount = 0;
+		Arrays.sort(productInfos, 0, count-1);
+
+		for (int productInfoIndex = 0; productInfoIndex < count; productInfoIndex++) {
+			ProductInfo productInfo = productInfos[productInfoIndex];
+			Product product = productInfo.getProduct();
+			
+			float productDiscount = (productInfo.getAmount() > 1) 
+				? productInfo.getAmount() * product.getCategory().getDiscountPercent() : 0;
+
+			total += productInfo.getAmount() * product.getPrice();
+			totalDiscount += productDiscount;
+
+			for (int productCounter = 0; productCounter < productInfo.getAmount(); productCounter++) {
+				sb.append(String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}", 
+										product.getId(), product.getName(), product.getCategory(), product.getPrice()));
+				
+				if (productDiscount > 0) { 
+					sb.append(String.format(" **discount: -%.1f", productDiscount));
 				}
+				sb.append("\n");
 			}
-			if ( counter.get ( p.category() ).get() >= 2 )
-			{
-				discount += price * p.category().getDiscountPercent();
-			}
-			total += price;
 		}
-		System.out.println ( "Total price: " + total );
-		System.out.println ( "Discount: " + discount );
-		System.out.println ( "Final Price: " + ( total - discount ) );
+		
+		sb.append(String.format("Total price: %.1f\n", (float)total));
+		sb.append(String.format("Total discount: %.1f\n", (float)totalDiscount));
+		sb.append(String.format("Final Price: %.1f\n", (float)(total - totalDiscount)));
+		return sb.toString();
 	}
-
-
-	
-	
-	// constructor
-	// getters y setters, esto no es POO, es una chapuza
 }
