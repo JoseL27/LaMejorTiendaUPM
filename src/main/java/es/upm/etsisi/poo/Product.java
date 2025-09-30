@@ -35,11 +35,20 @@ public class Product {
 		}
 	}
 
+	/**
+	 * Enum to reference a product 'Field', meaning a property of a product.
+	 */
 	public enum Field {
 		NAME,
 		CATEGORY,
 		PRICE;
-		
+
+		/**
+		 * Function to get a Field from a string. Used to facilitate parsing.
+		 * Case insesitive match of the enum values name's (Basically Enum.valueOf with .toUpperCase)
+		 * @param label  The string to match against
+		 * @return       A valid Field if the match was successfull or NULL.
+		 */
 		public static Field fromLabel(String label) {
 			Field field = null;
 			try {
