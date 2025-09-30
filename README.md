@@ -20,6 +20,12 @@
   - getProducts()/toString/print()
 - [ ] Andres - Implementar parseo commandos auxiliares de Help, Echo, Exit (HelpCommand)
   - NOTA: dejar TryExecute vacio
+- [ ] Jinxian - Implementar tryParse de TicketCommand
+  - NOTA: dejar tryExecute vacio
+- [ ] Enriquinho - Reunir tests en un main
+- [ ] Julio - Hacer el bucle principal del programa
+- [ ] Andres - Implementar tryExecute de producto
+- [ ] Jose - Implementar tryExecute de ticket
   
 ## Merges de tareas
 - [x] Andres: Quitar 'Diseño ...' y 'Inventory.java'
@@ -41,12 +47,6 @@
 - [ ] Hablar sobre siguientes cosas
 
 ## Mas tarde
-- [ ] Implementar TryParse de Ticket (TicketCommand)
-  - NOTA: dejar TryExecute vacio
-- [ ] Escribir tests basicos (productos se crean y añaden bien, etc)
-- [ ] Escribir bucle principal del programa
-- [ ] Implementar ejecucion de comandos
-- [ ] Implementar descuentos
 - [ ] Mensajes de usuario para los errores
 
 ## Como hacer una tarea
