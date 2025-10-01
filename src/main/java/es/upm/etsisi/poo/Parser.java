@@ -6,7 +6,7 @@ package es.upm.etsisi.poo;
  */
 public class Parser {
     private String[] commands;
-    private String texto;
+    private String text;
 
     /**
      * Esta función elimina todos los espacios repetidos y crea el String array de la longitud máxima
@@ -26,11 +26,11 @@ public class Parser {
     }
 
     private void auxParser(String command) {
-        texto = command.trim().replaceAll(" +", " ");     //Elimina espacios
+        text = command.trim().replaceAll(" +", " ");     //Elimina espacios
         int i = 0;
         boolean comillas = false;
-        for (int j = 0; j < texto.length(); j++) {
-            char ch = texto.charAt(j);
+        for (int j = 0; j < text.length(); j++) {
+            char ch = text.charAt(j);
             if (ch == ' ' && !comillas) {
                 i++;
                 commands[i] = "";
@@ -43,7 +43,7 @@ public class Parser {
     }
 
     /**
-     * Adapta el tamaño del array al necesario
+     * Changes the size of the array accordingly
      */
     private void cutter() {
         int i = 0;
@@ -58,24 +58,25 @@ public class Parser {
     }
 
 
-    /**
-     * This getter returns the full array of commands.
-     */
-    public String[] getCommands() {
-        return commands;
-    }
+    // /**
+    //  * This getter returns the full array of commands.
+    //  */
+    // public String[] getCommands() {
+    //     return commands;
+    // }
 
     /**
      * This getter returns one command of the array.
      */
     public String getCommand(int i) {
-        String resul = "Error, estas fuera del array";
+        String resul = null;
         if (i > -1 && i < commands.length) {
             resul = commands[i];
         }
         return resul;
     }
-    public int getLenght() {
+	
+    public int getLength() {
         return commands.length;
     }
 

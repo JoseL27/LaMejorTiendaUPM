@@ -13,7 +13,7 @@
   - toString
 - [x] Enrique - Implementar TryParse de Product (ProductCommand)
   - NOTA: dejar TryExecute vacio
-- [ ] Andres - Escribir clase Ticket
+- [x] Andres - Escribir clase Ticket (hecha todos)
   - constructor
   - getters
   - setters
@@ -22,7 +22,7 @@
   - NOTA: dejar TryExecute vacio
 - [ ] Jinxian - Implementar tryParse de TicketCommand
   - NOTA: dejar tryExecute vacio
-- [ ] Enriquinho - Reunir tests en un main
+- [ ] Enrique - Configurar y reunir test en JUNIT
 - [ ] Julio - Hacer el bucle principal del programa
 - [ ] Andres - Implementar tryExecute de producto
 - [ ] Jose - Implementar tryExecute de ticket
@@ -41,10 +41,7 @@
 - [x] Andres cambio al Ticket
 - [x] Andres <- main
 - [x] main <- Andres
-- [ ] Actualizar todos los inputs en main
-- [ ] Reunir tests en un main
-- [ ] Pensar JUNIT
-- [ ] Hablar sobre siguientes cosas
+- [x] Actualizar todos los inputs en main
 
 ## Mas tarde
 - [ ] Mensajes de usuario para los errores

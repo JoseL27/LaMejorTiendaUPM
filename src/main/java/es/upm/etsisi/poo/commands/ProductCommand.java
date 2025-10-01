@@ -3,6 +3,7 @@ import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.Product;
 import es.upm.etsisi.poo.ParseResult;
 import es.upm.etsisi.poo.Utils;
+import es.upm.etsisi.poo.Parser;
 
 /**
  *  ProductCommand class that parses a stream of tokens into a specific ProductCommand,
@@ -109,24 +110,24 @@ public class ProductCommand extends Command {
 	}
 
 	/**
-	 * First entry point to parse 'product' command (assumes the tokens[0] is 'product')
+	 * First entry point to parse 'product' command (assumes the parser.getCommand(0) is 'product')
 	 * Is responsible for parsing the 'subcommand' and dispatching to the corresponding one.
-	 * @param tokens The stream of tokens to parse
+	 * @param parser The stream of tokens to parse
 	 * @return       The result of the parse. Either a valid ProductCommand instance or a failure code.
 	 * @see ParseResult
 	 */
-	public static ParseResult TryParse(String[] tokens) {
-		if (tokens.length < 2)
+	public static ParseResult tryParse(Parser parser) {
+		if (parser.getLength() < 2)
 			return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
 
-		SubCommand subCommand = SubCommand.fromLabel(tokens[1]);
+		SubCommand subCommand = SubCommand.fromLabel(parser.getCommand(1));
 		if (subCommand == null) return new ParseResult(ParseResult.Code.INVALID_SUB_COMMAND);
 
 		ParseResult result = switch (subCommand) {
-		case ADD	-> tryParseAdd(tokens);
-		case LIST	-> tryParseList(tokens);
-		case UPDATE -> tryParseUpdate(tokens);
-		case REMOVE -> tryParseRemove(tokens);
+		case ADD	-> tryParseAdd(parser);
+		case LIST	-> tryParseList(parser);
+		case UPDATE -> tryParseUpdate(parser);
+		case REMOVE -> tryParseRemove(parser);
 		};
 		return result;
 	}
@@ -135,27 +136,27 @@ public class ProductCommand extends Command {
 	 * Parses the 'add' variation of the 'product' command.
 	 * The function parses each field sequentially and short circuits if any fail.
 	 * FORMAT: prod add <id> "<nombre>" <categoria> <precio>
-	 * @param tokens The stream of tokens to parse
+	 * @param parser The stream of tokens to parse
 	 * @return       The result of the parse. If every parse succedes a valid ProductCommand Add instance
 	 *               specifiying productId, productName, productCategory and productPrice,
 	 *               OR a failure code specifying which parse went wrong.
 	 * @see ParseResult
 	 */
-	public static ParseResult tryParseAdd(String[] tokens) {
-		if (tokens.length < 6) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+	public static ParseResult tryParseAdd(Parser parser) {
+		if (parser.getLength() < 6) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
 
- 		Integer id = Utils.tryParseInt(tokens[2]);
+ 		Integer id = Utils.tryParseInt(parser.getCommand(2));
 		if (id == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
 
-		String name = tokens[3];
+		String name = parser.getCommand(3);
 
-		Product.Category category = Product.Category.fromLabel(tokens[4]);
+		Product.Category category = Product.Category.fromLabel(parser.getCommand(4));
 		if (category == null) return new ParseResult(ParseResult.Code.INVALID_CATEGORY);
 
- 		Integer price = Utils.tryParseInt(tokens[5]);
+ 		Integer price = Utils.tryParseInt(parser.getCommand(5));
 		if (price == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
 
-		if (tokens.length > 6) {
+		if (parser.getLength() > 6) {
 			System.out.println("DEBUG: Excess arguments unimplemented");
 		}
 
@@ -167,14 +168,14 @@ public class ProductCommand extends Command {
 	 * This function does not actual parsing besides checking the number of arguments and
 	 * creating a proper ProductCommand List instance.
 	 * FORMAT: prod list 
-	 * @param tokens The stream of tokens to parse.
+	 * @param parser The stream of tokens to parse.
 	 * @return       The result of the parse. If the amount of tokens is 2 then a valid
 	 *               ProductCommand List instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS.
 	 */
-	public static ParseResult tryParseList(String[] tokens) {
-		if (tokens.length < 2) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+	public static ParseResult tryParseList(Parser parser) {
+		if (parser.getLength() < 2) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
 
-		if (tokens.length > 2) {
+		if (parser.getLength() > 2) {
 			System.out.println("DEBUG: Excess arguments unimplemented");
 		}
 		
@@ -186,7 +187,7 @@ public class ProductCommand extends Command {
 	 * The function parses 'id' and 'field' sequential  and short circuits if any fail. Then, according to
 	 * the Product.Field the 'valor' token is parsed accordingly (either String, Product.Category or Integer). 
 	 * FORMAT: prod update <id> campo valor (campos: nombre|categoria|precio)
-	 * @param tokens The stream of tokens to parse
+	 * @param parser The stream of tokens to parse
 	 * @return       The result of the parse. If every parse succedes a valid ProductCommand Update instance
 	 *               specifiying productId and productField as well as the value to the field specified
 	 *               (productName if Field is String; productCategory if Field is Product.Category and productPrice if field is Integer)
@@ -194,13 +195,13 @@ public class ProductCommand extends Command {
 	 * @see ParseResult
 	 * @see Product.Field
 	 */		
-	public static ParseResult tryParseUpdate(String[] tokens) {
-		if (tokens.length < 5) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+	public static ParseResult tryParseUpdate(Parser parser) {
+		if (parser.getLength() < 5) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
 		
- 		Integer id = Utils.tryParseInt(tokens[2]);
+ 		Integer id = Utils.tryParseInt(parser.getCommand(2));
 		if (id == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
 
-		Product.Field field = Product.Field.fromLabel(tokens[3]);
+		Product.Field field = Product.Field.fromLabel(parser.getCommand(3));
 		if (field == null) return new ParseResult(ParseResult.Code.INVALID_PRODUCT_FIELD);
 
 		String name = null;
@@ -209,19 +210,19 @@ public class ProductCommand extends Command {
 
 		switch (field) {
 		case Product.Field.NAME: {
-			name = tokens[4];
+			name = parser.getCommand(4);
 		} break;
 		case Product.Field.CATEGORY: {
-			category = Product.Category.fromLabel(tokens[4]);
+			category = Product.Category.fromLabel(parser.getCommand(4));
 			if (category == null) return new ParseResult(ParseResult.Code.INVALID_CATEGORY);
 		} break;
 		case Product.Field.PRICE: {
-			price = Utils.tryParseInt(tokens[4]);
+			price = Utils.tryParseInt(parser.getCommand(4));
 			if (price == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
 		} break;
 		}
 		
-		if (tokens.length > 5) {
+		if (parser.getLength() > 5) {
 			System.out.println("DEBUG: Excess arguments unimplemented");
 		}
 		
@@ -232,18 +233,18 @@ public class ProductCommand extends Command {
 	 * Parses the 'remove' variation of the 'product' command.
 	 * The function only parses and 'id'.
 	 * FORMAT: prod remove <id>
-	 * @param tokens The stream of tokens to parse
+	 * @param parser The stream of tokens to parse
 	 * @return       The result of the parse. If the amount of tokens is 3 and the 'id' parse succedes then a valid
 	 *               ProductCommand Remove instance OR a failure code with the corresponding error code.
 	 */		
-	public static ParseResult tryParseRemove(String[] tokens) {
-		if (tokens.length < 3) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+	public static ParseResult tryParseRemove(Parser parser) {
+		if (parser.getLength() < 3) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
 
-		if (tokens.length > 3) {
+		if (parser.getLength() > 3) {
 			System.out.println("DEBUG: Excess arguments unimplemented");
 		}
 
- 		Integer id = Utils.tryParseInt(tokens[2]);
+ 		Integer id = Utils.tryParseInt(parser.getCommand(2));
 		if (id == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
 
 		return new ParseResult(new ProductCommand(SubCommand.REMOVE, id, null, null, 0));
@@ -264,24 +265,24 @@ public class ProductCommand extends Command {
 	 * Basic main for tests. Checks each test and prints the result.
 	 */
 	public static void main(String[] args) {
-		String[][] tests = {
-			{ "prod" },
-			{ "prod", "add", "1", "Libro POO", "BOOK", "25" },
-			{ "prod", "add", "2", "Camiseta talla:M UPM", "CLOTHES", "15" },
-			{ "prod", "list" },
-			{ "prod", "update", "1", "NAME", "Libro POO V2" },
-			{ "prod", "update", "1", "PRICE", "30" },
-			{ "prod", "add", "3", "Libro POO repetido Error", "BOOK", "25" },
-			{ "prod", "remove", "3" },
-		};
+		// String[][] tests = {
+		// 	{ "prod" },
+		// 	{ "prod", "add", "1", "Libro POO", "BOOK", "25" },
+		// 	{ "prod", "add", "2", "Camiseta talla:M UPM", "CLOTHES", "15" },
+		// 	{ "prod", "list" },
+		// 	{ "prod", "update", "1", "NAME", "Libro POO V2" },
+		// 	{ "prod", "update", "1", "PRICE", "30" },
+		// 	{ "prod", "add", "3", "Libro POO repetido Error", "BOOK", "25" },
+		// 	{ "prod", "remove", "3" },
+		// };
 
-		for (int testIndex = 0; testIndex < tests.length; testIndex++) { 
-			String[] testTokens = tests[testIndex];
-			System.out.printf("TEST #%d\n", testIndex);
-			System.out.printf("\tinput: %s\n", Utils.arrayToString(testTokens));
+		// for (int testIndex = 0; testIndex < tests.length; testIndex++) { 
+		// 	String[] testTokens = tests[testIndex];
+		// 	System.out.printf("TEST #%d\n", testIndex);
+		// 	System.out.printf("\tinput: %s\n", Utils.arrayToString(testTokens));
 
-			ParseResult result = TryParse(testTokens);
-			System.out.printf("\tresult: %s\n", result);
-		}
+		// 	ParseResult result = TryParse(testTokens);
+		// 	System.out.printf("\tresult: %s\n", result);
+		// }
 	}
 }
