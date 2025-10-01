@@ -57,6 +57,33 @@ public class TicketCommand {
     }
 
     public Command.ExecuteResult tryExecute(){
+        Command.ExecuteResult result = null;
+
+        switch (this.subCommand){
+            case NEW -> result = tryExecuteNew();
+            case ADD -> result = tryExecuteAdd();
+            case REMOVE -> result = tryExecuteRemove();
+            case PRINT -> result = tryExecutePrint();
+        }
+
+        return result;
+    }
+
+    private Command.ExecuteResult tryExecuteNew(){
+        // Completar cuando tengamos hecho el uso del ticket en la aplicacion
+        return null;
+    }
+
+    private Command.ExecuteResult tryExecuteAdd(){
+        return null;
+    }
+
+
+    private Command.ExecuteResult tryExecuteRemove(){
+        return null;
+    }
+
+    private Command.ExecuteResult tryExecutePrint(){
         return null;
     }
 }
