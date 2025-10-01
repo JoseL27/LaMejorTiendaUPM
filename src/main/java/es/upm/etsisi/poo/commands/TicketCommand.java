@@ -2,6 +2,7 @@ package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.ParseResult;
+import es.upm.etsisi.poo.Parser;
 
 /**
  * Represents a command that falls under the ticket category, being those:
@@ -51,7 +52,7 @@ public class TicketCommand {
      */
     private int quantity;
 
-    public static ParseResult tryParse(String[] tokens){
+    public static ParseResult tryParse(Parser parser){
         return null;
     }
 
