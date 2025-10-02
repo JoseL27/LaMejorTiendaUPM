@@ -13,7 +13,7 @@ public class CommandTest {
 
 	// Succes
 	@Test
-	void Test() {
+	void productAddTest() {
 		ParseResult result = Command.tryParse(new Parser("prod add 1 \"Libro POO\" BOOK 25"));
 		ProductCommand expectedCmd = new ProductCommand(ProductCommand.SubCommand.ADD, 1, "Libro POO", Product.Category.BOOK, 25);
 		assertEquals(result, new ParseResult(expectedCmd));

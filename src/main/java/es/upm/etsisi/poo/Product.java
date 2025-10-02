@@ -131,4 +131,15 @@ public class Product {
 	public void setPrice(double price) {
 		this.price = price;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || this.getClass() != obj.getClass()) return false;
+
+		Product otherProd = (Product)obj;
+		return this.id == otherProd.id
+			&& Utils.nullOrEquals(this.name, otherProd.name)
+			&& Utils.nullOrEquals(this.category, otherProd.category)
+			&& this.price == otherProd.price;
+	}
 }
