@@ -21,7 +21,7 @@ public class ProductCommand extends Command {
 	/**
 	 * SubCommand enum describing the exiting sub commands to a product command
 	 */
-	enum SubCommand {
+	public enum SubCommand {
 		ADD,	  
 		LIST,  
 		UPDATE,
@@ -261,28 +261,15 @@ public class ProductCommand extends Command {
 							 this.subCommand, this.productId, this.productName, this.productCategory, this.productPrice);
 	}
 
-	/**
-	 * Basic main for tests. Checks each test and prints the result.
-	 */
-	public static void main(String[] args) {
-		// String[][] tests = {
-		// 	{ "prod" },
-		// 	{ "prod", "add", "1", "Libro POO", "BOOK", "25" },
-		// 	{ "prod", "add", "2", "Camiseta talla:M UPM", "CLOTHES", "15" },
-		// 	{ "prod", "list" },
-		// 	{ "prod", "update", "1", "NAME", "Libro POO V2" },
-		// 	{ "prod", "update", "1", "PRICE", "30" },
-		// 	{ "prod", "add", "3", "Libro POO repetido Error", "BOOK", "25" },
-		// 	{ "prod", "remove", "3" },
-		// };
-
-		// for (int testIndex = 0; testIndex < tests.length; testIndex++) { 
-		// 	String[] testTokens = tests[testIndex];
-		// 	System.out.printf("TEST #%d\n", testIndex);
-		// 	System.out.printf("\tinput: %s\n", Utils.arrayToString(testTokens));
-
-		// 	ParseResult result = TryParse(testTokens);
-		// 	System.out.printf("\tresult: %s\n", result);
-		// }
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || (obj.getClass() != this.getClass())) return false;
+		ProductCommand otherProdCmd = (ProductCommand)obj;
+		
+		return Utils.nullOrEquals(this.subCommand, otherProdCmd.subCommand) 
+			&& Utils.nullOrEquals(this.productName, otherProdCmd.productName)
+			&& this.productId == otherProdCmd.productId
+			&& this.productCategory == otherProdCmd.productCategory
+			&& this.productPrice == otherProdCmd.productPrice;		
 	}
 }
