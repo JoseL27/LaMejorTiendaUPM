@@ -4,10 +4,13 @@ import es.upm.etsisi.poo.commands.ProductCommand;
 
 public class Command {
 	public enum ExecuteResult {
+		SUCCESS,
 		INVALID_ID,
 		INVALID_QUANTITY,
 		PRODUCT_NOT_IN_STORAGE,
-		PRODUCT_NOT_IN_TICKET
+		PRODUCT_NOT_IN_TICKET,
+		DATA_ERROR,
+		TICKET_DOES_NOT_EXIST
 	}
 
 	/**
