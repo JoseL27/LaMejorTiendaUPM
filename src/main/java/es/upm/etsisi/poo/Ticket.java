@@ -6,7 +6,19 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Set;
 
+/**
+ * Ticket class to manage an application ticket which consists of a product list with amounts.
+ * 
+ * @author Enrique Rocha - 03/10
+ * @see Product
+ */
 public class Ticket {
+
+	/**
+	 * ProductInfo struct-like holder as a Product-amount pair.
+	 * Has basic constructors and getters.
+	 * Implements 'Comparable' class to alfabetically order products as in the requirement document.
+	 */
 	private class ProductInfo implements Comparable<ProductInfo> {
 		private Product product;
 		private int amount;
@@ -38,18 +50,48 @@ public class Ticket {
 		}
 	}
 
+	/**
+	 * Max amount of products allowed in the Ticket, as the requirement documents specifies.
+	 */
 	public static final int TICKET_MAX_PRODUCTS = 100;
-	
+
+	/**
+	 * The current products the ticket holds. static array of products-amount pairs.
+	 * Has a fixed size of 'TICKET_MAX_PRODUCTS' and holds 'count' product infos.
+	 */
 	private ProductInfo[] productInfos;
+
+	/**
+	 * The count of product infos to manage the static array.
+	 */
 	private int count;
 
+	/**
+	 * Basic constructor
+	 */
 	public Ticket() {
 		productInfos = new ProductInfo[TICKET_MAX_PRODUCTS];
 		count = 0;
 	}
 
+
+	/**
+	 * Adds a product asociated to an amount to the ticket. Too things may happen:
+	 * Checks if the product allready exists 
+	 *  - If the product does not exist it will be added by appendProductInfo
+	 *    which will check if the current 'count' is less than the 'TICKET_MAX_PRODUCTS'.
+	 *  - If the product exists (equality is checked by id) its amount is incremented
+	 *
+	 * @param product  the product to add or increment
+	 * @param amount   the amount to increment
+	 * @return         false if the product was attempted to be added and TICKET_MAX_PRODUCTS was hit.
+	 *
+	 * @see findProductInfo
+	 * @see appendProductInfo
+	 */
 	public boolean addProduct(Product product, int amount) {
 		boolean result = false;
+
 		ProductInfo foundProductInfo = findProductInfo(product.getId());
 			
 		if (foundProductInfo != null) {
@@ -60,7 +102,19 @@ public class Ticket {
 
 		return result;
 	}
-	
+
+	/**
+	 * Search and remove the product with the corresponding id. 
+	 * 
+	 * Lookup is standard linear search and actual removal is O(1) due to
+	 * unordered removal (replaces element to remove with the last element).
+	 * 
+	 * @param id  the id of the product to attempt to remove
+	 * @return    true if the product was removed and false if it was not found
+	 *
+	 * @note Lookup could be optimized after calling 'printList' which
+	 * sorts the products array
+	 */
 	public boolean removeProduct(int id) {
 		int foundIndex = productInfoIndex(id);
 		if (foundIndex != -1) {
@@ -72,33 +126,21 @@ public class Ticket {
 		return false;
 	}
 
-	private int productInfoIndex(int id) {
-		int result = -1;
-		int index = 0;
-		while (result == -1 && index < count) {
-			ProductInfo currentProductInfo = productInfos[index];
-			if (currentProductInfo.getProduct().getId() == id) {
-				result = index;
-			}
-			index++;
-		}
-		return index;
-	}
 
-	private ProductInfo findProductInfo(int id) {
-		int index = productInfoIndex(id);
-		return (index != -1) ? productInfos[index] : null;
-	}
-
-	private boolean appendProductInfo(ProductInfo productInfo) {
-		if (count + 1 < productInfos.length) {
-			productInfos[count] = productInfo;
-			count++;
-			return true;
-		}
-		return false;
-	}
-
+	/**
+	 * Get a summary string of the current ticket products associated with an amount and discount.
+	 * Sorts the productInfos array on product name string comparison (alfabetically).
+	 * 
+	 * @return a summary string according to the requirements document
+	 *
+	 * Example:
+	 * $ ticket add 1 2
+	 * {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
+	 * {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
+	 * Total price: 60.0
+	 * Total discount: 6.0
+	 * Final Price: 54.0
+	*/
 	public String summaryString()
 	{
 		StringBuilder sb = new StringBuilder();
@@ -134,11 +176,52 @@ public class Ticket {
 		return sb.toString();
 	}
 
-	public static void main(String[] args) {
-		Ticket ticket = new Ticket();
-		ticket.addProduct(new Product(1, "Libro POO V2", Product.Category.BOOK, 30), 2);
-		ticket.addProduct(new Product(2, "Camiseta talla:M UPM", Product.Category.CLOTHES, 15), 1);
 
-		System.out.println(ticket.summaryString());
+	/**
+	 * Helper to find the index of a product info in the array.
+	 * Standard linear search.
+	 *
+	 * @param id   the id of the product to search for
+	 * @return     the index of the product info in the array or -1 if it wasn't found
+	 */
+	private int productInfoIndex(int id) {
+		int result = -1;
+		int index = 0;
+		while (result == -1 && index < count) {
+			ProductInfo currentProductInfo = productInfos[index];
+			if (currentProductInfo.getProduct().getId() == id) {
+				result = index;
+			}
+			index++;
+		}
+		return index;
 	}
+
+	/**
+	 * Helper to get a productInfo in the product info array.
+	 *
+	 * @param id   the id of the product to search for
+	 * @return     the product info in the array or null if it wasn't found
+	 * @see findProductInfo
+	 */
+	private ProductInfo findProductInfo(int id) {
+		int index = productInfoIndex(id);
+		return (index != -1) ? productInfos[index] : null;
+	}
+
+	/**
+	 * Helper to get a append a productInfo in the product info array.
+	 * Standard array append checking the max length
+	 *
+	 * @param productInfo   the productInfo to add at the end
+	 * @return              false if 'count == productInfos.length'
+	 */
+	private boolean appendProductInfo(ProductInfo productInfo) {
+		if (count + 1 < productInfos.length) {
+			productInfos[count] = productInfo;
+			count++;
+			return true;
+		}
+		return false;
+	}	
 }
