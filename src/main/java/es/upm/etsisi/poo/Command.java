@@ -1,5 +1,7 @@
 package es.upm.etsisi.poo;
 
+import es.upm.etsisi.poo.commands.EchoCommand;
+import es.upm.etsisi.poo.commands.HelpCommand;
 import es.upm.etsisi.poo.commands.ProductCommand;
 
 public class Command {
@@ -35,18 +37,15 @@ public class Command {
 					result = new ParseResult(ParseResult.Code.SUCCESS);
 					break;
 				case "help":
-					//result = HelpCommand.tryParse(parser);
-
+					result = new ParseResult(new HelpCommand());
 					//Provisional for tests
 					System.out.println("HelpCommand called");
-					result = new ParseResult(ParseResult.Code.SUCCESS);
 					break;
 				case "echo":
-					//result = EchoCommand.tryParse(parser);
+					result = new ParseResult(new EchoCommand(parser.getCommand(1)));
 
 					//Provisional for tests
 					System.out.println("EchoCommand called");
-					result = new ParseResult(ParseResult.Code.SUCCESS);
 					break;
 				case "exit":
 					//result = ExitCommand.tryParse(parser);

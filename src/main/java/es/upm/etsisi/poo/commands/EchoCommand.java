@@ -2,7 +2,7 @@ package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.Command;
 
-public class EchoCommand {
+public class EchoCommand extends Command{
     private final String message;
 
     public EchoCommand (String message)
