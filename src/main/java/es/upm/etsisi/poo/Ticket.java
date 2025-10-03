@@ -8,8 +8,8 @@ import java.util.Set;
 
 public class Ticket {
 	private class ProductInfo implements Comparable<ProductInfo> {
-		Product product;
-		int amount;
+		private Product product;
+		private int amount;
 
 		public ProductInfo(Product product, int amount) {
 			this.product = product;
@@ -33,8 +33,8 @@ public class Ticket {
 		}
 
 		@Override
-		public int compareTo(ProductInfo toCompare) {
-			return product.getName().compareTo(toCompare.getProduct().getName());
+		public int compareTo(ProductInfo other) {
+			return this.product.getName().compareTo(other.product.getName());
 		}
 	}
 
@@ -61,8 +61,7 @@ public class Ticket {
 		return result;
 	}
 	
-	public boolean removeProduct(int id)
-	{
+	public boolean removeProduct(int id) {
 		int foundIndex = productInfoIndex(id);
 		if (foundIndex != -1) {
 			productInfos[foundIndex] = productInfos[count];
@@ -104,34 +103,42 @@ public class Ticket {
 	{
 		StringBuilder sb = new StringBuilder();
 
-		int total = 0;
-		int totalDiscount = 0;
-		Arrays.sort(productInfos, 0, count-1);
+		double totalPrice = 0;
+		double totalDiscount = 0;
+		Arrays.sort(productInfos, 0, count);
 
 		for (int productInfoIndex = 0; productInfoIndex < count; productInfoIndex++) {
 			ProductInfo productInfo = productInfos[productInfoIndex];
 			Product product = productInfo.getProduct();
 			
-			float productDiscount = (productInfo.getAmount() > 1) 
-				? productInfo.getAmount() * product.getCategory().getDiscountPercent() : 0;
+			totalPrice += productInfo.getAmount() * product.getPrice();
 
-			total += productInfo.getAmount() * product.getPrice();
-			totalDiscount += productDiscount;
+			boolean hasDiscount = productInfo.getAmount() > 1;
 
 			for (int productCounter = 0; productCounter < productInfo.getAmount(); productCounter++) {
 				sb.append(String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}", 
 										product.getId(), product.getName(), product.getCategory(), product.getPrice()));
 				
-				if (productDiscount > 0) { 
-					sb.append(String.format(" **discount: -%.1f", productDiscount));
+				if (hasDiscount) {
+					double productDiscount = product.getPrice() * product.getCategory().getDiscountPercent();
+					totalDiscount += productDiscount;
+					sb.append(String.format(" **discount -%.1f", productDiscount));
 				}
 				sb.append("\n");
 			}
 		}
 		
-		sb.append(String.format("Total price: %.1f\n", (float)total));
+		sb.append(String.format("Total price: %.1f\n", (float)totalPrice));
 		sb.append(String.format("Total discount: %.1f\n", (float)totalDiscount));
-		sb.append(String.format("Final Price: %.1f\n", (float)(total - totalDiscount)));
+		sb.append(String.format("Final Price: %.1f\n", (float)(totalPrice - totalDiscount)));
 		return sb.toString();
+	}
+
+	public static void main(String[] args) {
+		Ticket ticket = new Ticket();
+		ticket.addProduct(new Product(1, "Libro POO V2", Product.Category.BOOK, 30), 2);
+		ticket.addProduct(new Product(2, "Camiseta talla:M UPM", Product.Category.CLOTHES, 15), 1);
+
+		System.out.println(ticket.summaryString());
 	}
 }
