@@ -1,15 +1,17 @@
-public class EchoCommand ()
-{
-private final String message
+package es.upm.etsisi.poo.commands;
 
-public EchoCommand (String message)
-{
-this.message = message;
-}
+import es.upm.etsisi.poo.Command;
 
-public TryExec ()
-{
- /*if ( message.isEmpty () )
+public class EchoCommand {
+    private final String message;
+
+    public EchoCommand (String message)
+    {
+        this.message = message;
+    }
+
+    public Command.ExecuteResult tryExecute() {
+        /*if ( message.isEmpty () )
         {
             System.err.println ( "Error: echo command requires text to echo" );
         }
@@ -17,6 +19,7 @@ public TryExec ()
         {
             //System.out.println ( "echo" + text );
         }*/
-}
+        return null;
+    }
 
 }
