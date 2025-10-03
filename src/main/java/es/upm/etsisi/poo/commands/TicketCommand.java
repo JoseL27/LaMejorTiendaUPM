@@ -81,18 +81,18 @@ public class TicketCommand {
         return Command.ExecuteResult.SUCCESS;
     }
 
-    private Command.ExecuteResult tryExecuteAdd(Ticket ticket){
+    private Command.ExecuteResult tryExecuteAdd(Ticket ticket) {
         Command.ExecuteResult result = null;
-        if (!isValidId(this.prodId)){ // Use the one from DataManager when it is public
-            return Command.ExecuteResult.INVALID_ID;
-        }
-        if (!isValidQuantity(this.quantity)){
-            return Command.ExecuteResult.INVALID_QUANTITY;
-        }
+        if (!isValidId(this.prodId)) { // Use the one from DataManager when it is public
+            result = Command.ExecuteResult.INVALID_ID;
+        } else if (!isValidQuantity(this.quantity)) {
+            result = Command.ExecuteResult.INVALID_QUANTITY;
+        } else{
         // Get product from dataManager
         // if product == null result = PRODUCT_NOT_IN_STORAGE
         //else if !ticket.addProduct(product, this.quantity) result = DATA_ERROR
         //else result = SUCCESS
+        }
         return result;
     }
 
