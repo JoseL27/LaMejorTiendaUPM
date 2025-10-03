@@ -1,7 +1,7 @@
 package es.upm.etsisi.poo;
 
 public interface DataManager {
-	enum DataResult {
+	public enum DataResult {
 		SUCCESS,
 		INVALID_NAME,
 		INVALID_ID,

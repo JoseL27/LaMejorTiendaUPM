@@ -38,4 +38,8 @@ public class Utils {
 			return value;
 		}
 	}
+
+	public static boolean nullOrEquals(Object a, Object b) {
+		return (a == b) || (a != null && a.equals(b));
+	}
 }
