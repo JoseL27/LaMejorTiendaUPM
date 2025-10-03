@@ -40,12 +40,12 @@ public class ArrayDataManager implements DataManager {
     }
 
     /**
-     * Check if given price is valid (priceToCheck >= 0)
+     * Check if given price is valid (priceToCheck > 0)
      * @param priceToCheck Price double to check
      * @return true if valid, otherwise return false
      */
     private boolean isValidPrice(double priceToCheck) {
-        return priceToCheck >= 0;
+        return priceToCheck > 0;
     }
 
     /**
@@ -92,7 +92,7 @@ public class ArrayDataManager implements DataManager {
      * @return DataResult enum: SUCCESS, INVALID_ID, INVALID_NAME, INVALID_PRICE, INVALID_CATEGORY, INVENTORY_FULL, PRODUCT_ALREADY_EXISTS
      */
     public DataResult createProduct(int id, String name, Product.Category category, double price) {
-        // Sanity checks: ID >= 0, name.length < 100, price >= 0
+        // Sanity checks: ID >= 0, name.length < 100, price > 0
         if (!isValidId(id)) return DataResult.INVALID_ID;
         if (!isValidName(name)) return DataResult.INVALID_NAME;
         if (!isValidPrice(price)) return DataResult.INVALID_PRICE;
@@ -143,7 +143,7 @@ public class ArrayDataManager implements DataManager {
      * @return DataResult enum: SUCCESS, INVALID_ID, INVALID_PRICE, PRODUCT_NOT_FOUND
      */
     public DataResult updateProductPrice(int id, double price) {
-        // Sanity checks: ID >= 0, price >= 0
+        // Sanity checks: ID >= 0, price > 0
         if (!isValidId(id)) return DataResult.INVALID_ID;
         if (!isValidPrice(price)) return DataResult.INVALID_PRICE;
 
