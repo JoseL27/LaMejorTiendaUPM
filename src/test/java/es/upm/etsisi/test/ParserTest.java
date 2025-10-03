@@ -1,4 +1,4 @@
-package es.upm.etsisi.poo.test;
+package es.upm.etsisi.test;
 
 import es.upm.etsisi.poo.Parser;
 

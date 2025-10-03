@@ -1,4 +1,4 @@
-package es.upm.etsisi.poo.test.commands;
+package es.upm.etsisi.test.commands;
 
 import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.Product;
