@@ -250,9 +250,58 @@ public class ProductCommand extends Command {
 		return new ParseResult(new ProductCommand(SubCommand.REMOVE, id, null, null, 0));
 	} 
 
-	public Command.ExecuteResult TryExecute() {
-		System.out.println("ProductCommand.TryExecute() UNIMPLEMENTED");
-		return null;
+	/**
+	 * Attempts to execute a product-related command on the given store and ticket.
+	 * <p>
+	 * Supported subcommands include:
+	 * <ul>
+	 *   <li>ADD: Adds a new product to the store.</li>
+	 *   <li>LIST: Lists all products currently in the store.</li>
+	 *   <li>UPDATE: Updates a specific field (name, category, or price) of an existing product.</li>
+	 *   <li>REMOVE: Removes a product from the store.</li>
+	 * </ul>
+	 * The specific action performed depends on the value of {@code this.subCommand}.
+	 * 
+	 * @param store  the {@link ArrayDataManager} representing the store's data manager
+	 * @param ticket the {@link Ticket} associated with the command execution (may be used for logging or tracking)
+	 * @return a {@link Command.ExecuteResult} indicating the outcome of the command execution
+	 */
+	public Command.ExecuteResult TryExecute( ArrayDataManager store, Ticket ticket) {
+
+		//System.out.println("ProductCommand.TryExecute() UNIMPLEMENTED");
+		final DataResult result;
+		switch (this.subCommand) {
+		case ADD:
+			// Add product to the store
+			result = store.addProduct(this.productId, this.productName, this.productCategory, this.productPrice);
+			break;
+		case LIST:
+			// List products in the store
+			final Product[] products = store.listProducts();
+			if (products == null) {
+				System.out.println("");
+			} else {
+				System.out.println("ID\tNOMBRE\tCATEGORIA\tPRECIO");
+				for (Product p : products) {
+					System.out.println(p.toString());
+				}
+			}
+			result = new DataResult(DataResult.Code.SUCCESS);
+			break;
+		case UPDATE:
+			// Update product in the store
+			result = switch (this.productField) {
+			case NAME -> store.updateProductName(this.productId, this.productName);
+			case CATEGORY -> store.updateProductCategory(this.productId, this.productCategory);
+			case PRICE -> store.updateProductPrice(this.productId, this.productPrice);
+			};
+			break;
+		case REMOVE:
+			// Remove product from the store
+			ticket.removeProduct(this.productId); // Remove product from the ticket as well
+			result = store.removeProduct(this.productId);
+			break;
+		return result;
 	}
 
 	@Override
