@@ -1,10 +1,6 @@
 package es.upm.etsisi.poo;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.Set;
 
 /**
  * Ticket class to manage an application ticket which consists of a product list with amounts.

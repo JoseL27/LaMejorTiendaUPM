@@ -1,19 +1,16 @@
 package es.upm.etsisi.poo;
-//Hablar cual de las dos opciones prefieren implementar para recibir el comando
 
 /**
- * This class function is to parse the command received in different position of the array
+ * This class function is to parse the command received in different position of an array.
  */
 public class Parser {
     private String[] commands;
     private String text;
 
     /**
-     * Esta función elimina todos los espacios repetidos y crea el String array de la longitud máxima
-     * de la cadena recibida, para ello va caracter a caracter, si es un espacio aumenta la posición en
-     * la que debe guardarse, si hay comillas, no se aumenta este espacio hasta que se cierran
-     *
-     * @param command
+     * Builder that initializes commands, with the length of the imput.
+     * It makes some modifications in order to adapt the object
+     * @param command Input of the terminal
      */
     public Parser(String command) {
         int n = command.length();
@@ -25,6 +22,12 @@ public class Parser {
         cutter();
     }
 
+    /**
+     * This private function is called by the builder, it deletes all the extra spaces in command.
+     * Then for each character is added to a position of the array which grows with spaces. If " is found
+     * all the following characters will be in the same position no matter if there are spaces until another " is found
+     * @param command Input of the terminal
+     */
     private void auxParser(String command) {
         text = command.trim().replaceAll(" +", " ");     //Elimina espacios
         int i = 0;
@@ -43,7 +46,8 @@ public class Parser {
     }
 
     /**
-     * Changes the size of the array accordingly
+     * This private function is called by the builder, it reduces the array length by detecting which is the highest
+     * position that has content, then a new array is initialized with the correct length and the content is copied
      */
     private void cutter() {
         int i = 0;
@@ -58,12 +62,12 @@ public class Parser {
     }
 
 
-    // /**
-    //  * This getter returns the full array of commands.
-    //  */
-    // public String[] getCommands() {
-    //     return commands;
-    // }
+    /**
+     * This getter returns the full array of commands.
+     */
+    public String[] getCommands() {
+        return commands;
+    }
 
     /**
      * This getter returns one command of the array.
@@ -75,13 +79,17 @@ public class Parser {
         }
         return resul;
     }
-	
+
+    /**
+     * This getter returns the length of the array
+     * @return
+     */
     public int getLength() {
         return commands.length;
     }
 
-    public static void main(String[] args) {
-        Parser p = new Parser("Vamos a parsear \"Esta cadena\" y veamos como queda el array");
-        p.getCommand(0);
-    }
+   // public static void main(String[] args) {
+       // Parser p = new Parser("Vamos a parsear \"Esta cadena\" y veamos como queda el array");
+       // p.getCommand(0);
+    //}
 }
