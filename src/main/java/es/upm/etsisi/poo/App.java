@@ -4,7 +4,6 @@ import java.util.Scanner;
 
 public class App {
     private ArrayDataManager dataManager;
-    private boolean running;
     private Ticket ticket;
 
     /**
@@ -12,7 +11,6 @@ public class App {
      */
     public App() {
         dataManager = new ArrayDataManager();
-        running = false;
         ticket = new Ticket();
     }
 
@@ -30,7 +28,7 @@ public class App {
             Parser pars = new Parser(command);
             ParseResult parsingInfo=Command.tryParse(pars);
             if(parsingInfo.getCode()== ParseResult.Code.SUCCESS){
-                Command.ExecuteResult executingInfo = parsingInfo.getCommand().TryExecute();
+                Command.ExecuteResult executingInfo = parsingInfo.getCommand().tryExecute(ticket,dataManager);
                 System.out.println(executingInfo);
             }else{
                 System.out.println(parsingInfo);
