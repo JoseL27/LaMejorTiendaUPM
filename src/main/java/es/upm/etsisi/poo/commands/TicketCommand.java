@@ -28,7 +28,7 @@ public class TicketCommand extends Command{
             SubCommand result = null;
 
             try {
-                result = SubCommand.valueOf(label);
+                result = SubCommand.valueOf(label.toUpperCase());
             }catch (IllegalArgumentException ex){
                 //Show error message or make another class handle it
             }finally{
