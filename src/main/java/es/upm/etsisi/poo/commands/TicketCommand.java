@@ -65,8 +65,113 @@ public class TicketCommand extends Command{
         this.subCommand = subCommand;
     }
 
+    /**
+     * First entrypoint to parse 'ticket' command (assumes the parser.getCommand(0) is 'ticket').
+     * This method is responsible for parsing different subcommands, it also invokes other parsing
+     * methods if the subcommand in question needs more arguments.
+     * This tryParse ignores extra arguments unless the arguments which are actually used have the wrong type.
+     * Prints a warning to STDOUT if excess arguments were found.
+     * @param parser Tokenized command
+     * @return Parse result. Either a valid TicketCommand instance or a failure code
+     */
     public static ParseResult tryParse(Parser parser){
-        return null;
+        if (parser.getLength() < 2)
+            return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+
+        SubCommand subCommand = SubCommand.fromLabel(parser.getCommand(1));
+
+        ParseResult result = switch (subCommand) {
+            case NEW -> tryParseNew(parser);
+            case ADD -> tryParseAdd(parser);
+            case REMOVE -> tryParseRemove(parser);
+            case PRINT -> tryParsePrint(parser);
+        };
+
+        return result;
+    }
+
+    /**
+     * Parses the 'new' subcommand of the 'ticket' command.
+     * This function does not do any parsing besides checking the number of arguments and
+     * creating a proper TicketCommand New instance.
+     * @param parser The stream of tokens to parse
+     * @return The result of the parse. If the amount of tokens is 2 then a valid
+     * TicketCommand New instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
+     */
+    public static ParseResult tryParseNew(Parser parser) {
+        if (parser.getLength() < 2)
+            return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+
+        if (parser.getLength() > 2)
+            System.out.println("DEBUG: Excess arguments found for subcommand NEW");
+
+        return new ParseResult(new TicketCommand(SubCommand.NEW));
+    }
+
+    /**
+     * Parses the 'print' subcommand of the 'ticket' command.
+     * This function does not do any parsing besides checking the number of arguments and
+     * creating a proper TicketCommand Print instance.
+     * @param parser The stream of tokens to parse
+     * @return The result of the parse. If the amount of tokens is 2 then a valid
+     * TicketCommand Print instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
+     */
+    public static ParseResult tryParsePrint(Parser parser) {
+        if (parser.getLength() < 2)
+            return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+
+        if (parser.getLength() > 2)
+            System.out.println("DEBUG: Excess arguments found for subcommand PRINT");
+
+        return new ParseResult(new TicketCommand(SubCommand.PRINT));
+    }
+
+    /**
+     * Parses the 'add' subcommand of the 'ticket' command.
+     * This function parses each field sequentially and immediately returns a failed ParseResult if it
+     * fails to parse any arguments.
+     * FORMAT: ticket add <prodId> <cantidad>
+     * @param parser The stream of tokens to parse
+     * @return The result of the parse. If parsing is successful, this will return a valid TicketCommand Add instance
+     * specifying productId and quantity. Or a failure code specifying which part of the parsing went wrong.
+     */
+    public static ParseResult tryParseAdd(Parser parser) {
+        if (parser.getLength() < 4)
+            return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+
+        Integer prodId = Utils.tryParseInt(parser.getCommand(2));
+        if (prodId == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
+
+        Integer quantity = Utils.tryParseInt(parser.getCommand(3));
+        if (quantity == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
+
+        if (parser.getLength() > 4)
+            System.out.println("DEBUG: Excess arguments found for subcommand ADD");
+
+        return new ParseResult(new TicketCommand(SubCommand.ADD, prodId, quantity));
+    }
+
+    /**
+     * Parses the 'remove' subcommand of the 'ticket' command.
+     * This function parses each field sequentially and immediately returns a failed ParseResult if it
+     * fails to parse any arguments.
+     * FORMAT: ticket remove <prodId>
+     * @param parser The stream of tokens to parse
+     * @return The result of the parse. If parsing is successful, this will return a valid TicketCommand Remove instance
+     * specifying productId. Or a failure code specifying which part of the parsing went wrong.
+     */
+    public static ParseResult tryParseRemove(Parser parser) {
+        if (parser.getLength() < 3)
+            return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+
+        Integer prodId = Utils.tryParseInt(parser.getCommand(2));
+        if (prodId == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
+
+        if (parser.getLength() > 3) {
+            System.out.println("DEBUG: Excess arguments found for subcommand REMOVE");
+        }
+
+        return new ParseResult(new TicketCommand(SubCommand.REMOVE, prodId));
     }
 
     /**
