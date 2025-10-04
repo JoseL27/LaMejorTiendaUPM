@@ -6,11 +6,10 @@ public class Command {
 	public enum ExecuteResult {
 		SUCCESS,
 		INVALID_ID,
-		INVALID_QUANTITY,
+		INVALID_AMOUNT,
 		PRODUCT_NOT_IN_STORAGE,
 		PRODUCT_NOT_IN_TICKET,
-		DATA_ERROR,
-		TICKET_DOES_NOT_EXIST
+		DATA_ERROR
 	}
 
 	/**

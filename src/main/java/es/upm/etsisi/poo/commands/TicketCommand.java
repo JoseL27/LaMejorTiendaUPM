@@ -48,7 +48,7 @@ public class TicketCommand {
     /**
      * Used in SubCommand.ADD
      */
-    private int quantity;
+    private int amount;
 
     public static ParseResult tryParse(Parser parser){
         return null;
@@ -57,50 +57,72 @@ public class TicketCommand {
     /**
      * Reads the subcommand from this command and calls the corresponding function to execute it
      * @param ticket The ticket on which the changes corresponding to the command will be applied
+     * @param dataManager data manager from which necessary products will be taken
      * @return SUCCESS, if the command is executed correctly, and the error code if not
      */
-    public Command.ExecuteResult tryExecute(Ticket ticket){ // may have to change parameters depending on ticket handling implementation
+    public Command.ExecuteResult tryExecute(Ticket ticket, ArrayDataManager dataManager){
         Command.ExecuteResult result = null;
 
         if (ticket == null){
-            result = Command.ExecuteResult.TICKET_DOES_NOT_EXIST;
-        }else {
-            switch (this.subCommand) {
-                case NEW -> result = tryExecuteNew(ticket);
-                case ADD -> result = tryExecuteAdd(ticket);
-                case REMOVE -> result = tryExecuteRemove(ticket);
-                case PRINT -> result = tryExecutePrint(ticket);
-            }
+            ticket = new Ticket();
+        }
+
+        switch (this.subCommand) {
+            case NEW -> result = tryExecuteNew(ticket);
+            case ADD -> result = tryExecuteAdd(ticket, dataManager);
+            case REMOVE -> result = tryExecuteRemove(ticket);
+            case PRINT -> result = tryExecutePrint(ticket);
         }
 
         return result;
     }
 
+    /**
+     * Converts this instance of Ticket into a new one
+     * @param ticket ticket to be reset or created
+     * @return SUCCESS always, since no recognisable error can happen
+     */
     private Command.ExecuteResult tryExecuteNew(Ticket ticket){
         ticket = new Ticket();
         return Command.ExecuteResult.SUCCESS;
     }
 
-    private Command.ExecuteResult tryExecuteAdd(Ticket ticket) {
-        Command.ExecuteResult result = null;
-        if (!isValidId(this.prodId)) { // Use the one from DataManager when it is public
+    /**
+     * Adds a product from the storage to the ticket
+     * @param ticket ticket to which the product will be added
+     * @param dataManager dataManager from which the product will be taken
+     * @return SUCCESS, if the product is added correctly, or the corresponding error if not
+     */
+    private Command.ExecuteResult tryExecuteAdd(Ticket ticket, ArrayDataManager dataManager) {
+        Command.ExecuteResult result;
+
+        if (!ArrayDataManager.isValidId(this.prodId)) { // Use the one from DataManager when it is public
             result = Command.ExecuteResult.INVALID_ID;
-        } else if (!isValidQuantity(this.quantity)) {
-            result = Command.ExecuteResult.INVALID_QUANTITY;
+        } else if (!isValidAmount(this.amount)) {
+            result = Command.ExecuteResult.INVALID_AMOUNT;
         } else{
-        // Get product from dataManager
-        // if product == null result = PRODUCT_NOT_IN_STORAGE
-        //else if !ticket.addProduct(product, this.quantity) result = DATA_ERROR
-        //else result = SUCCESS
+            Product productToAdd = dataManager.readProduct(this.prodId);
+            if (productToAdd == null){
+                result = Command.ExecuteResult.PRODUCT_NOT_IN_STORAGE;
+            }else if (!ticket.addProduct(productToAdd, this.amount)){
+                result = Command.ExecuteResult.DATA_ERROR;
+            }else {
+                result = Command.ExecuteResult.SUCCESS;
+            }
         }
         return result;
     }
 
 
+    /**
+     * Removes all appearances of a product inside the ticket
+     * @param ticket ticket from which the product will be removed
+     * @return SUCCESS, if the product is removed correctly, or the corresponding error if not
+     */
     private Command.ExecuteResult tryExecuteRemove(Ticket ticket){
         Command.ExecuteResult result = null;
 
-        if (!isValidId(this.prodId)){
+        if (!ArrayDataManager.isValidId(this.prodId)){
             return Command.ExecuteResult.INVALID_ID;
         }
 
@@ -112,15 +134,17 @@ public class TicketCommand {
         return result;
     }
 
+    /**
+     * Prints in standard output the summary of the ticket
+     * @param ticket ticket to be printed
+     * @return SUCCESS always, since no recognisable error can happen
+     */
     private Command.ExecuteResult tryExecutePrint(Ticket ticket){
-        return null;
+        System.out.println(ticket.summaryString());
+        return Command.ExecuteResult.SUCCESS;
     }
 
-    private boolean isValidId(int id){ // Delete this when the one from DataManager is public
-        return id >= 0;
-    }
-
-    private boolean isValidQuantity(int quantity){
+    private boolean isValidAmount(int quantity){
         return quantity >= 0 && quantity <= Ticket.TICKET_MAX_PRODUCTS;
     }
 }
