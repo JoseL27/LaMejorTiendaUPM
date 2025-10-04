@@ -79,6 +79,7 @@ public class TicketCommand extends Command{
             return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
 
         SubCommand subCommand = SubCommand.fromLabel(parser.getCommand(1));
+        if (subCommand == null) return new ParseResult(ParseResult.Code.INVALID_SUB_COMMAND);
 
         ParseResult result = switch (subCommand) {
             case NEW -> tryParseNew(parser);
