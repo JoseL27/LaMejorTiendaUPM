@@ -83,7 +83,7 @@ public class Ticket {
 			}
 			index++;
 		}
-		return index;
+		return result;
 	}
 
 	private ProductInfo findProductInfo(int id) {
@@ -106,7 +106,9 @@ public class Ticket {
 
 		int total = 0;
 		int totalDiscount = 0;
-		Arrays.sort(productInfos, 0, count-1);
+		if (count > 0) {
+			Arrays.sort(productInfos, 0, count - 1);
+		}
 
 		for (int productInfoIndex = 0; productInfoIndex < count; productInfoIndex++) {
 			ProductInfo productInfo = productInfos[productInfoIndex];

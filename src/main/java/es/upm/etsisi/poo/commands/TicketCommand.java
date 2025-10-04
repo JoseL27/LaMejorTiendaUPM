@@ -9,7 +9,7 @@ import es.upm.etsisi.poo.*;
  *  - ticket remove <prodId> (elimina todas las apariciones del producto, revisa si existe el id)
  *  - ticket print (imprime factura)
  */
-public class TicketCommand {
+public class TicketCommand extends Command{
     /**
      *  Represents a subcommand of a ticket command
      */
@@ -50,6 +50,21 @@ public class TicketCommand {
      */
     private int amount;
 
+    public TicketCommand(SubCommand subCommand, int prodId, int amount){
+        this.subCommand = subCommand;
+        this.prodId = prodId;
+        this.amount = amount;
+    }
+
+    public TicketCommand(SubCommand subCommand, int prodId){
+        this.subCommand = subCommand;
+        this.prodId = prodId;
+    }
+
+    public TicketCommand(SubCommand subCommand){
+        this.subCommand = subCommand;
+    }
+
     public static ParseResult tryParse(Parser parser){
         return null;
     }
@@ -60,6 +75,7 @@ public class TicketCommand {
      * @param dataManager data manager from which necessary products will be taken
      * @return SUCCESS, if the command is executed correctly, and the error code if not
      */
+    @Override
     public Command.ExecuteResult tryExecute(Ticket ticket, ArrayDataManager dataManager){
         Command.ExecuteResult result = null;
 
@@ -146,5 +162,67 @@ public class TicketCommand {
 
     private boolean isValidAmount(int quantity){
         return quantity >= 0 && quantity <= Ticket.TICKET_MAX_PRODUCTS;
+    }
+
+    /**
+     * tests
+     */
+    public static void main(String[] args) {
+        Ticket testTicket = new Ticket();
+
+        ArrayDataManager dataManager = new ArrayDataManager();
+        dataManager.createProduct(1, "Libro POO", Product.Category.BOOK, 25);
+        dataManager.createProduct(2, "Camiseta talla:M UPM", Product.Category.CLOTHES, 15);
+        dataManager.createProduct(3, "Libro POO repetido", Product.Category.BOOK, 25);
+
+        TicketCommand testCommand = null;
+
+        System.out.println("test 1: New ticket");
+        testCommand = new TicketCommand(SubCommand.NEW);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+        testCommand = new TicketCommand(SubCommand.PRINT);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+
+        System.out.println("test 2: Add product 1 2 times");
+        testCommand = new TicketCommand(SubCommand.ADD, 1, 2);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+        testCommand = new TicketCommand(SubCommand.PRINT);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+
+        System.out.println("test 3: reseteo ticket");
+        testCommand = new TicketCommand(SubCommand.NEW);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+        testCommand = new TicketCommand(SubCommand.PRINT);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+
+        System.out.println("test 4: Add product 2 1 time");
+        testCommand = new TicketCommand(SubCommand.ADD, 2, 1);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+        testCommand = new TicketCommand(SubCommand.PRINT);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+
+        System.out.println("test 5: Add product with invalid id");
+        testCommand = new TicketCommand(SubCommand.ADD, -1, 1);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+        testCommand = new TicketCommand(SubCommand.PRINT);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+
+        System.out.println("test 6: Add product not in storage");
+        testCommand = new TicketCommand(SubCommand.ADD, 4, 1);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+        testCommand = new TicketCommand(SubCommand.PRINT);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+
+        System.out.println("test 7: Remove product not in ticket");
+        testCommand = new TicketCommand(SubCommand.REMOVE, 3);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+        testCommand = new TicketCommand(SubCommand.PRINT);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+
+        System.out.println("test 8: Remove product 2");
+        testCommand = new TicketCommand(SubCommand.REMOVE, 2);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+        testCommand = new TicketCommand(SubCommand.PRINT);
+        System.out.println(testCommand.tryExecute(testTicket, dataManager));
     }
 }
