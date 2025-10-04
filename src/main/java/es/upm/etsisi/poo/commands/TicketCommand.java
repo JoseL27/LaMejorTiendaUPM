@@ -99,7 +99,7 @@ public class TicketCommand extends Command{
      * @return SUCCESS always, since no recognisable error can happen
      */
     private Command.ExecuteResult tryExecuteNew(Ticket ticket){
-        ticket = new Ticket();
+        ticket.reset();
         return Command.ExecuteResult.SUCCESS;
     }
 

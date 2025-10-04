@@ -48,6 +48,11 @@ public class Ticket {
 		count = 0;
 	}
 
+	public void reset(){
+		productInfos = new ProductInfo[TICKET_MAX_PRODUCTS];
+		count = 0;
+	}
+
 	public boolean addProduct(Product product, int amount) {
 		boolean result = false;
 		ProductInfo foundProductInfo = findProductInfo(product.getId());
