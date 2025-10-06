@@ -18,14 +18,14 @@
   - getters
   - setters
   - getProducts()/toString/print()
-- [ ] Andres - Implementar parseo commandos auxiliares de Help, Echo, Exit (HelpCommand)
+- [x] Andres - Implementar parseo commandos auxiliares de Help, Echo, Exit (HelpCommand)
   - NOTA: dejar TryExecute vacio
-- [ ] Jinxian - Implementar tryParse de TicketCommand
+- [x] Jinxian - Implementar tryParse de TicketCommand
   - NOTA: dejar tryExecute vacio
-- [ ] Enrique - Configurar y reunir test en JUNIT
-- [ ] Julio - Hacer el bucle principal del programa
-- [ ] Andres - Implementar tryExecute de producto
-- [ ] Jose - Implementar tryExecute de ticket
+- [x] Enrique - Configurar y reunir test en JUNIT
+- [x] Julio - Hacer el bucle principal del programa
+- [x] Andres - Implementar tryExecute de producto
+- [x] Jose - Implementar tryExecute de ticket
   
 ## Merges de tareas
 - [x] Andres: Quitar 'Diseño ...' y 'Inventory.java'
