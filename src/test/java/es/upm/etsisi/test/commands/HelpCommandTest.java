@@ -1,10 +1,9 @@
+package es.upm.etsisi.test.commands;
+
 import es.upm.etsisi.poo.Command;
+import es.upm.etsisi.poo.commands.HelpCommand;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-
-package es.upm.etsisi.poo.commands;
-
-
 
 class HelpCommandTest {
 

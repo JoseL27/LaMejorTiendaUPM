@@ -1,6 +1,8 @@
 package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.Command;
+import es.upm.etsisi.poo.ParseResult;
+import es.upm.etsisi.poo.Parser;
 
 /**
  * Represents a command that echoes to the standard output a given message.
@@ -19,7 +21,7 @@ public class EchoCommand extends Command{
     public static ParseResult tryParse (Parser parser)
     {
         if ( parser.getLength() < 2 ) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
-        return new ParseResult(new EchoCommand(parser.getToken(1)));
+        return new ParseResult(new EchoCommand(parser.getCommand(1)));
     }
 
     public Command.ExecuteResult tryExecute() {

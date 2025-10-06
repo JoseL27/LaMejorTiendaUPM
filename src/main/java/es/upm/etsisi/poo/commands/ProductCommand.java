@@ -4,6 +4,9 @@ import es.upm.etsisi.poo.Product;
 import es.upm.etsisi.poo.ParseResult;
 import es.upm.etsisi.poo.Utils;
 import es.upm.etsisi.poo.Parser;
+import es.upm.etsisi.poo.DataManager.DataResult;
+import es.upm.etsisi.poo.ArrayDataManager;
+import es.upm.etsisi.poo.Ticket;
 
 /**
  *  ProductCommand class that parses a stream of tokens into a specific ProductCommand,
@@ -270,10 +273,12 @@ public class ProductCommand extends Command {
 
 		//System.out.println("ProductCommand.TryExecute() UNIMPLEMENTED");
 		final DataResult result;
+		ExecuteResult FinalResult = null;
 		switch (this.subCommand) {
 		case ADD:
 			// Add product to the store
-			result = store.addProduct(this.productId, this.productName, this.productCategory, this.productPrice);
+			result = store.createProduct(this.productId, this.productName, this.productCategory, this.productPrice);
+			FinalResult = result == DataResult.SUCCESS ? Command.ExecuteResult.OK : Command.ExecuteResult.ERROR;
 			break;
 		case LIST:
 			// List products in the store
@@ -286,7 +291,7 @@ public class ProductCommand extends Command {
 					System.out.println(p.toString());
 				}
 			}
-			result = new DataResult(DataResult.Code.SUCCESS);
+			FinalResult = Command.ExecuteResult.OK;
 			break;
 		case UPDATE:
 			// Update product in the store
@@ -295,13 +300,16 @@ public class ProductCommand extends Command {
 			case CATEGORY -> store.updateProductCategory(this.productId, this.productCategory);
 			case PRICE -> store.updateProductPrice(this.productId, this.productPrice);
 			};
+			FinalResult = result == DataResult.SUCCESS ? Command.ExecuteResult.OK : Command.ExecuteResult.ERROR;
 			break;
 		case REMOVE:
 			// Remove product from the store
 			ticket.removeProduct(this.productId); // Remove product from the ticket as well
-			result = store.removeProduct(this.productId);
+			result = store.deleteProduct(this.productId);
+			FinalResult = result == DataResult.SUCCESS ? Command.ExecuteResult.OK : Command.ExecuteResult.ERROR;
 			break;
-		return result;
+		}
+		return FinalResult;
 	}
 
 	@Override

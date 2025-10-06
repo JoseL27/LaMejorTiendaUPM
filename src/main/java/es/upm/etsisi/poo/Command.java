@@ -6,6 +6,8 @@ import es.upm.etsisi.poo.commands.ProductCommand;
 
 public class Command {
 	public enum ExecuteResult {
+		OK,
+		ERROR
 	}
 
 	/**
