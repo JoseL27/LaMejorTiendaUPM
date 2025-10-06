@@ -81,10 +81,17 @@ public class Ticket {
 	 * Basic constructor
 	 */
 	public Ticket() {
+		reset();
+	}
+
+	/**
+	 * Resets the Ticket resources
+	 */
+	public void reset() {
 		productInfos = new ProductInfo[TICKET_MAX_PRODUCTS];
 		count = 0;
 	}
-
+	
 
 	/**
 	 * Adds a product asociated to an amount to the ticket. Too things may happen:
@@ -158,7 +165,10 @@ public class Ticket {
 
 		double totalPrice = 0;
 		double totalDiscount = 0;
-		Arrays.sort(productInfos, 0, count);
+		
+		if (count > 0) {
+			Arrays.sort(productInfos, 0, count);
+		}
 
 		for (int productInfoIndex = 0; productInfoIndex < count; productInfoIndex++) {
 			ProductInfo productInfo = productInfos[productInfoIndex];
@@ -234,43 +244,6 @@ public class Ticket {
 			return true;
 		}
 		return false;
-	}
-
-	public String summaryString()
-	{
-		StringBuilder sb = new StringBuilder();
-
-		int total = 0;
-		int totalDiscount = 0;
-		if (count > 0) {
-			Arrays.sort(productInfos, 0, count - 1);
-		}
-
-		for (int productInfoIndex = 0; productInfoIndex < count; productInfoIndex++) {
-			ProductInfo productInfo = productInfos[productInfoIndex];
-			Product product = productInfo.getProduct();
-			
-			float productDiscount = (productInfo.getAmount() > 1) 
-				? productInfo.getAmount() * product.getCategory().getDiscountPercent() : 0;
-
-			total += productInfo.getAmount() * product.getPrice();
-			totalDiscount += productDiscount;
-
-			for (int productCounter = 0; productCounter < productInfo.getAmount(); productCounter++) {
-				sb.append(String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}", 
-										product.getId(), product.getName(), product.getCategory(), product.getPrice()));
-				
-				if (productDiscount > 0) { 
-					sb.append(String.format(" **discount: -%.1f", productDiscount));
-				}
-				sb.append("\n");
-			}
-		}
-		
-		sb.append(String.format("Total price: %.1f\n", (float)total));
-		sb.append(String.format("Total discount: %.1f\n", (float)totalDiscount));
-		sb.append(String.format("Final Price: %.1f\n", (float)(total - totalDiscount)));
-		return sb.toString();
 	}
 
 	@Override
