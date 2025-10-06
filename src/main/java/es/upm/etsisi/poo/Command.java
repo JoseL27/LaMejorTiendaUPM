@@ -3,6 +3,7 @@ package es.upm.etsisi.poo;
 import es.upm.etsisi.poo.commands.EchoCommand;
 import es.upm.etsisi.poo.commands.HelpCommand;
 import es.upm.etsisi.poo.commands.ProductCommand;
+import es.upm.etsisi.poo.commands.TicketCommand;
 
 public class Command {
 	public enum ExecuteResult {
@@ -41,7 +42,7 @@ public class Command {
 
 					//Provisional for tests
 					System.out.println("TicketCommand called");
-					result = new ParseResult(ParseResult.Code.SUCCESS);
+					result = TicketCommand.tryParse(parser);
 					break;
 				case "help":
 					result = new ParseResult(new HelpCommand());
