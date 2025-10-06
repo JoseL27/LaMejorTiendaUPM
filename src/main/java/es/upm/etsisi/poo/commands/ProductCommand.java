@@ -1,4 +1,5 @@
 package es.upm.etsisi.poo.commands;
+
 import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.Product;
 import es.upm.etsisi.poo.ParseResult;
