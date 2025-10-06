@@ -1,5 +1,7 @@
 package es.upm.etsisi.poo;
 
+import es.upm.etsisi.poo.commands.EchoCommand;
+import es.upm.etsisi.poo.commands.HelpCommand;
 import es.upm.etsisi.poo.commands.ProductCommand;
 
 public class Command {
@@ -42,18 +44,15 @@ public class Command {
 					result = new ParseResult(ParseResult.Code.SUCCESS);
 					break;
 				case "help":
-					//result = HelpCommand.tryParse(parser);
-
+					result = new ParseResult(new HelpCommand());
 					//Provisional for tests
 					System.out.println("HelpCommand called");
-					result = new ParseResult(ParseResult.Code.SUCCESS);
 					break;
 				case "echo":
-					//result = EchoCommand.tryParse(parser);
+					result = new ParseResult(new EchoCommand(parser.getCommand(1)));
 
 					//Provisional for tests
 					System.out.println("EchoCommand called");
-					result = new ParseResult(ParseResult.Code.SUCCESS);
 					break;
 				case "exit":
 					//result = ExitCommand.tryParse(parser);
@@ -73,41 +72,5 @@ public class Command {
 	public ExecuteResult tryExecute(Ticket ticket, ArrayDataManager dataManager) {
 		assert false;
 		return null;
-	}
-
-	public static void main(String[] args){
-		// String[][] testInputs =
-		// 		{
-		// 				{ "prod" },
-		// 				{ "prod", "add", "INVALID_NUMBER", "Libro POO", "BOOK", "25" },
-		// 				{ "prod", "add", "1", "Libro POO", "BOOK", "25" },
-		// 				{ "prod", "add", "2", "Camiseta talla:M UPM", "CLOTHES", "15" },
-		// 				{ "prod", "list" },
-		// 				{ "prod", "update", "1", "NAME", "Libro POO V2" },
-		// 				{ "prod", "update", "1", "PRICE", "30" },
-		// 				{ "prod", "add", "3", "Libro POO repetido Error", "BOOK", "25" },
-		// 				{ "prod", "remove", "3" },
-		// 				{ "ticket", "new" },
-		// 				{ "ticket", "add", "1", "1" },
-		// 				{ "ticket", "remove" },
-		// 				{ "ticket", "print" },
-		// 				{ "help" },
-		// 				{ "echo", "TEST" },
-		// 				{ "exit" },
-		// 				{ "prud" },
-		// 				{ "prod", "add", "1", "Libro POO", "BOOK", "25" , "INVALID", "INVALID"},
-		// 				null,
-		// 				{},
-		// 		};
-
-		// for (int i = 0; i < testInputs.length; i++){
-		// 	System.out.println("Test " + (i + 1) + ":");
-		// 	if (testInputs[i] != null) {
-		// 		System.out.println("Input: " + Utils.arrayToString(testInputs[i]));
-		// 	}
-
-		// 	ParseResult testResult = tryParse(testInputs[i]);
-		// 	System.out.println("Result: " + testResult.toString());
-		// }
 	}
 }

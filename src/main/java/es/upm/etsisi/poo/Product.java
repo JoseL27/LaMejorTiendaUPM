@@ -5,7 +5,7 @@ public class Product {
 		MERCH	   	(0.00f, "MERCH"),
 		STATIONERY 	(0.05f, "STATIONERY"),
 		CLOTHES	    (0.07f, "CLOTHES"),
-		BOOK	   	(0.01f, "BOOK"),
+		BOOK	   	(0.10f, "BOOK"),
 		ELECTRONICA	(0.03f, "ELECTRONICA");
 
 		private final float discountPercent;
@@ -66,32 +66,22 @@ public class Product {
 	private double price;
 
 	// constructor
-	public Product ( int id, String name, Category category, double price )
-	{
+	public Product(int id, String name, Category category, double price) {
 		this.id = id;
 		this.name = name;
 		this.category = category;
 		this.price = price;
 	}
 
-	public int compareTo ( Product p )
-	{
-		return this.name.compareTo ( p.name );
-	}
-
-	public boolean  equals ( Product p )
-	{
+	public boolean equals(Product p) {
 		return this.id == p.id;
 	}
-	// getters y setters, estos no se usan, son shit code
 
-	public Category category ()
-	{
+	public Category category() {
 		return this.category;
 	}
 
-	public double price ( int amount )
-	{
+	public double price(int amount) {
 		return this.price * amount;
 	}
 
@@ -130,5 +120,16 @@ public class Product {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || this.getClass() != obj.getClass()) return false;
+
+		Product otherProd = (Product)obj;
+		return this.id == otherProd.id
+			&& Utils.nullOrEquals(this.name, otherProd.name)
+			&& Utils.nullOrEquals(this.category, otherProd.category)
+			&& this.price == otherProd.price;
 	}
 }

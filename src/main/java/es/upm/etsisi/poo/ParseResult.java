@@ -68,4 +68,13 @@ public class ParseResult {
 	public String toString() {
 		return String.format("{ code: %s, command: %s }", code, command);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || (obj.getClass() != this.getClass())) return false;
+		
+		ParseResult otherParseResult = (ParseResult)obj;
+		return Utils.nullOrEquals(this.code, otherParseResult.code) 
+			&& Utils.nullOrEquals(this.command, otherParseResult.command);
+	}
 }

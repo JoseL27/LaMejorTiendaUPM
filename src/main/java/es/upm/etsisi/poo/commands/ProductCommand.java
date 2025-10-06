@@ -1,9 +1,14 @@
 package es.upm.etsisi.poo.commands;
+
 import es.upm.etsisi.poo.Command;
+import es.upm.etsisi.poo.Command.ExecuteResult;
 import es.upm.etsisi.poo.Product;
 import es.upm.etsisi.poo.ParseResult;
 import es.upm.etsisi.poo.Utils;
 import es.upm.etsisi.poo.Parser;
+import es.upm.etsisi.poo.DataManager.DataResult;
+import es.upm.etsisi.poo.ArrayDataManager;
+import es.upm.etsisi.poo.Ticket;
 
 /**
  *  ProductCommand class that parses a stream of tokens into a specific ProductCommand,
@@ -21,7 +26,7 @@ public class ProductCommand extends Command {
 	/**
 	 * SubCommand enum describing the exiting sub commands to a product command
 	 */
-	enum SubCommand {
+	public enum SubCommand {
 		ADD,	  
 		LIST,  
 		UPDATE,
@@ -250,9 +255,82 @@ public class ProductCommand extends Command {
 		return new ParseResult(new ProductCommand(SubCommand.REMOVE, id, null, null, 0));
 	} 
 
-	public Command.ExecuteResult TryExecute() {
-		System.out.println("ProductCommand.TryExecute() UNIMPLEMENTED");
-		return null;
+	/**
+	 * Attempts to execute a product-related command on the given store and ticket.
+	 * <p>
+	 * Supported subcommands include:
+	 * <ul>
+	 *   <li>ADD: Adds a new product to the store.</li>
+	 *   <li>LIST: Lists all products currently in the store.</li>
+	 *   <li>UPDATE: Updates a specific field (name, category, or price) of an existing product.</li>
+	 *   <li>REMOVE: Removes a product from the store.</li>
+	 * </ul>
+	 * The specific action performed depends on the value of {@code this.subCommand}.
+	 * 
+	 * @param store  the {@link ArrayDataManager} representing the store's data manager
+	 * @param ticket the {@link Ticket} associated with the command execution (may be used for logging or tracking)
+	 * @return a {@link ExecuteResult} indicating the outcome of the command execution
+	 */
+	public ExecuteResult TryExecute( ArrayDataManager store, Ticket ticket) {
+
+		//System.out.println("ProductCommand.TryExecute() UNIMPLEMENTED");
+		ExecuteResult result = null;
+		switch (this.subCommand) {
+		case ADD: { 
+			// Add product to the store
+			DataResult dataResult = store.createProduct(this.productId, this.productName, this.productCategory, this.productPrice);
+			
+			result = switch (dataResult) {
+			case SUCCESS							-> ExecuteResult.SUCCESS;
+			case INVALID_ID, PRODUCT_ALREADY_EXISTS -> ExecuteResult.INVALID_ID;
+			default									-> ExecuteResult.DATA_ERROR;
+			};
+			
+		} break;
+		case LIST: {
+			// List products in the store
+			Product[] products = store.listProducts();
+			if (products != null) {
+				System.out.println("ID\tNOMBRE\tCATEGORIA\tPRECIO");
+				for (Product p : products) {
+					System.out.println(p.toString());
+				}
+			}
+			result = ExecuteResult.SUCCESS;
+		} break;
+			
+		case UPDATE: { 
+			// Update product in the store
+			DataResult dataResult = switch (this.productField) {
+			case NAME -> store.updateProductName(this.productId, this.productName);
+			case CATEGORY -> store.updateProductCategory(this.productId, this.productCategory);
+			case PRICE -> store.updateProductPrice(this.productId, this.productPrice);
+			};
+			
+			result = switch (dataResult) {
+			case SUCCESS			-> ExecuteResult.SUCCESS;
+			case INVALID_ID			-> ExecuteResult.INVALID_ID;
+			case PRODUCT_NOT_FOUND	-> ExecuteResult.PRODUCT_NOT_IN_STORAGE;
+			default					-> ExecuteResult.DATA_ERROR;
+			};
+			
+		} break;
+		case REMOVE: {
+			// Remove product from the store
+			ticket.removeProduct(this.productId);
+			
+			// Remove product from the ticket as well
+			DataResult dataResult = store.deleteProduct(this.productId);
+			result = switch (dataResult) {
+			case SUCCESS			-> ExecuteResult.SUCCESS;
+			case INVALID_ID			-> ExecuteResult.INVALID_ID;
+			case PRODUCT_NOT_FOUND	-> ExecuteResult.PRODUCT_NOT_IN_STORAGE;
+			default					-> ExecuteResult.DATA_ERROR;
+			};
+			
+		} break;
+		}
+		return result;
 	}
 
 	@Override
@@ -261,28 +339,15 @@ public class ProductCommand extends Command {
 							 this.subCommand, this.productId, this.productName, this.productCategory, this.productPrice);
 	}
 
-	/**
-	 * Basic main for tests. Checks each test and prints the result.
-	 */
-	public static void main(String[] args) {
-		// String[][] tests = {
-		// 	{ "prod" },
-		// 	{ "prod", "add", "1", "Libro POO", "BOOK", "25" },
-		// 	{ "prod", "add", "2", "Camiseta talla:M UPM", "CLOTHES", "15" },
-		// 	{ "prod", "list" },
-		// 	{ "prod", "update", "1", "NAME", "Libro POO V2" },
-		// 	{ "prod", "update", "1", "PRICE", "30" },
-		// 	{ "prod", "add", "3", "Libro POO repetido Error", "BOOK", "25" },
-		// 	{ "prod", "remove", "3" },
-		// };
-
-		// for (int testIndex = 0; testIndex < tests.length; testIndex++) { 
-		// 	String[] testTokens = tests[testIndex];
-		// 	System.out.printf("TEST #%d\n", testIndex);
-		// 	System.out.printf("\tinput: %s\n", Utils.arrayToString(testTokens));
-
-		// 	ParseResult result = TryParse(testTokens);
-		// 	System.out.printf("\tresult: %s\n", result);
-		// }
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || (obj.getClass() != this.getClass())) return false;
+		ProductCommand otherProdCmd = (ProductCommand)obj;
+		
+		return Utils.nullOrEquals(this.subCommand, otherProdCmd.subCommand) 
+			&& Utils.nullOrEquals(this.productName, otherProdCmd.productName)
+			&& this.productId == otherProdCmd.productId
+			&& this.productCategory == otherProdCmd.productCategory
+			&& this.productPrice == otherProdCmd.productPrice;		
 	}
 }
