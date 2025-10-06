@@ -40,7 +40,7 @@ public class HelpCommand extends Command{
             System.out.print ("  " + c + " " + d + "%," );
         }
         System.out.println ();*/
-        return Command.ExecuteResult.OK;
+        return Command.ExecuteResult.SUCCESS;
     }
 
 }

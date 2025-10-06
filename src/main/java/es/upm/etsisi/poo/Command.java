@@ -6,8 +6,12 @@ import es.upm.etsisi.poo.commands.ProductCommand;
 
 public class Command {
 	public enum ExecuteResult {
-		OK,
-		ERROR
+		SUCCESS,
+		INVALID_ID,
+		INVALID_AMOUNT,
+		PRODUCT_NOT_IN_STORAGE,
+		PRODUCT_NOT_IN_TICKET,
+		DATA_ERROR
 	}
 
 	/**

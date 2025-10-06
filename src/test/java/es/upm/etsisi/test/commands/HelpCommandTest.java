@@ -11,6 +11,6 @@ class HelpCommandTest {
     void testTryExecuteReturnsOK() {
         HelpCommand helpCommand = new HelpCommand();
         Command.ExecuteResult result = helpCommand.TryExecute();
-        assertEquals(Command.ExecuteResult.OK, result, "TryExecute should return OK");
+        assertEquals(Command.ExecuteResult.SUCCESS, result, "TryExecute should return OK");
     }
 }

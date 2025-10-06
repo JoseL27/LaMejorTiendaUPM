@@ -278,8 +278,12 @@ public class ProductCommand extends Command {
 		case ADD:
 			// Add product to the store
 			result = store.createProduct(this.productId, this.productName, this.productCategory, this.productPrice);
-			FinalResult = result == DataResult.SUCCESS ? Command.ExecuteResult.OK : Command.ExecuteResult.ERROR;
-			break;
+			FinalResult = switch (result) {
+			case SUCCESS -> Command.ExecuteResult.SUCCESS;
+			case INVALID_ID, PRODUCT_ALREADY_EXISTS -> Command.ExecuteResult.INVALID_ID;
+			case INVENTORY_FULL -> Command.ExecuteResult.DATA_ERROR;
+			case INVALID_NAME, INVALID_CATEGORY, INVALID_PRICE -> Command.ExecuteResult.DATA_ERROR;
+			};
 		case LIST:
 			// List products in the store
 			final Product[] products = store.listProducts();
@@ -291,7 +295,7 @@ public class ProductCommand extends Command {
 					System.out.println(p.toString());
 				}
 			}
-			FinalResult = Command.ExecuteResult.OK;
+			FinalResult = Command.ExecuteResult.SUCCESS;
 			break;
 		case UPDATE:
 			// Update product in the store
@@ -300,13 +304,22 @@ public class ProductCommand extends Command {
 			case CATEGORY -> store.updateProductCategory(this.productId, this.productCategory);
 			case PRICE -> store.updateProductPrice(this.productId, this.productPrice);
 			};
-			FinalResult = result == DataResult.SUCCESS ? Command.ExecuteResult.OK : Command.ExecuteResult.ERROR;
+			FinalResult = switch (result) {
+			case SUCCESS -> Command.ExecuteResult.SUCCESS;
+			case INVALID_ID -> Command.ExecuteResult.INVALID_ID;
+			case PRODUCT_NOT_FOUND -> Command.ExecuteResult.PRODUCT_NOT_IN_STORAGE;
+			case INVALID_NAME, INVALID_CATEGORY, INVALID_PRICE -> Command.ExecuteResult.DATA_ERROR;
+			};
 			break;
 		case REMOVE:
 			// Remove product from the store
 			ticket.removeProduct(this.productId); // Remove product from the ticket as well
 			result = store.deleteProduct(this.productId);
-			FinalResult = result == DataResult.SUCCESS ? Command.ExecuteResult.OK : Command.ExecuteResult.ERROR;
+			FinalResult = switch (result) {
+			case SUCCESS -> Command.ExecuteResult.SUCCESS;
+			case INVALID_ID -> Command.ExecuteResult.INVALID_ID;
+			case PRODUCT_NOT_FOUND -> Command.ExecuteResult.PRODUCT_NOT_IN_STORAGE;
+			};
 			break;
 		}
 		return FinalResult;
