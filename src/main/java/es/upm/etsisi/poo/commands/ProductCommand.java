@@ -267,11 +267,12 @@ public class ProductCommand extends Command {
 	 * </ul>
 	 * The specific action performed depends on the value of {@code this.subCommand}.
 	 * 
-	 * @param store  the {@link ArrayDataManager} representing the store's data manager
 	 * @param ticket the {@link Ticket} associated with the command execution (may be used for logging or tracking)
+	 * @param store  the {@link ArrayDataManager} representing the store's data manager
 	 * @return a {@link ExecuteResult} indicating the outcome of the command execution
 	 */
-	public ExecuteResult TryExecute( ArrayDataManager store, Ticket ticket) {
+	@Override
+	public ExecuteResult tryExecute(Ticket ticket, ArrayDataManager store) {
 
 		//System.out.println("ProductCommand.TryExecute() UNIMPLEMENTED");
 		ExecuteResult result = null;
