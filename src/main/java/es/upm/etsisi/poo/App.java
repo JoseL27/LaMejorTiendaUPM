@@ -34,7 +34,7 @@ public class App {
                 System.out.println(parsingInfo);
             }
 
-        } while (command.equals("exit"));
+        } while (!command.equals("exit"));
 
         // while (running) {
         // 	// Hacer cosas
