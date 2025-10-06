@@ -25,7 +25,7 @@ public class ArrayDataManager implements DataManager {
      * @param idToCheck numeric id to check
      * @return true if valid, otherwise return false
      */
-    private boolean isValidId(int idToCheck) {
+    public static boolean isValidId(int idToCheck) {
         // Change if 0 is not an allowed ID
         return idToCheck >= 0;
     }
