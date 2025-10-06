@@ -215,7 +215,7 @@ public class Ticket {
 			}
 			index++;
 		}
-		return index;
+		return result;
 	}
 
 	/**
