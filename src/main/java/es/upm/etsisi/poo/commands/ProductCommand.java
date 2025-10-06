@@ -1,6 +1,7 @@
 package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.Command;
+import es.upm.etsisi.poo.Command.ExecuteResult;
 import es.upm.etsisi.poo.Product;
 import es.upm.etsisi.poo.ParseResult;
 import es.upm.etsisi.poo.Utils;
@@ -268,62 +269,68 @@ public class ProductCommand extends Command {
 	 * 
 	 * @param store  the {@link ArrayDataManager} representing the store's data manager
 	 * @param ticket the {@link Ticket} associated with the command execution (may be used for logging or tracking)
-	 * @return a {@link Command.ExecuteResult} indicating the outcome of the command execution
+	 * @return a {@link ExecuteResult} indicating the outcome of the command execution
 	 */
-	public Command.ExecuteResult TryExecute( ArrayDataManager store, Ticket ticket) {
+	public ExecuteResult TryExecute( ArrayDataManager store, Ticket ticket) {
 
 		//System.out.println("ProductCommand.TryExecute() UNIMPLEMENTED");
-		final DataResult result;
-		ExecuteResult FinalResult = null;
+		ExecuteResult result = null;
 		switch (this.subCommand) {
-		case ADD:
+		case ADD: { 
 			// Add product to the store
-			result = store.createProduct(this.productId, this.productName, this.productCategory, this.productPrice);
-			FinalResult = switch (result) {
-			case SUCCESS -> Command.ExecuteResult.SUCCESS;
-			case INVALID_ID, PRODUCT_ALREADY_EXISTS -> Command.ExecuteResult.INVALID_ID;
-			case INVENTORY_FULL -> Command.ExecuteResult.DATA_ERROR;
-			case INVALID_NAME, INVALID_CATEGORY, INVALID_PRICE -> Command.ExecuteResult.DATA_ERROR;
+			DataResult dataResult = store.createProduct(this.productId, this.productName, this.productCategory, this.productPrice);
+			
+			result = switch (dataResult) {
+			case SUCCESS							-> ExecuteResult.SUCCESS;
+			case INVALID_ID, PRODUCT_ALREADY_EXISTS -> ExecuteResult.INVALID_ID;
+			default									-> ExecuteResult.DATA_ERROR;
 			};
-		case LIST:
+			
+		} break;
+		case LIST: {
 			// List products in the store
-			final Product[] products = store.listProducts();
-			if (products == null) {
-				System.out.println("");
-			} else {
+			Product[] products = store.listProducts();
+			if (products != null) {
 				System.out.println("ID\tNOMBRE\tCATEGORIA\tPRECIO");
 				for (Product p : products) {
 					System.out.println(p.toString());
 				}
 			}
-			FinalResult = Command.ExecuteResult.SUCCESS;
-			break;
-		case UPDATE:
+			result = ExecuteResult.SUCCESS;
+		} break;
+			
+		case UPDATE: { 
 			// Update product in the store
-			result = switch (this.productField) {
+			DataResult dataResult = switch (this.productField) {
 			case NAME -> store.updateProductName(this.productId, this.productName);
 			case CATEGORY -> store.updateProductCategory(this.productId, this.productCategory);
 			case PRICE -> store.updateProductPrice(this.productId, this.productPrice);
 			};
-			FinalResult = switch (result) {
-			case SUCCESS -> Command.ExecuteResult.SUCCESS;
-			case INVALID_ID -> Command.ExecuteResult.INVALID_ID;
-			case PRODUCT_NOT_FOUND -> Command.ExecuteResult.PRODUCT_NOT_IN_STORAGE;
-			case INVALID_NAME, INVALID_CATEGORY, INVALID_PRICE -> Command.ExecuteResult.DATA_ERROR;
+			
+			result = switch (dataResult) {
+			case SUCCESS			-> ExecuteResult.SUCCESS;
+			case INVALID_ID			-> ExecuteResult.INVALID_ID;
+			case PRODUCT_NOT_FOUND	-> ExecuteResult.PRODUCT_NOT_IN_STORAGE;
+			default					-> ExecuteResult.DATA_ERROR;
 			};
-			break;
-		case REMOVE:
+			
+		} break;
+		case REMOVE: {
 			// Remove product from the store
-			ticket.removeProduct(this.productId); // Remove product from the ticket as well
-			result = store.deleteProduct(this.productId);
-			FinalResult = switch (result) {
-			case SUCCESS -> Command.ExecuteResult.SUCCESS;
-			case INVALID_ID -> Command.ExecuteResult.INVALID_ID;
-			case PRODUCT_NOT_FOUND -> Command.ExecuteResult.PRODUCT_NOT_IN_STORAGE;
+			ticket.removeProduct(this.productId);
+			
+			// Remove product from the ticket as well
+			DataResult dataResult = store.deleteProduct(this.productId);
+			result = switch (dataResult) {
+			case SUCCESS			-> ExecuteResult.SUCCESS;
+			case INVALID_ID			-> ExecuteResult.INVALID_ID;
+			case PRODUCT_NOT_FOUND	-> ExecuteResult.PRODUCT_NOT_IN_STORAGE;
+			default					-> ExecuteResult.DATA_ERROR;
 			};
-			break;
+			
+		} break;
 		}
-		return FinalResult;
+		return result;
 	}
 
 	@Override
