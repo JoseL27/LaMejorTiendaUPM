@@ -1,5 +1,7 @@
 package es.upm.etsisi.poo;
 
+import es.upm.etsisi.poo.commands.TicketCommand;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +37,19 @@ public class Ticket {
 		@Override
 		public int compareTo(ProductInfo toCompare) {
 			return product.getName().compareTo(toCompare.getProduct().getName());
+		}
+
+		@Override
+		public boolean equals(Object obj){
+			boolean result = false;
+
+			if (obj != null && obj.getClass() == this.getClass()){
+				ProductInfo otherProduct = (ProductInfo) obj;
+				result = otherProduct.product.equals(this.product)
+						&& otherProduct.amount == this.amount;
+			}
+
+			return result;
 		}
 	}
 
@@ -140,5 +155,18 @@ public class Ticket {
 		sb.append(String.format("Total discount: %.1f\n", (float)totalDiscount));
 		sb.append(String.format("Final Price: %.1f\n", (float)(total - totalDiscount)));
 		return sb.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj){
+		boolean result = false;
+
+		if (obj != null && obj.getClass() == this.getClass()){
+			Ticket otherTicket = (Ticket) obj;
+			result = otherTicket.count == this.count
+					&& Arrays.equals(otherTicket.productInfos, this.productInfos);
+		}
+
+		return result;
 	}
 }

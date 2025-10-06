@@ -13,7 +13,7 @@ public class TicketCommand extends Command{
     /**
      *  Represents a subcommand of a ticket command
      */
-    enum SubCommand{
+    public enum SubCommand{
         NEW,
         ADD,
         REMOVE,
@@ -183,20 +183,17 @@ public class TicketCommand extends Command{
      */
     @Override
     public Command.ExecuteResult tryExecute(Ticket ticket, ArrayDataManager dataManager){
-        Command.ExecuteResult result = null;
 
         if (ticket == null){
-            ticket = new Ticket();
+            return ExecuteResult.NULL_TICKET;
         }
 
-        switch (this.subCommand) {
-            case NEW -> result = tryExecuteNew(ticket);
-            case ADD -> result = tryExecuteAdd(ticket, dataManager);
-            case REMOVE -> result = tryExecuteRemove(ticket);
-            case PRINT -> result = tryExecutePrint(ticket);
-        }
-
-        return result;
+        return switch (this.subCommand) {
+            case NEW ->  tryExecuteNew(ticket);
+            case ADD ->  tryExecuteAdd(ticket, dataManager);
+            case REMOVE ->  tryExecuteRemove(ticket);
+            case PRINT ->  tryExecutePrint(ticket);
+        };
     }
 
     /**
@@ -270,187 +267,198 @@ public class TicketCommand extends Command{
         return quantity >= 0 && quantity <= Ticket.TICKET_MAX_PRODUCTS;
     }
 
-    /**
-     * tests
-     */
-    public static void main(String[] args) {
-        Ticket testTicket = new Ticket();
+//    public static void main(String[] args) {
+//        Ticket testTicket = new Ticket();
+//
+//        ArrayDataManager dataManager = new ArrayDataManager();
+//        dataManager.createProduct(1, "Libro POO", Product.Category.BOOK, 25);
+//        dataManager.createProduct(2, "Camiseta talla:M UPM", Product.Category.CLOTHES, 15);
+//        dataManager.createProduct(3, "Libro POO repetido", Product.Category.BOOK, 25);
+//
+//        TicketCommand testCommand = null;
+//
+//        System.out.println("test 1: New ticket");
+//        testCommand = new TicketCommand(SubCommand.NEW);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//        testCommand = new TicketCommand(SubCommand.PRINT);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//
+//        System.out.println("test 2: Add product 1 2 times");
+//        testCommand = new TicketCommand(SubCommand.ADD, 1, 2);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//        testCommand = new TicketCommand(SubCommand.PRINT);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//
+//        System.out.println("test 3: reseteo ticket");
+//        testCommand = new TicketCommand(SubCommand.NEW);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//        testCommand = new TicketCommand(SubCommand.PRINT);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//
+//        System.out.println("test 4: Add product 2 1 time");
+//        testCommand = new TicketCommand(SubCommand.ADD, 2, 1);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//        testCommand = new TicketCommand(SubCommand.PRINT);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//
+//        System.out.println("test 5: Add product with invalid id");
+//        testCommand = new TicketCommand(SubCommand.ADD, -1, 1);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//        testCommand = new TicketCommand(SubCommand.PRINT);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//
+//        System.out.println("test 6: Add product not in storage");
+//        testCommand = new TicketCommand(SubCommand.ADD, 4, 1);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//        testCommand = new TicketCommand(SubCommand.PRINT);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//
+//        System.out.println("test 7: Remove product not in ticket");
+//        testCommand = new TicketCommand(SubCommand.REMOVE, 3);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//        testCommand = new TicketCommand(SubCommand.PRINT);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//
+//        System.out.println("test 8: Remove product 2");
+//        testCommand = new TicketCommand(SubCommand.REMOVE, 2);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//        testCommand = new TicketCommand(SubCommand.PRINT);
+//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
+//
+//        testTryParse();
+//    }
+//
+//    public static void testTryParse() {
+//        System.out.println("[TryParse] Test 1: ticket new (Should work): ");
+//        Parser pars = new Parser("ticket new");
+//        ParseResult parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 2: ticket new fhqghwads (Should work with warning): ");
+//        pars = new Parser("ticket new fhqghwads");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 3: ticket (should fail with insufficient_arguments): "); // Should this fail with insufficient_arguments or invalid_subcommand?
+//        pars = new Parser("ticket");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 4: ticket print (should work): ");
+//        pars = new Parser("ticket print");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 5: ticket print samekosaba (should work with warning): ");
+//        pars = new Parser("ticket print samekosaba");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 6: ticket fuckshitup (should fail with invalid_sub_command): ");
+//        pars = new Parser("ticket fuckshitup");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 7: ticket fuckshitup 4 3 (should fail with invalid_sub_command): ");
+//        pars = new Parser("ticket fuckshitup 4 3");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 8: ticket add (should fail with insufficient_arguments): ");
+//        pars = new Parser("ticket add");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 9: ticket add rompe (should fail with insufficient_arguments): ");
+//        pars = new Parser("ticket add rompe");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 10: ticket add rompe cabezas (should fail with invalid_number): ");
+//        pars = new Parser("ticket add rompe cabezas");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 11: ticket add 5 cabezas (should fail with invalid_number): ");
+//        pars = new Parser("ticket add 5 cabezas");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 12: ticket add rompe 4 (should fail with invalid_number): ");
+//        pars = new Parser("ticket add rompe 4");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 13: ticket add 3 (should fail with insufficient_arguments): ");
+//        pars = new Parser("ticket add 3");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 14: ticket add 2 4 (should work): ");
+//        pars = new Parser("ticket add 2 4");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        System.out.println("[TryParse] Test 15: ticket add 2 4 rayuela_hacia_mas_alla (should work with warning): ");
+//        pars = new Parser("ticket add 2 4 rayuela_hacia_mas_alla");
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        String command = "ticket remove";
+//        System.out.printf("[TryParse] Test 16: %s (should fail with insufficient_arguments): \n", command);
+//        pars = new Parser(command);
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        command = "ticket remove uno";
+//        System.out.printf("[TryParse] Test 17: %s (should fail with invalid_number): \n", command);
+//        pars = new Parser(command);
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        command = "ticket remove 1";
+//        System.out.printf("[TryParse] Test 18: %s (should work): \n", command);
+//        pars = new Parser(command);
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//
+//        command = "ticket remove 1 cd";
+//        System.out.printf("[TryParse] Test 19: %s (should work with warning): \n", command);
+//        pars = new Parser(command);
+//        parsRs = TicketCommand.tryParse(pars);
+//        System.out.println(parsRs.getCode());
+//        System.out.println();
+//    }
 
-        ArrayDataManager dataManager = new ArrayDataManager();
-        dataManager.createProduct(1, "Libro POO", Product.Category.BOOK, 25);
-        dataManager.createProduct(2, "Camiseta talla:M UPM", Product.Category.CLOTHES, 15);
-        dataManager.createProduct(3, "Libro POO repetido", Product.Category.BOOK, 25);
+    @Override
+    public boolean equals(Object obj){
+        boolean result = false;
 
-        TicketCommand testCommand = null;
+        if (obj != null && obj.getClass() == this.getClass()){
+            TicketCommand otherCommand = (TicketCommand) obj;
+            result = otherCommand.subCommand == this.subCommand
+                    && otherCommand.prodId == this.prodId
+                    && otherCommand.amount == this.amount;
+        }
 
-        System.out.println("test 1: New ticket");
-        testCommand = new TicketCommand(SubCommand.NEW);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-        testCommand = new TicketCommand(SubCommand.PRINT);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-
-        System.out.println("test 2: Add product 1 2 times");
-        testCommand = new TicketCommand(SubCommand.ADD, 1, 2);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-        testCommand = new TicketCommand(SubCommand.PRINT);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-
-        System.out.println("test 3: reseteo ticket");
-        testCommand = new TicketCommand(SubCommand.NEW);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-        testCommand = new TicketCommand(SubCommand.PRINT);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-
-        System.out.println("test 4: Add product 2 1 time");
-        testCommand = new TicketCommand(SubCommand.ADD, 2, 1);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-        testCommand = new TicketCommand(SubCommand.PRINT);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-
-        System.out.println("test 5: Add product with invalid id");
-        testCommand = new TicketCommand(SubCommand.ADD, -1, 1);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-        testCommand = new TicketCommand(SubCommand.PRINT);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-
-        System.out.println("test 6: Add product not in storage");
-        testCommand = new TicketCommand(SubCommand.ADD, 4, 1);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-        testCommand = new TicketCommand(SubCommand.PRINT);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-
-        System.out.println("test 7: Remove product not in ticket");
-        testCommand = new TicketCommand(SubCommand.REMOVE, 3);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-        testCommand = new TicketCommand(SubCommand.PRINT);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-
-        System.out.println("test 8: Remove product 2");
-        testCommand = new TicketCommand(SubCommand.REMOVE, 2);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-        testCommand = new TicketCommand(SubCommand.PRINT);
-        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-
-        testTryParse();
-    }
-
-    public static void testTryParse() {
-        System.out.println("[TryParse] Test 1: ticket new (Should work): ");
-        Parser pars = new Parser("ticket new");
-        ParseResult parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 2: ticket new fhqghwads (Should work with warning): ");
-        pars = new Parser("ticket new fhqghwads");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 3: ticket (should fail with insufficient_arguments): "); // Should this fail with insufficient_arguments or invalid_subcommand?
-        pars = new Parser("ticket");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 4: ticket print (should work): ");
-        pars = new Parser("ticket print");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 5: ticket print samekosaba (should work with warning): ");
-        pars = new Parser("ticket print samekosaba");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 6: ticket fuckshitup (should fail with invalid_sub_command): ");
-        pars = new Parser("ticket fuckshitup");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 7: ticket fuckshitup 4 3 (should fail with invalid_sub_command): ");
-        pars = new Parser("ticket fuckshitup 4 3");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 8: ticket add (should fail with insufficient_arguments): ");
-        pars = new Parser("ticket add");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 9: ticket add rompe (should fail with insufficient_arguments): ");
-        pars = new Parser("ticket add rompe");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 10: ticket add rompe cabezas (should fail with invalid_number): ");
-        pars = new Parser("ticket add rompe cabezas");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 11: ticket add 5 cabezas (should fail with invalid_number): ");
-        pars = new Parser("ticket add 5 cabezas");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 12: ticket add rompe 4 (should fail with invalid_number): ");
-        pars = new Parser("ticket add rompe 4");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 13: ticket add 3 (should fail with insufficient_arguments): ");
-        pars = new Parser("ticket add 3");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 14: ticket add 2 4 (should work): ");
-        pars = new Parser("ticket add 2 4");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        System.out.println("[TryParse] Test 15: ticket add 2 4 rayuela_hacia_mas_alla (should work with warning): ");
-        pars = new Parser("ticket add 2 4 rayuela_hacia_mas_alla");
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        String command = "ticket remove";
-        System.out.printf("[TryParse] Test 16: %s (should fail with insufficient_arguments): \n", command);
-        pars = new Parser(command);
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        command = "ticket remove uno";
-        System.out.printf("[TryParse] Test 17: %s (should fail with invalid_number): \n", command);
-        pars = new Parser(command);
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        command = "ticket remove 1";
-        System.out.printf("[TryParse] Test 18: %s (should work): \n", command);
-        pars = new Parser(command);
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
-
-        command = "ticket remove 1 cd";
-        System.out.printf("[TryParse] Test 19: %s (should work with warning): \n", command);
-        pars = new Parser(command);
-        parsRs = TicketCommand.tryParse(pars);
-        System.out.println(parsRs.getCode());
-        System.out.println();
+        return result;
     }
 }

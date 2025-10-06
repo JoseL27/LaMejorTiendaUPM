@@ -9,7 +9,8 @@ public class Command {
 		INVALID_AMOUNT,
 		PRODUCT_NOT_IN_STORAGE,
 		PRODUCT_NOT_IN_TICKET,
-		DATA_ERROR
+		DATA_ERROR,
+		NULL_TICKET
 	}
 
 	/**
