@@ -69,6 +69,11 @@ public class ParseResult {
 		return String.format("{ code: %s, command: %s }", code, command);
 	}
 
+	/**
+	 * Checks if this is equal to another object, that has to be a ParseResult, based on code and command
+	 * @param obj Object to be compared to
+	 * @return true if both objects are equal under this criteria, false in other
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || (obj.getClass() != this.getClass())) return false;

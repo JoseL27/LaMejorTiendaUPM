@@ -42,11 +42,21 @@ public class Ticket {
 			this.amount += increment;
 		}
 
+		/**
+		 * Compares this to another ProductInfo based on name only
+		 * @param other the ProductInfo to be compared.
+		 * @return A value less than 0 if this is lesser, 0 if they are equal, and a value greater than if this is greater
+		 */
 		@Override
 		public int compareTo(ProductInfo other) {
 			return this.product.getName().compareTo(other.product.getName());
 		}
 
+		/**
+		 * Checks if this is equal to another object, that has to be a ProductInfo based on the amount and Product.equals()
+		 * @param obj Object to be compared to
+		 * @return true, if both objects are equal under this criteria, false in other case
+		 */
 		@Override
 		public boolean equals(Object obj){
 			boolean result = false;
@@ -246,6 +256,11 @@ public class Ticket {
 		return false;
 	}
 
+	/**
+	 * Checks if this is equal to another object, that has to be a Ticket, based on count and all the productInfos
+	 * @param obj Object to be compared to
+	 * @return true, if both objects are equal under this criteria, false in other case
+	 */
 	@Override
 	public boolean equals(Object obj){
 		boolean result = false;
