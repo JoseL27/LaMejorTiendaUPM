@@ -38,29 +38,13 @@ public class Command {
 					result = ProductCommand.tryParse(parser);
 					break;
 				case "ticket":
-					//result = TicketCommand.tryParse(parser);
-
-					//Provisional for tests
-					System.out.println("TicketCommand called");
 					result = TicketCommand.tryParse(parser);
 					break;
 				case "help":
 					result = new ParseResult(new HelpCommand());
-					//Provisional for tests
-					System.out.println("HelpCommand called");
 					break;
 				case "echo":
 					result = new ParseResult(new EchoCommand(parser.getCommand(1)));
-
-					//Provisional for tests
-					System.out.println("EchoCommand called");
-					break;
-				case "exit":
-					//result = ExitCommand.tryParse(parser);
-
-					//Provisional for tests
-					System.out.println("ExitCommand called");
-					result = new ParseResult(ParseResult.Code.SUCCESS);
 					break;
 				default:
 					result = new ParseResult(ParseResult.Code.INVALID_COMMAND);

@@ -26,13 +26,15 @@ public class App {
         do {
             System.out.print("tUPM> ");
             command = sc.nextLine();
-            Parser pars = new Parser(command);
-            ParseResult parsingInfo = Command.tryParse(pars);
-            if (parsingInfo.getCode() == ParseResult.Code.SUCCESS) {
-                Command.ExecuteResult executingInfo = parsingInfo.getCommand().tryExecute(ticket, dataManager);
-                System.out.println(executingInfo);
-            } else {
-                System.out.println(parsingInfo);
+            if (!command.equals("exit")) {
+                Parser pars = new Parser(command);
+                ParseResult parsingInfo = Command.tryParse(pars);
+                if (parsingInfo.getCode() == ParseResult.Code.SUCCESS) {
+                    Command.ExecuteResult executingInfo = parsingInfo.getCommand().tryExecute(ticket, dataManager);
+                    System.out.println(executingInfo);
+                } else {
+                    System.out.println(parsingInfo);
+                }
             }
         } while (!command.equals("exit"));
     }
@@ -41,6 +43,7 @@ public class App {
      * Main class, the Scanner is initialized in different ways attending to the args length
      * if it is 0, the scanner will read from the console, in the rest of the cases the scanner will
      * try to read from a document
+     *
      * @param args
      */
     public static void main(String[] args) {
