@@ -84,7 +84,6 @@ public class Parser {
 
     /**
      * This getter returns the length of the array
-     * @return
      */
     public int getLength() {
         return commands.length;

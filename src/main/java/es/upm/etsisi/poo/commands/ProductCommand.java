@@ -116,8 +116,7 @@ public class ProductCommand extends Command {
 	 * First entry point to parse 'product' command (assumes the parser.getCommand(0) is 'product')
 	 * Is responsible for parsing the 'subcommand' and dispatching to the corresponding one.
 	 * @param parser The stream of tokens to parse
-	 * @return       The result of the parse. Either a valid ProductCommand instance or a failure code.
-	 * @see ParseResult
+	 * @return       The result of the parse. Either a valid ProductCommand instance or null
 	 */
 	public static Command tryParse(Parser parser) {
 		if (!Command.checkArgsCountWithPrint("prod", parser, 2, 6)) return null;
@@ -143,8 +142,7 @@ public class ProductCommand extends Command {
 	 * @param parser The stream of tokens to parse
 	 * @return       The result of the parse. If every parse succedes a valid ProductCommand Add instance
 	 *               specifiying productId, productName, productCategory and productPrice,
-	 *               OR a failure code specifying which parse went wrong.
-	 * @see ParseResult
+	 *               or null if it fails
 	 */
 	public static Command tryParseAdd(Parser parser) {
 		if (!Command.checkArgsCountWithPrint("prod add", parser, 6)) return null;
@@ -170,7 +168,7 @@ public class ProductCommand extends Command {
 	 * FORMAT: prod list 
 	 * @param parser The stream of tokens to parse.
 	 * @return       The result of the parse. If the amount of tokens is 2 then a valid
-	 *               ProductCommand List instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS.
+	 *               ProductCommand List instance or null
 	 */
 	public static Command tryParseList(Parser parser) {
 		return Command.checkArgsCountWithPrint("prod list", parser, 2) ? new ProductCommand(SubCommand.LIST, 0, null, null, 0) : null;
@@ -185,8 +183,7 @@ public class ProductCommand extends Command {
 	 * @return       The result of the parse. If every parse succedes a valid ProductCommand Update instance
 	 *               specifiying productId and productField as well as the value to the field specified
 	 *               (productName if Field is String; productCategory if Field is Product.Category and productPrice if field is Integer)
-	 *               OR a failure code specifying which parse went wrong.
-	 * @see ParseResult
+	 *               or null
 	 * @see Product.Field
 	 */		
 	public static Command tryParseUpdate(Parser parser) {
@@ -225,7 +222,7 @@ public class ProductCommand extends Command {
 	 * FORMAT: prod remove <id>
 	 * @param parser The stream of tokens to parse
 	 * @return       The result of the parse. If the amount of tokens is 3 and the 'id' parse succedes then a valid
-	 *               ProductCommand Remove instance OR a failure code with the corresponding error code.
+	 *               ProductCommand Remove instance or null
 	 */		
 	public static Command tryParseRemove(Parser parser) {
 		if (!Command.checkArgsCountWithPrint("prod remove", parser, 3)) return null;
@@ -250,83 +247,83 @@ public class ProductCommand extends Command {
 	 * 
 	 * @param ticket the {@link Ticket} associated with the command execution (may be used for logging or tracking)
 	 * @param store  the {@link ArrayDataManager} representing the store's data manager
-	 * @return a {@link ExecuteResult} indicating the outcome of the command execution
 	 */
 	@Override
 	public void tryExecute(Ticket ticket, ArrayDataManager store) {
 
 		switch (this.subCommand) {
-		case ADD: { 
-			// Add product to the store
-			DataResult dataResult = store.createProduct(this.productId, this.productName, this.productCategory, this.productPrice);
+			case ADD -> {
+				// Add product to the store
+				DataResult dataResult = store.createProduct(this.productId, this.productName, this.productCategory, this.productPrice);
 
-			switch (dataResult) {
-			case SUCCESS: {
-				System.out.println(new Product(this.productId, this.productName, this.productCategory, this.productPrice));
-                System.out.println("prod add: ok"); 
-			} break;
-			case PRODUCT_ALREADY_EXISTS: System.out.printf("prod add: error: product with id %d already exists\n", this.productId); break;
-			case INVALID_ID:             System.out.printf("prod add: error: expected id greater or equal than zero\n");			break;
-			case INVALID_NAME:           System.out.printf("prod add: error: expected name with less than 100 characters\n");		break;
-			case INVALID_PRICE:          System.out.printf("prod add: error: expected price greater than zero\n");					break;
-			case INVENTORY_FULL:         System.out.printf("prod add: error: inventory full\n");									break;
-			default:                     System.out.printf("prod add: error: unexpected issue\n");									break;
-			};
-
-		} break;
-		case LIST: {
-			Product[] products = store.listProducts();
-			System.out.println("Catalog:");
-			if (products != null) {
-				for (Product p : products) {
-					System.out.println(" "+p.toString());
-				}
-			}
-			System.out.println("prod list: ok");
-		} break;
-			
-		case UPDATE: { 
-			// Update product in the store
-			DataResult dataResult = switch (this.productField) {
-			case NAME -> store.updateProductName(this.productId, this.productName);
-			case CATEGORY -> store.updateProductCategory(this.productId, this.productCategory);
-			case PRICE -> store.updateProductPrice(this.productId, this.productPrice);
-			};
-			
-			switch (dataResult) {
-			case SUCCESS: {
-				System.out.println(store.readProduct(this.productId));
-				System.out.printf("prod update: ok\n");	
-			} break;
-			case INVALID_ID:        System.out.printf("prod update: error: expected id greater or equal than zero\n");		 break;
-			case INVALID_NAME:      System.out.printf("prod update: error: expected name with less than 100 characters\n");	 break;
-			case INVALID_PRICE:     System.out.printf("prod update: error: expected price greater than zero\n");			 break;
-			case PRODUCT_NOT_FOUND: System.out.printf("prod update: error: product with id %d not found\n", this.productId); break;
-			default:                System.out.printf("prod update: error: unexpected issue\n");							 break;
-			};
-			
-		} break;
-		case REMOVE: {
-			
-			Product productToRemove = store.readProduct(this.productId);
-			if (productToRemove != null) { 
-				ticket.removeProduct(this.productId);
-				DataResult dataResult = store.deleteProduct(this.productId);
-			
 				switch (dataResult) {
-				case SUCCESS: {
-					System.out.println(productToRemove.toString());
-					System.out.printf("prod remove: ok\n");
-				} break;
-				case INVALID_ID: System.out.printf("prod remove: error: expected id greater or equal than zero\n");	break;
-				default:         System.out.printf("prod remove: error: unexpected issue\n");						break;
+					case SUCCESS -> {
+						System.out.println(new Product(this.productId, this.productName, this.productCategory, this.productPrice));
+						System.out.println("prod add: ok");
+					}
+					case PRODUCT_ALREADY_EXISTS -> System.out.printf("prod add: error: product with id %d already exists\n", this.productId);
+					case INVALID_ID             -> System.out.printf("prod add: error: expected id greater or equal than zero\n");
+					case INVALID_NAME           -> System.out.printf("prod add: error: expected name with less than 100 characters\n");
+					case INVALID_PRICE          -> System.out.printf("prod add: error: expected price greater than zero\n");
+					case INVENTORY_FULL         -> System.out.printf("prod add: error: inventory full\n");
+					default                     -> System.out.printf("prod add: error: unexpected issue\n");
+				}
+
+			}
+
+			case LIST -> {
+				Product[] products = store.listProducts();
+				System.out.println("Catalog:");
+				if (products != null) {
+					for (Product p : products) {
+						System.out.println(" "+p.toString());
+					}
+				}
+				System.out.println("prod list: ok");
+			}
+
+			case UPDATE -> {
+				// Update product in the store
+				DataResult dataResult = switch (this.productField) {
+					case NAME -> store.updateProductName(this.productId, this.productName);
+					case CATEGORY -> store.updateProductCategory(this.productId, this.productCategory);
+					case PRICE -> store.updateProductPrice(this.productId, this.productPrice);
 				};
 
-			} else {
-				System.out.printf("prod remove: error: product with id %d not found\n", this.productId);
+				switch (dataResult) {
+					case SUCCESS -> {
+						System.out.println(store.readProduct(this.productId));
+						System.out.printf("prod update: ok\n");
+					}
+					case INVALID_ID        -> System.out.printf("prod update: error: expected id greater or equal than zero\n");
+					case INVALID_NAME      -> System.out.printf("prod update: error: expected name with less than 100 characters\n");
+					case INVALID_PRICE     -> System.out.printf("prod update: error: expected price greater than zero\n");
+					case PRODUCT_NOT_FOUND -> System.out.printf("prod update: error: product with id %d not found\n", this.productId);
+					default                -> System.out.printf("prod update: error: unexpected issue\n");
+				}
+
 			}
-			
-		} break;
+			case REMOVE -> {
+
+				Product productToRemove = store.readProduct(this.productId);
+				if (productToRemove != null) {
+					ticket.removeProduct(this.productId);
+					DataResult dataResult = store.deleteProduct(this.productId);
+
+					switch (dataResult) {
+						case SUCCESS -> {
+							System.out.println(productToRemove.toString());
+							System.out.printf("prod remove: ok\n");
+						}
+						case INVALID_ID -> System.out.printf("prod remove: error: expected id greater or equal than zero\n");
+						default         -> System.out.printf("prod remove: error: unexpected issue\n");
+					}
+
+				} else {
+					System.out.printf("prod remove: error: product with id %d not found\n", this.productId);
+				}
+
+			}
 		}
 	}
 
