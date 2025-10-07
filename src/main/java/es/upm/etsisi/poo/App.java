@@ -37,6 +37,9 @@ public class App {
                 }
             }
         } while (!command.equals("exit"));
+
+		System.out.println("Closing application.");
+		System.out.println("Goodbye");
     }
 
     /**
