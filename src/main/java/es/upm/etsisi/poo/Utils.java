@@ -7,7 +7,7 @@ import java.util.function.Predicate;
  */
 public class Utils {
 
-	/**
+	/** true if both objects are equal under this criteria, false in other
 	 * Creats a string of an array. Calls .toString on every element
 	 * with a format '<elem0><delim><elem1><delim><elem2>...'
 	 */

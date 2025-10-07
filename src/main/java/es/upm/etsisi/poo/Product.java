@@ -67,6 +67,11 @@ public class Product {
 		this.price = price;
 	}
 
+	/**
+	 * Checks if this is the same as other product, based on id only
+	 * @param p product to be compared to
+	 * @return true, if the products have the same id, false in other case
+	 */
 	public boolean equals(Product p) {
 		return this.id == p.id;
 	}
@@ -113,6 +118,11 @@ public class Product {
 		this.price = price;
 	}
 
+	/**
+	 * Checks if this is equal to another object, that has to be a Product, based on id, name, category and price
+	 * @param obj Object to be compared to
+	 * @return true, if the objects are equals under this criteria, false in other case
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || this.getClass() != obj.getClass()) return false;

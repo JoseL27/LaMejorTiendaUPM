@@ -336,6 +336,12 @@ public class ProductCommand extends Command {
 							 this.subCommand, this.productId, this.productName, this.productCategory, this.productPrice);
 	}
 
+	/**
+	 * Checks if this is the same as other object, that has to be a ProductCommand, based on its subCommand, product name, product id,
+	 * product category and product price
+	 * @param obj object to be compared to
+	 * @return true, if the objects are equal under this criteria, false in other case
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || (obj.getClass() != this.getClass())) return false;
