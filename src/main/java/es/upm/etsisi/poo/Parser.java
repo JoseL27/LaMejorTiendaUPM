@@ -87,9 +87,4 @@ public class Parser {
     public int getLength() {
         return commands.length;
     }
-
-   // public static void main(String[] args) {
-       // Parser p = new Parser("Vamos a parsear \"Esta cadena\" y veamos como queda el array");
-       // p.getCommand(0);
-    //}
 }
