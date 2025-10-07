@@ -74,120 +74,95 @@ public class TicketCommand extends Command{
      * @param parser Tokenized command
      * @return Parse result. Either a valid TicketCommand instance or a failure code
      */
-    public static ParseResult tryParse(Parser parser){
-        if (parser.getLength() < 2)
-            return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+    public static Command tryParse(Parser parser){
+		if (!Command.checkArgsCountWithPrint("ticket", parser, 2, 4)) return null;
 
-        SubCommand subCommand = SubCommand.fromLabel(parser.getCommand(1));
-        if (subCommand == null) return new ParseResult(ParseResult.Code.INVALID_SUB_COMMAND);
-
-    ParseResult result = switch (subCommand) {
-    case NEW	-> tryParseNew(parser);
-    case ADD	-> tryParseAdd(parser);
-    case REMOVE -> tryParseRemove(parser);
-    case PRINT	-> tryParsePrint(parser);
-    };
-	
-    return result;
-    }
-	
-    /**
-    * Parses the 'new' subcommand of the 'ticket' command.
-    * This function does not do any parsing besides checking the number of arguments and
-    * creating a proper TicketCommand New instance.
-    * @param parser The stream of tokens to parse
-    * @return The result of the parse. If the amount of tokens is 2 then a valid
-    * TicketCommand New instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
-    */
-    public static ParseResult tryParseNew(Parser parser) {
-    if (parser.getLength() < 2)
-    return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
-	
-    if (parser.getLength() > 2)
-    System.out.println("DEBUG: Excess arguments found for subcommand NEW");
-	
-    return new ParseResult(new TicketCommand(SubCommand.NEW));
-    }
-	
-    /**
-    * Parses the 'print' subcommand of the 'ticket' command.
-    * This function does not do any parsing besides checking the number of arguments and
-    * creating a proper TicketCommand Print instance.
-    * @param parser The stream of tokens to parse
-    * @return The result of the parse. If the amount of tokens is 2 then a valid
-    * TicketCommand Print instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
-    */
-    public static ParseResult tryParsePrint(Parser parser) {
-    if (parser.getLength() < 2)
-    return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
-	
-    if (parser.getLength() > 2)
-    System.out.println("DEBUG: Excess arguments found for subcommand PRINT");
-	
-    return new ParseResult(new TicketCommand(SubCommand.PRINT));
-    }
-	
-    /**
-    * Parses the 'add' subcommand of the 'ticket' command.
-    * This function parses each field sequentially and immediately returns a failed ParseResult if it
-    * fails to parse any arguments.
-    * FORMAT: ticket add <productId> <cantidad>
-    * @param parser The stream of tokens to parse
-    * @return The result of the parse. If parsing is successful, this will return a valid TicketCommand Add instance
-    * specifying productId and quantity. Or a failure code specifying which part of the parsing went wrong.
-    */
-    public static ParseResult tryParseAdd(Parser parser) {
-    if (parser.getLength() < 4)
-    return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
-	
-    Integer productId = Utils.tryParseInt(parser.getCommand(2));
-    if (productId == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
-	
-    Integer quantity = Utils.tryParseInt(parser.getCommand(3));
-    if (quantity == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
-	
-    if (parser.getLength() > 4)
-    System.out.println("DEBUG: Excess arguments found for subcommand ADD");
-	
-    return new ParseResult(new TicketCommand(SubCommand.ADD, productId, quantity));
-    }
-	
-    /**
-    * Parses the 'remove' subcommand of the 'ticket' command.
-    * This function parses each field sequentially and immediately returns a failed ParseResult if it
-    * fails to parse any arguments.
-    * FORMAT: ticket remove <productId>
-    * @param parser The stream of tokens to parse
-    * @return The result of the parse. If parsing is successful, this will return a valid TicketCommand Remove instance
-    * specifying productId. Or a failure code specifying which part of the parsing went wrong.
-    */
-    public static ParseResult tryParseRemove(Parser parser) {
-    if (parser.getLength() < 3)
-    return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
-	
-    Integer productId = Utils.tryParseInt(parser.getCommand(2));
-    if (productId == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
-	
-    if (parser.getLength() > 3) {
-    System.out.println("DEBUG: Excess arguments found for subcommand REMOVE");
-    }
-	
-    return new ParseResult(new TicketCommand(SubCommand.REMOVE, productId));
-    }
-	
-    /**
-    * Reads the subcommand from this command and calls the corresponding function to execute it
-    * @param ticket The ticket on which the changes corresponding to the command will be applied
-    * @param dataManager data manager from which necessary products will be taken
-    * @return SUCCESS, if the command is executed correctly, and the error code if not
-    */
-    @Override
-    public Command.ExecuteResult tryExecute(Ticket ticket, ArrayDataManager dataManager) {
-		if (ticket == null) {
-			return ExecuteResult.NULL_TICKET;
+		SubCommand subCommand = SubCommand.fromLabel(parser.getCommand(1));
+		if (subCommand == null) {
+			Command.printInvalidEnum("ticket", "sub command", parser.getCommand(1), SubCommand.values());
+			return null;
 		}
+
+		return switch (subCommand) {
+		case NEW	-> tryParseNew(parser);
+		case ADD	-> tryParseAdd(parser);
+		case REMOVE -> tryParseRemove(parser);
+		case PRINT	-> tryParsePrint(parser);
+		};
+    }
 	
-		return switch (this.subCommand) {
+    /**
+	 * Parses the 'new' subcommand of the 'ticket' command.
+	 * This function does not do any parsing besides checking the number of arguments and
+	 * creating a proper TicketCommand New instance.
+	 * @param parser The stream of tokens to parse
+	 * @return The result of the parse. If the amount of tokens is 2 then a valid
+	 * TicketCommand New instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
+	 */
+    public static Command tryParseNew(Parser parser) {
+		return Command.checkArgsCountWithPrint("ticket new", parser, 2) ? new TicketCommand(SubCommand.NEW) : null;
+    }
+	
+    /**
+	 * Parses the 'print' subcommand of the 'ticket' command.
+	 * This function does not do any parsing besides checking the number of arguments and
+	 * creating a proper TicketCommand Print instance.
+	 * @param parser The stream of tokens to parse
+	 * @return The result of the parse. If the amount of tokens is 2 then a valid
+	 * TicketCommand Print instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
+	 */
+    public static Command tryParsePrint(Parser parser) {
+		return Command.checkArgsCountWithPrint("ticket print", parser, 2) ? new TicketCommand(SubCommand.PRINT) : null; 
+    }
+	
+    /**
+	 * Parses the 'add' subcommand of the 'ticket' command.
+	 * This function parses each field sequentially and immediately returns a failed ParseResult if it
+	 * fails to parse any arguments.
+	 * FORMAT: ticket add <productId> <cantidad>
+	 * @param parser The stream of tokens to parse
+	 * @return The result of the parse. If parsing is successful, this will return a valid TicketCommand Add instance
+	 * specifying productId and quantity. Or a failure code specifying which part of the parsing went wrong.
+	 */
+    public static Command tryParseAdd(Parser parser) {
+		if (!Command.checkArgsCountWithPrint("ticket add", parser, 4)) return null ;
+		
+		Integer productId = Command.tryParseIntWithPrint("ticket add", parser.getCommand(2));
+		if (productId == null) return null;
+
+		Integer quantity = Command.tryParseIntWithPrint("ticket add", parser.getCommand(3));
+		if (quantity == null) return null;
+	
+		return new TicketCommand(SubCommand.ADD, productId, quantity);
+    }
+	
+    /**
+	 * Parses the 'remove' subcommand of the 'ticket' command.
+	 * This function parses each field sequentially and immediately returns a failed ParseResult if it
+	 * fails to parse any arguments.
+	 * FORMAT: ticket remove <productId>
+	 * @param parser The stream of tokens to parse
+	 * @return The result of the parse. If parsing is successful, this will return a valid TicketCommand Remove instance
+	 * specifying productId. Or a failure code specifying which part of the parsing went wrong.
+	 */
+    public static Command tryParseRemove(Parser parser) {
+		if (!Command.checkArgsCountWithPrint("ticket remove", parser, 3)) return null;
+		
+		Integer productId = Command.tryParseIntWithPrint("ticket remove", parser.getCommand(2));
+		if (productId == null) return null;
+		
+		return new TicketCommand(SubCommand.REMOVE, productId);
+    }
+	
+    /**
+	 * Reads the subcommand from this command and calls the corresponding function to execute it
+	 * @param ticket The ticket on which the changes corresponding to the command will be applied
+	 * @param dataManager data manager from which necessary products will be taken
+	 * @return SUCCESS, if the command is executed correctly, and the error code if not
+	 */
+    @Override
+    public void tryExecute(Ticket ticket, ArrayDataManager dataManager) {
+		switch (this.subCommand) {
 		case NEW	-> tryExecuteNew(ticket);
 		case ADD	-> tryExecuteAdd(ticket, dataManager);
 		case REMOVE -> tryExecuteRemove(ticket);
@@ -200,10 +175,9 @@ public class TicketCommand extends Command{
      * @param ticket ticket to be reset or created
      * @return SUCCESS always, since no recognisable error can happen
      */
-    private Command.ExecuteResult tryExecuteNew(Ticket ticket){
+    private void tryExecuteNew(Ticket ticket){
         ticket.reset();
 		System.out.println("ticket new: ok");
-        return Command.ExecuteResult.SUCCESS;
     }
 
     /**
@@ -212,35 +186,27 @@ public class TicketCommand extends Command{
      * @param dataManager dataManager from which the product will be taken
      * @return SUCCESS, if the product is added correctly, or the corresponding error if not
      */
-    private Command.ExecuteResult tryExecuteAdd(Ticket ticket, ArrayDataManager dataManager) {
-        Command.ExecuteResult result;
-
+    private void tryExecuteAdd(Ticket ticket, ArrayDataManager dataManager) {
         if (!ArrayDataManager.isValidId(this.productId)) { // Use the one from DataManager when it is public
 			System.out.printf("ticket add: error: expected id greater or equal than zero\n");
-            result = Command.ExecuteResult.INVALID_ID;
 			
         } else if (!isValidAmount(this.amount)) {
 			System.out.printf("ticket add: error: expected amount greater or equal than zero\n");
-            result = Command.ExecuteResult.INVALID_AMOUNT;
 			
         } else {
             Product productToAdd = dataManager.readProduct(this.productId);
 			
             if (productToAdd == null){
-                result = Command.ExecuteResult.PRODUCT_NOT_IN_STORAGE;
 				System.out.printf("ticket add: error: product with id %d not found\n", this.productId);
 				
             } else if (!ticket.addProduct(productToAdd, this.amount)){
-                result = Command.ExecuteResult.DATA_ERROR;
 				System.out.printf("ticket add: error: ticket is full (100 items max)\n");
 				
             } else {
-                result = Command.ExecuteResult.SUCCESS;
 				System.out.println(ticket.summaryString());
 				System.out.println("ticket add: ok");
             }
         }
-        return result;
     }
 
 
@@ -249,26 +215,20 @@ public class TicketCommand extends Command{
      * @param ticket ticket from which the product will be removed
      * @return SUCCESS, if the product is removed correctly, or the corresponding error if not
      */
-    private Command.ExecuteResult tryExecuteRemove(Ticket ticket){
-        Command.ExecuteResult result = null;
-
+    private void tryExecuteRemove(Ticket ticket){
         if (!ArrayDataManager.isValidId(this.productId)){
 			System.out.printf("ticket add: error: expected id greater or equal than zero\n");
-            result = Command.ExecuteResult.INVALID_ID;
 			
         } else {
 			Product removed = ticket.removeProduct(this.productId);
 			if (removed != null) {
-				result = Command.ExecuteResult.SUCCESS;
 				System.out.println(removed.toString());
 				System.out.println("ticket remove: ok");
 			
 			} else {
-				result = Command.ExecuteResult.PRODUCT_NOT_IN_TICKET;
 				System.out.printf("ticket remove: error: product with id %d not in ticket\n", this.productId);
 			}
 		}
-        return result;
     }
 
     /**
@@ -276,196 +236,14 @@ public class TicketCommand extends Command{
      * @param ticket ticket to be printed
      * @return SUCCESS always, since no recognisable error can happen
      */
-    private Command.ExecuteResult tryExecutePrint(Ticket ticket){
+    private void tryExecutePrint(Ticket ticket){
         System.out.println(ticket.summaryString());
 		System.out.println("ticket print: ok");
-        return Command.ExecuteResult.SUCCESS;
     }
 
     private boolean isValidAmount(int quantity){
         return quantity >= 0 && quantity <= Ticket.TICKET_MAX_PRODUCTS;
     }
-
-//    public static void main(String[] args) {
-//        Ticket testTicket = new Ticket();
-//
-//        ArrayDataManager dataManager = new ArrayDataManager();
-//        dataManager.createProduct(1, "Libro POO", Product.Category.BOOK, 25);
-//        dataManager.createProduct(2, "Camiseta talla:M UPM", Product.Category.CLOTHES, 15);
-//        dataManager.createProduct(3, "Libro POO repetido", Product.Category.BOOK, 25);
-//
-//        TicketCommand testCommand = null;
-//
-//        System.out.println("test 1: New ticket");
-//        testCommand = new TicketCommand(SubCommand.NEW);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//        testCommand = new TicketCommand(SubCommand.PRINT);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//
-//        System.out.println("test 2: Add product 1 2 times");
-//        testCommand = new TicketCommand(SubCommand.ADD, 1, 2);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//        testCommand = new TicketCommand(SubCommand.PRINT);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//
-//        System.out.println("test 3: reseteo ticket");
-//        testCommand = new TicketCommand(SubCommand.NEW);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//        testCommand = new TicketCommand(SubCommand.PRINT);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//
-//        System.out.println("test 4: Add product 2 1 time");
-//        testCommand = new TicketCommand(SubCommand.ADD, 2, 1);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//        testCommand = new TicketCommand(SubCommand.PRINT);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//
-//        System.out.println("test 5: Add product with invalid id");
-//        testCommand = new TicketCommand(SubCommand.ADD, -1, 1);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//        testCommand = new TicketCommand(SubCommand.PRINT);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//
-//        System.out.println("test 6: Add product not in storage");
-//        testCommand = new TicketCommand(SubCommand.ADD, 4, 1);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//        testCommand = new TicketCommand(SubCommand.PRINT);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//
-//        System.out.println("test 7: Remove product not in ticket");
-//        testCommand = new TicketCommand(SubCommand.REMOVE, 3);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//        testCommand = new TicketCommand(SubCommand.PRINT);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//
-//        System.out.println("test 8: Remove product 2");
-//        testCommand = new TicketCommand(SubCommand.REMOVE, 2);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//        testCommand = new TicketCommand(SubCommand.PRINT);
-//        System.out.println(testCommand.tryExecute(testTicket, dataManager));
-//
-//        testTryParse();
-//    }
-//
-//    public static void testTryParse() {
-//        System.out.println("[TryParse] Test 1: ticket new (Should work): ");
-//        Parser pars = new Parser("ticket new");
-//        ParseResult parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 2: ticket new fhqghwads (Should work with warning): ");
-//        pars = new Parser("ticket new fhqghwads");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 3: ticket (should fail with insufficient_arguments): "); // Should this fail with insufficient_arguments or invalid_subcommand?
-//        pars = new Parser("ticket");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 4: ticket print (should work): ");
-//        pars = new Parser("ticket print");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 5: ticket print samekosaba (should work with warning): ");
-//        pars = new Parser("ticket print samekosaba");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 6: ticket fuckshitup (should fail with invalid_sub_command): ");
-//        pars = new Parser("ticket fuckshitup");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 7: ticket fuckshitup 4 3 (should fail with invalid_sub_command): ");
-//        pars = new Parser("ticket fuckshitup 4 3");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 8: ticket add (should fail with insufficient_arguments): ");
-//        pars = new Parser("ticket add");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 9: ticket add rompe (should fail with insufficient_arguments): ");
-//        pars = new Parser("ticket add rompe");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 10: ticket add rompe cabezas (should fail with invalid_number): ");
-//        pars = new Parser("ticket add rompe cabezas");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 11: ticket add 5 cabezas (should fail with invalid_number): ");
-//        pars = new Parser("ticket add 5 cabezas");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 12: ticket add rompe 4 (should fail with invalid_number): ");
-//        pars = new Parser("ticket add rompe 4");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 13: ticket add 3 (should fail with insufficient_arguments): ");
-//        pars = new Parser("ticket add 3");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 14: ticket add 2 4 (should work): ");
-//        pars = new Parser("ticket add 2 4");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        System.out.println("[TryParse] Test 15: ticket add 2 4 rayuela_hacia_mas_alla (should work with warning): ");
-//        pars = new Parser("ticket add 2 4 rayuela_hacia_mas_alla");
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        String command = "ticket remove";
-//        System.out.printf("[TryParse] Test 16: %s (should fail with insufficient_arguments): \n", command);
-//        pars = new Parser(command);
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        command = "ticket remove uno";
-//        System.out.printf("[TryParse] Test 17: %s (should fail with invalid_number): \n", command);
-//        pars = new Parser(command);
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        command = "ticket remove 1";
-//        System.out.printf("[TryParse] Test 18: %s (should work): \n", command);
-//        pars = new Parser(command);
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//
-//        command = "ticket remove 1 cd";
-//        System.out.printf("[TryParse] Test 19: %s (should work with warning): \n", command);
-//        pars = new Parser(command);
-//        parsRs = TicketCommand.tryParse(pars);
-//        System.out.println(parsRs.getCode());
-//        System.out.println();
-//    }
 
     @Override
     public boolean equals(Object obj){

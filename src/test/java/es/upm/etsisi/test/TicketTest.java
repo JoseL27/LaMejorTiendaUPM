@@ -4,6 +4,7 @@ import es.upm.etsisi.poo.Ticket;
 import es.upm.etsisi.poo.Product;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ public class TicketTest {
 	void removeProductTest() { 
 		Ticket ticket = new Ticket();
 		ticket.addProduct(new Product(1, "Product", Product.Category.BOOK, 10), 1);
-		assertTrue(ticket.removeProduct(1));
+		assertNotNull(ticket.removeProduct(1));
 	}
 
 	@Test			
@@ -34,7 +35,7 @@ public class TicketTest {
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"Total price: 60.0\n"
 			+"Total discount: 6.0\n"
-			+"Final Price: 54.0\n";
+			+"Final Price: 54.0";
 
 		assertEquals(expectedString, ticket.summaryString());
 	}
@@ -51,7 +52,7 @@ public class TicketTest {
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"Total price: 75.0\n"
 			+"Total discount: 6.0\n"
-			+"Final Price: 69.0\n";
+			+"Final Price: 69.0";
 		
 		assertEquals(expectedString, ticket.summaryString());
 	}
@@ -64,7 +65,7 @@ public class TicketTest {
 		String expectedString = "{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
 			+"Total price: 15.0\n"
 			+"Total discount: 0.0\n"
-			+"Final Price: 15.0\n";
+			+"Final Price: 15.0";
 		assertEquals(expectedString, ticket.summaryString());
 	}
 

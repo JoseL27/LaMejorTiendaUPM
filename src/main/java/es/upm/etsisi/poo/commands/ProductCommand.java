@@ -1,9 +1,7 @@
 package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.Command;
-import es.upm.etsisi.poo.Command.ExecuteResult;
 import es.upm.etsisi.poo.Product;
-import es.upm.etsisi.poo.ParseResult;
 import es.upm.etsisi.poo.Utils;
 import es.upm.etsisi.poo.Parser;
 import es.upm.etsisi.poo.DataManager.DataResult;
@@ -121,20 +119,21 @@ public class ProductCommand extends Command {
 	 * @return       The result of the parse. Either a valid ProductCommand instance or a failure code.
 	 * @see ParseResult
 	 */
-	public static ParseResult tryParse(Parser parser) {
-		if (parser.getLength() < 2)
-			return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+	public static Command tryParse(Parser parser) {
+		if (!Command.checkArgsCountWithPrint("prod", parser, 2, 6)) return null;
 
 		SubCommand subCommand = SubCommand.fromLabel(parser.getCommand(1));
-		if (subCommand == null) return new ParseResult(ParseResult.Code.INVALID_SUB_COMMAND);
+		if (subCommand == null) {
+			Command.printInvalidEnum("prod", "sub command", parser.getCommand(1), SubCommand.values());
+			return null;
+		}
 
-		ParseResult result = switch (subCommand) {
+		return switch (subCommand) {
 		case ADD	-> tryParseAdd(parser);
 		case LIST	-> tryParseList(parser);
 		case UPDATE -> tryParseUpdate(parser);
 		case REMOVE -> tryParseRemove(parser);
-		};
-		return result;
+		};		
 	}
 
 	/**
@@ -147,25 +146,21 @@ public class ProductCommand extends Command {
 	 *               OR a failure code specifying which parse went wrong.
 	 * @see ParseResult
 	 */
-	public static ParseResult tryParseAdd(Parser parser) {
-		if (parser.getLength() < 6) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+	public static Command tryParseAdd(Parser parser) {
+		if (!Command.checkArgsCountWithPrint("prod add", parser, 6)) return null;
 
- 		Integer id = Utils.tryParseInt(parser.getCommand(2));
-		if (id == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
+ 		Integer id = Command.tryParseIntWithPrint("prod add", parser.getCommand(2));
+		if (id == null) return null;
 
 		String name = parser.getCommand(3);
 
-		Product.Category category = Product.Category.fromLabel(parser.getCommand(4));
-		if (category == null) return new ParseResult(ParseResult.Code.INVALID_CATEGORY);
+		Product.Category category = Command.tryParseCategoryWithPrint("prod add", parser.getCommand(4));
+		if (category == null) return null;
 
- 		Integer price = Utils.tryParseInt(parser.getCommand(5));
-		if (price == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
+ 		Integer price = Command.tryParseIntWithPrint("prod add", parser.getCommand(5));
+		if (price == null) return null;
 
-		if (parser.getLength() > 6) {
-			System.out.println("DEBUG: Excess arguments unimplemented");
-		}
-
-		return new ParseResult(new ProductCommand(SubCommand.ADD, id, name, category, price));
+		return new ProductCommand(SubCommand.ADD, id, name, category, price);
 	}    
 	
 	/**
@@ -177,14 +172,8 @@ public class ProductCommand extends Command {
 	 * @return       The result of the parse. If the amount of tokens is 2 then a valid
 	 *               ProductCommand List instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS.
 	 */
-	public static ParseResult tryParseList(Parser parser) {
-		if (parser.getLength() < 2) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
-
-		if (parser.getLength() > 2) {
-			System.out.println("DEBUG: Excess arguments unimplemented");
-		}
-		
-		return new ParseResult(new ProductCommand(SubCommand.LIST, 0, null, null, 0));
+	public static Command tryParseList(Parser parser) {
+		return Command.checkArgsCountWithPrint("prod list", parser, 2) ? new ProductCommand(SubCommand.LIST, 0, null, null, 0) : null;
 	}   
 
 	/**
@@ -200,38 +189,34 @@ public class ProductCommand extends Command {
 	 * @see ParseResult
 	 * @see Product.Field
 	 */		
-	public static ParseResult tryParseUpdate(Parser parser) {
-		if (parser.getLength() < 5) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+	public static Command tryParseUpdate(Parser parser) {
+		if (!Command.checkArgsCountWithPrint("prod update", parser, 5)) return null;
 		
- 		Integer id = Utils.tryParseInt(parser.getCommand(2));
-		if (id == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
+ 		Integer id = Command.tryParseIntWithPrint("prod update", parser.getCommand(2));
+		if (id == null) return null;
 
-		Product.Field field = Product.Field.fromLabel(parser.getCommand(3));
-		if (field == null) return new ParseResult(ParseResult.Code.INVALID_PRODUCT_FIELD);
+		Product.Field field = Command.tryParseFieldWithPrint("prod update", parser.getCommand(3));
+		if (field == null) return null;
 
 		String name = null;
 		Product.Category category = null;
 		Integer price = 0;
 
 		switch (field) {
-		case Product.Field.NAME: {
+		case NAME: {
 			name = parser.getCommand(4);
 		} break;
-		case Product.Field.CATEGORY: {
-			category = Product.Category.fromLabel(parser.getCommand(4));
-			if (category == null) return new ParseResult(ParseResult.Code.INVALID_CATEGORY);
+		case CATEGORY: {
+			category = Command.tryParseCategoryWithPrint("prod update", parser.getCommand(4));
+			if (category == null) return null;
 		} break;
-		case Product.Field.PRICE: {
-			price = Utils.tryParseInt(parser.getCommand(4));
-			if (price == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
+		case PRICE: {
+			price = Command.tryParseIntWithPrint("prod update", parser.getCommand(4));
+			if (price == null) return null;
 		} break;
 		}
-		
-		if (parser.getLength() > 5) {
-			System.out.println("DEBUG: Excess arguments unimplemented");
-		}
-		
-		return new ParseResult(new ProductCommand(SubCommand.UPDATE, id, name, category, price, field));
+
+		return new ProductCommand(SubCommand.UPDATE, id, name, category, price, field);
 	}
 
 	/**
@@ -242,17 +227,13 @@ public class ProductCommand extends Command {
 	 * @return       The result of the parse. If the amount of tokens is 3 and the 'id' parse succedes then a valid
 	 *               ProductCommand Remove instance OR a failure code with the corresponding error code.
 	 */		
-	public static ParseResult tryParseRemove(Parser parser) {
-		if (parser.getLength() < 3) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
+	public static Command tryParseRemove(Parser parser) {
+		if (!Command.checkArgsCountWithPrint("prod remove", parser, 3)) return null;
 
-		if (parser.getLength() > 3) {
-			System.out.println("DEBUG: Excess arguments unimplemented");
-		}
-
- 		Integer id = Utils.tryParseInt(parser.getCommand(2));
-		if (id == null) return new ParseResult(ParseResult.Code.INVALID_NUMBER);
-
-		return new ParseResult(new ProductCommand(SubCommand.REMOVE, id, null, null, 0));
+ 		Integer id = Command.tryParseIntWithPrint("prod remove", parser.getCommand(2));
+		if (id == null) return null;
+		
+		return new ProductCommand(SubCommand.REMOVE, id, null, null, 0);
 	} 
 
 	/**
@@ -272,16 +253,18 @@ public class ProductCommand extends Command {
 	 * @return a {@link ExecuteResult} indicating the outcome of the command execution
 	 */
 	@Override
-	public ExecuteResult tryExecute(Ticket ticket, ArrayDataManager store) {
+	public void tryExecute(Ticket ticket, ArrayDataManager store) {
 
-		//System.out.println("ProductCommand.TryExecute() UNIMPLEMENTED");
-		ExecuteResult result = null;
 		switch (this.subCommand) {
 		case ADD: { 
 			// Add product to the store
 			DataResult dataResult = store.createProduct(this.productId, this.productName, this.productCategory, this.productPrice);
+
 			switch (dataResult) {
-			case SUCCESS:                System.out.println("prod add: ok");														break;
+			case SUCCESS: {
+				System.out.println(new Product(this.productId, this.productName, this.productCategory, this.productPrice));
+                System.out.println("prod add: ok"); 
+			} break;
 			case PRODUCT_ALREADY_EXISTS: System.out.printf("prod add: error: product with id %d already exists\n", this.productId); break;
 			case INVALID_ID:             System.out.printf("prod add: error: expected id greater or equal than zero\n");			break;
 			case INVALID_NAME:           System.out.printf("prod add: error: expected name with less than 100 characters\n");		break;
@@ -289,18 +272,17 @@ public class ProductCommand extends Command {
 			case INVENTORY_FULL:         System.out.printf("prod add: error: inventory full\n");									break;
 			default:                     System.out.printf("prod add: error: unexpected issue\n");									break;
 			};
-			
+
 		} break;
 		case LIST: {
 			Product[] products = store.listProducts();
 			System.out.println("Catalog:");
 			if (products != null) {
 				for (Product p : products) {
-					System.out.println(p.toString());
+					System.out.println(" "+p.toString());
 				}
 			}
 			System.out.println("prod list: ok");
-			result = ExecuteResult.SUCCESS;
 		} break;
 			
 		case UPDATE: { 
@@ -312,7 +294,10 @@ public class ProductCommand extends Command {
 			};
 			
 			switch (dataResult) {
-			case SUCCESS:           System.out.printf("prod update: ok\n");													 break;
+			case SUCCESS: {
+				System.out.println(store.readProduct(this.productId));
+				System.out.printf("prod update: ok\n");	
+			} break;
 			case INVALID_ID:        System.out.printf("prod update: error: expected id greater or equal than zero\n");		 break;
 			case INVALID_NAME:      System.out.printf("prod update: error: expected name with less than 100 characters\n");	 break;
 			case INVALID_PRICE:     System.out.printf("prod update: error: expected price greater than zero\n");			 break;
@@ -343,7 +328,6 @@ public class ProductCommand extends Command {
 			
 		} break;
 		}
-		return result;
 	}
 
 	@Override

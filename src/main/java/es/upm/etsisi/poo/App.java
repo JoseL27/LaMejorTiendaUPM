@@ -21,25 +21,25 @@ public class App {
      * Then the Command is executed. If any error is detected, a message error is sent indicating the error.
      */
     public void run(Scanner sc) {
-        System.out.println("Tienda UPM");
+		System.out.println("Welcome to the ticket module App.");
+		System.out.println("Ticket module. Type 'help' to see commands.");
+		
         String command;
         do {
             System.out.print("tUPM> ");
             command = sc.nextLine();
+			System.out.println(command);
             if (!command.equals("exit")) {
                 Parser pars = new Parser(command);
-                ParseResult parsingInfo = Command.tryParse(pars);
-                if (parsingInfo.getCode() == ParseResult.Code.SUCCESS) {
-                    Command.ExecuteResult executingInfo = parsingInfo.getCommand().tryExecute(ticket, dataManager);
-                    System.out.println(executingInfo);
-                } else {
-                    System.out.println(parsingInfo);
-                }
-            }
+                Command parsedCommand = Command.tryParse(pars);
+				if (parsedCommand != null) {
+                    parsedCommand.tryExecute(ticket, dataManager);
+				}
+            } else {
+				System.out.println("Closing application.");
+				System.out.println("Goodbye!");
+			}
         } while (!command.equals("exit"));
-
-		System.out.println("Closing application.");
-		System.out.println("Goodbye");
     }
 
     /**

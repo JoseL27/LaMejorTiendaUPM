@@ -2,28 +2,22 @@ package es.upm.etsisi.poo;
 
 public class Product {
 	public enum Category {
-		MERCH	   	(0.00f, "MERCH"),
-		STATIONERY 	(0.05f, "STATIONERY"),
-		CLOTHES	    (0.07f, "CLOTHES"),
-		BOOK	   	(0.10f, "BOOK"),
-		ELECTRONICA	(0.03f, "ELECTRONICA");
+		MERCH	   	(0.00f),
+		STATIONERY 	(0.05f),
+		CLOTHES	    (0.07f),
+		BOOK	   	(0.10f),
+		ELECTRONICS	(0.03f);
 
 		private final float discountPercent;
-		private final String label;
 
-		private Category(float discountPercent, String label) {
+		private Category(float discountPercent) {
 			this.discountPercent = discountPercent;
-			this.label = label;
 		}
 
 		public float getDiscountPercent() {
 			return this.discountPercent;
 		}
 		
-		public String getLabel() {
-			return this.label;
-		}
-
 		public static Category fromLabel(String label) {
 			Category category = null;
 			try {

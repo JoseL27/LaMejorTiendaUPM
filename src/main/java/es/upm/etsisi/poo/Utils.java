@@ -9,19 +9,15 @@ public class Utils {
 
 	/**
 	 * Creats a string of an array. Calls .toString on every element
-	 * with a format '[elem0, elem1, ...]'
+	 * with a format '<elem0><delim><elem1><delim><elem2>...'
 	 */
-	public static <T> String arrayToString(T[] array) {
+	public static <T> String arrayToString(T[] array, String delim) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("[ ");
-		
 		for (int i = 0; i < array.length; i++) {
 			sb.append(array[i].toString());
 			if (i != array.length - 1)
-				sb.append(", ");
+				sb.append(delim);
 		}
-
-		sb.append(" ]");
 		return sb.toString();
 	}
 

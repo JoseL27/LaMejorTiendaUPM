@@ -137,7 +137,7 @@ public class Ticket {
 		int foundIndex = productInfoIndex(id);
 		
 		if (foundIndex != -1) {
-			Product removed = productInfos[count].getProduct();
+			Product removed = productInfos[foundIndex].getProduct();
 			productInfos[foundIndex] = productInfos[count];
 			productInfos[count]	= null;
 			count--;
@@ -196,7 +196,7 @@ public class Ticket {
 		
 		sb.append(String.format("Total price: %.1f\n", (float)totalPrice));
 		sb.append(String.format("Total discount: %.1f\n", (float)totalDiscount));
-		sb.append(String.format("Final Price: %.1f\n", (float)(totalPrice - totalDiscount)));
+		sb.append(String.format("Final Price: %.1f", (float)(totalPrice - totalDiscount)));
 		return sb.toString();
 	}
 

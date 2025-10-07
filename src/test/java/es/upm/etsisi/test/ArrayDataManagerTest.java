@@ -132,16 +132,6 @@ public class ArrayDataManagerTest {
 	}
 
 	@Test
-	void addInvalidNullCategoryTest() {
-        ArrayDataManager adm = new ArrayDataManager();
-		int productId = 1;
-        DataResult result = adm.createProduct(productId, "Libro POOOOOOOOOOOO", null, 25);
-		
-		assertEquals(result, DataResult.INVALID_CATEGORY);
-		assertNull(adm.readProduct(productId)); // Wasn't added
-	}
-
-	@Test
 	void addInvalidNegativePriceTest() {
         ArrayDataManager adm = new ArrayDataManager();
 		

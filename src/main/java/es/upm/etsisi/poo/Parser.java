@@ -1,5 +1,7 @@
 package es.upm.etsisi.poo;
 
+import java.util.Arrays;
+
 /**
  * This class function is to parse the command received in different position of an array.
  */
@@ -87,4 +89,9 @@ public class Parser {
     public int getLength() {
         return commands.length;
     }
+	
+	@Override
+	public String toString() {
+		return String.format("{class: Parser, text: %s, commands: %s}", this.text, Arrays.toString(this.commands));
+	}
 }

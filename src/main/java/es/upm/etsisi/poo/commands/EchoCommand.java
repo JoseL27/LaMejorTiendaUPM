@@ -2,7 +2,6 @@
 package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.Command;
-import es.upm.etsisi.poo.ParseResult;
 import es.upm.etsisi.poo.Parser;
 import es.upm.etsisi.poo.Utils;
 import es.upm.etsisi.poo.Ticket;
@@ -25,16 +24,14 @@ public class EchoCommand extends Command {
 		return this.message;
 	}
 
-    public static ParseResult tryParse (Parser parser) {
-        if (parser.getLength() < 2) return new ParseResult(ParseResult.Code.INSUFICIENT_ARGUMENTS);
-		if (parser.getLength() > 2) return new ParseResult(ParseResult.Code.TOO_MANY_ARGUMENTS);
-        return new ParseResult(new EchoCommand(parser.getCommand(1)));
+    public static Command tryParse(Parser parser) {
+		return Command.checkArgsCountWithPrint("echo", parser, 2) 
+			? new EchoCommand(parser.getCommand(1)) : null;
     }
 
 	@Override
-	public Command.ExecuteResult tryExecute(Ticket ticket, ArrayDataManager data) { 
-		System.out.printf("echo \"%s\"", this.message);
-        return Command.ExecuteResult.SUCCESS;
+	public void tryExecute(Ticket ticket, ArrayDataManager data) { 
+		System.out.printf("echo \"%s\"\n", this.message);
     }
 
 	@Override
@@ -42,5 +39,10 @@ public class EchoCommand extends Command {
 		if (obj == null || (obj.getClass() != this.getClass())) return false;
 		EchoCommand otherEchoCmd = (EchoCommand)obj;
 		return Utils.nullOrEquals(this.message, otherEchoCmd.message);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("{class: EchoCommand, message: '%s'}", this.message); 
 	}
 }
