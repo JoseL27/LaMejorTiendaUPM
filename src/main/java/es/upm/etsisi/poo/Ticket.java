@@ -187,7 +187,7 @@ public class Ticket {
 			
 			totalPrice += productInfo.getAmount() * product.getPrice();
 
-			boolean hasDiscount = productInfo.getAmount() > 1;
+			boolean hasDiscount = getOccurrences(product.getCategory()) > 1;
 
 			for (int productCounter = 0; productCounter < productInfo.getAmount(); productCounter++) {
 				sb.append(String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}", 
@@ -208,6 +208,22 @@ public class Ticket {
 		return sb.toString();
 	}
 
+	/**
+	 * Counts all the occurrences of a category in the ticket.
+	 * A productInfo is considered to have productInfo.getAmount() occurrences
+	 * @param category Category of which the occurrences will be counted
+	 * @return Number of occurrences of the category, if it does not appear, 0 is returned
+	 */
+	private int getOccurrences(Product.Category category){
+		int result = 0;
+
+		for (int i = 0; i < count; i++) {
+			if (category.equals(productInfos[i].getProduct().getCategory())){
+				result += productInfos[i].getAmount();
+			}
+		}
+		return result;
+	}
 
 	/**
 	 * Helper to find the index of a product info in the array.
