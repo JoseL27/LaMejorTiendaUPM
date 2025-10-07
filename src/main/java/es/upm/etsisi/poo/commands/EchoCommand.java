@@ -1,9 +1,12 @@
+
 package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.ParseResult;
 import es.upm.etsisi.poo.Parser;
 import es.upm.etsisi.poo.Utils;
+import es.upm.etsisi.poo.Ticket;
+import es.upm.etsisi.poo.ArrayDataManager;
 
 /**
  * Represents a command that echoes to the standard output a given message.
@@ -12,7 +15,7 @@ import es.upm.etsisi.poo.Utils;
  */
 public class EchoCommand extends Command {
 
-    private final String message;
+    private String message;
 
     public EchoCommand (String message) {
         this.message = message;
@@ -28,16 +31,10 @@ public class EchoCommand extends Command {
         return new ParseResult(new EchoCommand(parser.getCommand(1)));
     }
 
-    public Command.ExecuteResult tryExecute() {
-        /*if ( message.isEmpty () )
-        {
-            System.err.println ( "Error: echo command requires text to echo" );
-        }
-        else
-        {
-            //System.out.println ( "echo" + text );
-        }*/
-        return null;
+	@Override
+	public Command.ExecuteResult tryExecute(Ticket ticket, ArrayDataManager data) { 
+		System.out.printf("echo \"%s\"", this.message);
+        return Command.ExecuteResult.SUCCESS;
     }
 
 	@Override

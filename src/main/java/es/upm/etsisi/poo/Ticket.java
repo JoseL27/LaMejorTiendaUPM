@@ -128,20 +128,23 @@ public class Ticket {
 	 * unordered removal (replaces element to remove with the last element).
 	 * 
 	 * @param id  the id of the product to attempt to remove
-	 * @return    true if the product was removed and false if it was not found
+	 * @return    the removed product if it was found or null if it wasn't
 	 *
 	 * @note Lookup could be optimized after calling 'printList' which
 	 * sorts the products array
 	 */
-	public boolean removeProduct(int id) {
+	public Product removeProduct(int id) {
 		int foundIndex = productInfoIndex(id);
+		
 		if (foundIndex != -1) {
+			Product removed = productInfos[count].getProduct();
 			productInfos[foundIndex] = productInfos[count];
 			productInfos[count]	= null;
 			count--;
-			return true;
+			return removed;
 		}
-		return false;
+		
+		return null;
 	}
 
 

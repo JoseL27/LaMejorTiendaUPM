@@ -280,23 +280,26 @@ public class ProductCommand extends Command {
 		case ADD: { 
 			// Add product to the store
 			DataResult dataResult = store.createProduct(this.productId, this.productName, this.productCategory, this.productPrice);
-			
-			result = switch (dataResult) {
-			case SUCCESS							-> ExecuteResult.SUCCESS;
-			case INVALID_ID, PRODUCT_ALREADY_EXISTS -> ExecuteResult.INVALID_ID;
-			default									-> ExecuteResult.DATA_ERROR;
+			switch (dataResult) {
+			case SUCCESS:                System.out.println("prod add: ok");														break;
+			case PRODUCT_ALREADY_EXISTS: System.out.printf("prod add: error: product with id %d already exists\n", this.productId); break;
+			case INVALID_ID:             System.out.printf("prod add: error: expected id greater or equal than zero\n");			break;
+			case INVALID_NAME:           System.out.printf("prod add: error: expected name with less than 100 characters\n");		break;
+			case INVALID_PRICE:          System.out.printf("prod add: error: expected price greater than zero\n");					break;
+			case INVENTORY_FULL:         System.out.printf("prod add: error: inventory full\n");									break;
+			default:                     System.out.printf("prod add: error: unexpected issue\n");									break;
 			};
 			
 		} break;
 		case LIST: {
-			// List products in the store
 			Product[] products = store.listProducts();
+			System.out.println("Catalog:");
 			if (products != null) {
-				System.out.println("ID\tNOMBRE\tCATEGORIA\tPRECIO");
 				for (Product p : products) {
 					System.out.println(p.toString());
 				}
 			}
+			System.out.println("prod list: ok");
 			result = ExecuteResult.SUCCESS;
 		} break;
 			
@@ -308,26 +311,35 @@ public class ProductCommand extends Command {
 			case PRICE -> store.updateProductPrice(this.productId, this.productPrice);
 			};
 			
-			result = switch (dataResult) {
-			case SUCCESS			-> ExecuteResult.SUCCESS;
-			case INVALID_ID			-> ExecuteResult.INVALID_ID;
-			case PRODUCT_NOT_FOUND	-> ExecuteResult.PRODUCT_NOT_IN_STORAGE;
-			default					-> ExecuteResult.DATA_ERROR;
+			switch (dataResult) {
+			case SUCCESS:           System.out.printf("prod update: ok\n");													 break;
+			case INVALID_ID:        System.out.printf("prod update: error: expected id greater or equal than zero\n");		 break;
+			case INVALID_NAME:      System.out.printf("prod update: error: expected name with less than 100 characters\n");	 break;
+			case INVALID_PRICE:     System.out.printf("prod update: error: expected price greater than zero\n");			 break;
+			case PRODUCT_NOT_FOUND: System.out.printf("prod update: error: product with id %d not found\n", this.productId); break;
+			default:                System.out.printf("prod update: error: unexpected issue\n");							 break;
 			};
 			
 		} break;
 		case REMOVE: {
-			// Remove product from the store
-			ticket.removeProduct(this.productId);
 			
-			// Remove product from the ticket as well
-			DataResult dataResult = store.deleteProduct(this.productId);
-			result = switch (dataResult) {
-			case SUCCESS			-> ExecuteResult.SUCCESS;
-			case INVALID_ID			-> ExecuteResult.INVALID_ID;
-			case PRODUCT_NOT_FOUND	-> ExecuteResult.PRODUCT_NOT_IN_STORAGE;
-			default					-> ExecuteResult.DATA_ERROR;
-			};
+			Product productToRemove = store.readProduct(this.productId);
+			if (productToRemove != null) { 
+				ticket.removeProduct(this.productId);
+				DataResult dataResult = store.deleteProduct(this.productId);
+			
+				switch (dataResult) {
+				case SUCCESS: {
+					System.out.println(productToRemove.toString());
+					System.out.printf("prod remove: ok\n");
+				} break;
+				case INVALID_ID: System.out.printf("prod remove: error: expected id greater or equal than zero\n");	break;
+				default:         System.out.printf("prod remove: error: unexpected issue\n");						break;
+				};
+
+			} else {
+				System.out.printf("prod remove: error: product with id %d not found\n", this.productId);
+			}
 			
 		} break;
 		}

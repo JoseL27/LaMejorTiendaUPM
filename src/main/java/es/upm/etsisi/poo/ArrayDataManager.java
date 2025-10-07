@@ -96,7 +96,7 @@ public class ArrayDataManager implements DataManager {
         if (!isValidId(id)) return DataResult.INVALID_ID;
         if (!isValidName(name)) return DataResult.INVALID_NAME;
         if (!isValidPrice(price)) return DataResult.INVALID_PRICE;
-        if (category == null) return DataResult.INVALID_CATEGORY;
+        // if (category == null) return DataResult.INVALID_CATEGORY;
 
         // Check inventory full
         if (this.productAmount >= this.MAX_CAPACITY) return DataResult.INVENTORY_FULL;
@@ -167,7 +167,7 @@ public class ArrayDataManager implements DataManager {
     public DataResult updateProductCategory(int id, Product.Category category) {
         // Sanity checks: ID >= 0, category != null
         if (!isValidId(id)) return DataResult.INVALID_ID;
-        if (category == null) return DataResult.INVALID_CATEGORY;
+        // if (category == null) return DataResult.INVALID_CATEGORY;
 
         Product selectedProduct = this.readProduct(id);
 
