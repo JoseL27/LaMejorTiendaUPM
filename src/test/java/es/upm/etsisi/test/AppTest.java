@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.nio.file.Files;
@@ -23,41 +24,98 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach; 
+import org.junit.jupiter.api.AfterEach; 
 
 public class AppTest {
+	
+	private PrintStream systemOut;
+	private ByteArrayOutputStream testOut;
+	private App testApp;
 
-	@Test
-	void fullAppTest() throws IOException {
-		PrintStream systemOut = System.out;
-		ByteArrayOutputStream testOut = new ByteArrayOutputStream(); 
+	String testOutputString() {
+		return testOut.toString();
+	}
+
+	Scanner testOutputScanner() {
+		return new Scanner(testOut.toString());
+	}
+
+	@BeforeEach
+	void setupTestOutput() {
+		this.systemOut = System.out;
+		this.testOut = new ByteArrayOutputStream(); 
 		System.setOut(new PrintStream(testOut));
+	}
 
-		Scanner testInScanner = new Scanner(new File("full-app-in.txt"));
-		App app = new App();
-		app.run(testInScanner);
+	@AfterEach
+	void restoreTestOutput() {
+		System.setOut(systemOut);		
+	}
 
-		// assertEquals(new String(Files.readAllBytes(Paths.get("full-app-expected-out.txt"))), testOut.toString());
+	void assertEqualOutputs(String expectedOutput) {
+		assertEquals(expectedOutput, testOut.toString());
+	}
+	
+	void assertEqualOutputs(Path expectedOutputPath) throws IOException {
+		assertEquals(new String(Files.readAllBytes(expectedOutputPath)), testOut.toString());
+	}
+
+	void assertEqualOutputsByLine(String expectedOutput) {
+		Scanner expectedOutputScanner = new Scanner(expectedOutput);
+		Scanner testOutputScanner = testOutputScanner();
 		
-		Scanner testOutScanner = new Scanner(testOut.toString());
+		int lineCounter = 0;
+		while (expectedOutputScanner.hasNextLine() && testOutputScanner.hasNextLine()) {
+			assertEquals(expectedOutputScanner.nextLine(), testOutputScanner.nextLine(), String.format("missmatch line on line %d\n", lineCounter));
+			lineCounter++;
+		}
 
-		Path expectedOutputPath = Paths.get("full-app-expected-out.txt");
+		if (expectedOutputScanner.hasNextLine()) {
+			fail(String.format("Lines left in expected output: '%s'", expectedOutputScanner.nextLine()));
+		}
+		if (testOutputScanner.hasNextLine()) {
+			fail(String.format("Lines left in test output: '%s'", testOutputScanner.nextLine()));
+		}
+	}
+	
+	void assertEqualOutputsByLine(Path expectedOutputPath) throws IOException {
+		Scanner testOutputScanner = testOutputScanner();
 		List<String> expectedOutputLines = Files.readAllLines(expectedOutputPath);
 		Iterator<String> expectedLinesIt = expectedOutputLines.iterator();
 
 		int lineCounter = 0;
-		
-		while (expectedLinesIt.hasNext() && testOutScanner.hasNextLine()) {
-			assertEquals(expectedLinesIt.next(), testOutScanner.nextLine(), String.format("%s:%d: difference in line", expectedOutputPath, lineCounter));
+		while (expectedLinesIt.hasNext() && testOutputScanner.hasNextLine()) {
+			assertEquals(expectedLinesIt.next(), testOutputScanner.nextLine(), String.format("missmatch line on line %d\n", lineCounter));
 			lineCounter++;
 		}
 
 		if (expectedLinesIt.hasNext()) {
 			fail(String.format("Lines left in expected output: '%s'", expectedLinesIt.next()));
 		}
-		if (testOutScanner.hasNextLine()) {
-			fail(String.format("Lines left in test output: '%s'", testOutScanner.nextLine()));
+		if (testOutputScanner.hasNextLine()) {
+			fail(String.format("Lines left in test output: '%s'", testOutputScanner.nextLine()));
 		}
+	}
 
-		System.setOut(systemOut);		
+	void runAppWithInput(Scanner inputScanner) {
+		App app = new App();
+		app.run(inputScanner);
+	}
+
+	void runAppWithInput(File inputFile) throws FileNotFoundException {
+		runAppWithInput(new Scanner(inputFile));
+	}
+	
+	void runAppWithInput(String inputString) {
+		runAppWithInput(new Scanner(inputString));
+	}
+
+	@Test
+	void fullAppTest() throws IOException {
+		Scanner testInScanner = new Scanner(new File("full-app-in.txt"));
+		App app = new App();
+		app.run(testInScanner);
+		assertEqualOutputsByLine(Paths.get("full-app-expected-out.txt"));
 	}
 }
