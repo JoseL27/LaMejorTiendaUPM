@@ -22,6 +22,8 @@ public class App {
      * Then the Command is executed. If any error is detected, a message error is sent indicating the error.
      */
     public void run(Scanner sc) {
+		Locale.setDefault(new Locale("en", "US"));
+		
 		System.out.println("Welcome to the ticket module App.");
 		System.out.println("Ticket module. Type 'help' to see commands.");
 		
@@ -51,8 +53,6 @@ public class App {
      * @param args
      */
     public static void main(String[] args) {
-		Locale.setDefault(new Locale("en", "US"));
-		
         App app = new App();
         Scanner sc;
         if (args.length == 0) {

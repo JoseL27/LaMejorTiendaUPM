@@ -18,6 +18,7 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.Iterator;
 
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -26,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach; 
 import org.junit.jupiter.api.AfterEach; 
+import org.junit.jupiter.api.BeforeAll; 
+import org.junit.jupiter.api.AfterAll; 
 
 public class AppTest {
 	
@@ -39,6 +42,16 @@ public class AppTest {
 
 	Scanner testOutputScanner() {
 		return new Scanner(testOut.toString());
+	}
+
+	@BeforeAll
+	static void setEnUSLocale() {
+		Locale.setDefault(new Locale("en", "US"));
+	}
+	
+	@AfterAll
+	static void unsetEnUSLocale() {
+		Locale.setDefault(Locale.getDefault());
 	}
 
 	@BeforeEach
