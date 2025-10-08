@@ -152,8 +152,11 @@ public class ProductCommand extends Command {
 
 		String name = parser.getCommand(3);
 
-		Product.Category category = Utils.tryParseCategoryWithPrint("prod add", parser.getCommand(4));
-		if (category == null) return null;
+		Product.Category category = Product.Category.fromLabel(parser.getCommand(4));
+		if (category == null){
+			System.out.printf("prod add: error: invalid category '%s', expected one of: %s\n", parser.getCommand(4), Utils.arrayToString(Product.Category.values(), "|"));
+			return null;
+		}
 
  		Integer price = Utils.tryParseIntWithPrint("prod add", parser.getCommand(5));
 		if (price == null) return null;
@@ -209,8 +212,11 @@ public class ProductCommand extends Command {
 			name = parser.getCommand(4);
 		} break;
 		case CATEGORY: {
-			category = Utils.tryParseCategoryWithPrint("prod update", parser.getCommand(4));
-			if (category == null) return null;
+			category = Product.Category.fromLabel(parser.getCommand(4));
+			if (category == null){
+				System.out.printf("prod update: error: invalid category '%s', expected one of: %s", parser.getCommand(4), Utils.arrayToString(Product.Category.values(), "|"));
+				return null;
+			}
 		} break;
 		case PRICE: {
 			price = Utils.tryParseIntWithPrint("prod update", parser.getCommand(4));
