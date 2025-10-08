@@ -72,6 +72,15 @@ public class TicketTest {
 	@Test
 	void discountTest() {
 		Ticket ticket = new Ticket();
+		ticket.addProduct(new Product(2, "Camiseta talla:M UPM", Product.Category.CLOTHES, 10), 1);
+		ticket.addProduct(new Product(3, "Camiseta talla:XL teleco", Product.Category.CLOTHES, 20),1);
+
+		String expectedString = "{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:10.0} **discount -0.7\n"
+				+"{class:Product, id:3, name:'Camiseta talla:XL teleco', category:CLOTHES, price:20.0} **discount -1.4\n"
+				+"Total price: 30.0\n"
+				+"Total discount: 2.1\n"
+				+"Final Price: 27.9";
+		assertEquals(expectedString, ticket.summaryString());
 	}
 
 	// Failures
