@@ -1,13 +1,28 @@
 package es.upm.etsisi.test.commands;
 
+import java.util.Locale;
+
 import es.upm.etsisi.poo.*;
 import es.upm.etsisi.poo.commands.TicketCommand;
 
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
 
 public class TicketCommandTest {
+
+	// DICTATOR LOCALE 
+	@BeforeAll
+	static void setEnUSLocale() {
+		Locale.setDefault(new Locale("en", "US"));
+	}
+	
+	@AfterAll
+	static void unsetEnUSLocale() {
+		Locale.setDefault(Locale.getDefault());
+	}		
 
 	// failures
     @Test

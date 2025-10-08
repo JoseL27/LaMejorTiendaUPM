@@ -32,6 +32,17 @@ import org.junit.jupiter.api.AfterAll;
 
 public class AppTest {
 	
+	// DICTATOR LOCALE 
+	@BeforeAll
+	static void setEnUSLocale() {
+		Locale.setDefault(new Locale("en", "US"));
+	}
+	
+	@AfterAll
+	static void unsetEnUSLocale() {
+		Locale.setDefault(Locale.getDefault());
+	}
+	
 	private PrintStream systemOut;
 	private ByteArrayOutputStream testOut;
 	private App testApp;
@@ -42,16 +53,6 @@ public class AppTest {
 
 	Scanner testOutputScanner() {
 		return new Scanner(testOut.toString());
-	}
-
-	@BeforeAll
-	static void setEnUSLocale() {
-		Locale.setDefault(new Locale("en", "US"));
-	}
-	
-	@AfterAll
-	static void unsetEnUSLocale() {
-		Locale.setDefault(Locale.getDefault());
 	}
 
 	@BeforeEach

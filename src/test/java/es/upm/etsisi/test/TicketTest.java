@@ -1,5 +1,7 @@
 package es.upm.etsisi.test;
 
+import java.util.Locale;
+
 import es.upm.etsisi.poo.Ticket;
 import es.upm.etsisi.poo.Product;
 
@@ -8,8 +10,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
 
 public class TicketTest {
+
+	// DICTATOR LOCALE 
+	@BeforeAll
+	static void setEnUSLocale() {
+		Locale.setDefault(new Locale("en", "US"));
+	}
+	
+	@AfterAll
+	static void unsetEnUSLocale() {
+		Locale.setDefault(Locale.getDefault());
+	}	
 
 	// Success
 	@Test	

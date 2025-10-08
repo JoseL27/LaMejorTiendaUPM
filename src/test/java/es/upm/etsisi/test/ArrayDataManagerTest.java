@@ -1,5 +1,7 @@
 package es.upm.etsisi.test;
 
+import java.util.Locale;
+
 import es.upm.etsisi.poo.Product;
 import es.upm.etsisi.poo.ArrayDataManager;
 import es.upm.etsisi.poo.DataManager.DataResult;
@@ -7,8 +9,21 @@ import es.upm.etsisi.poo.DataManager.DataResult;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
 
 public class ArrayDataManagerTest {
+
+	// DICTATOR LOCALE 
+	@BeforeAll
+	static void setEnUSLocale() {
+		Locale.setDefault(new Locale("en", "US"));
+	}
+	
+	@AfterAll
+	static void unsetEnUSLocale() {
+		Locale.setDefault(Locale.getDefault());
+	}
 	
 	// Success
 	@Test

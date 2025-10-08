@@ -1,5 +1,7 @@
 package es.upm.etsisi.test.commands;
 
+import java.util.Locale;
+
 import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.Product;
 import es.upm.etsisi.poo.Parser;
@@ -8,8 +10,22 @@ import es.upm.etsisi.poo.commands.ProductCommand;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
 	
 public class ProductCommandTest {
+	
+	// DICTATOR LOCALE 
+	@BeforeAll
+	static void setEnUSLocale() {
+		Locale.setDefault(new Locale("en", "US"));
+	}
+	
+	@AfterAll
+	static void unsetEnUSLocale() {
+		Locale.setDefault(Locale.getDefault());
+	}	
+
 	@Test
 	void addBookTest() {
 		Command result = ProductCommand.tryParse(new Parser("prod add 1 \"Libro POO\" BOOK 25"));

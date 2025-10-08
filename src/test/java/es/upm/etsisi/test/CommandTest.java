@@ -1,5 +1,7 @@
 package es.upm.etsisi.test;
 
+import java.util.Locale;
+
 import es.upm.etsisi.poo.Product;
 import es.upm.etsisi.poo.Parser;
 import es.upm.etsisi.poo.Command;
@@ -9,8 +11,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
 
 public class CommandTest {
+
+	// DICTATOR LOCALE 
+	@BeforeAll
+	static void setEnUSLocale() {
+		Locale.setDefault(new Locale("en", "US"));
+	}
+	
+	@AfterAll
+	static void unsetEnUSLocale() {
+		Locale.setDefault(Locale.getDefault());
+	}	
 
 	// Succes
 	@Test
