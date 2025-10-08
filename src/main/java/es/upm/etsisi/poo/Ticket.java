@@ -1,7 +1,5 @@
 package es.upm.etsisi.poo;
 
-import es.upm.etsisi.poo.commands.TicketCommand;
-
 import java.util.Arrays;
 
 /**

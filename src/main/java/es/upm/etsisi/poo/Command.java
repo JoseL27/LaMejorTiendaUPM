@@ -36,7 +36,7 @@ public class Command {
 		if (parser.getLength() < minAmount) {
 			System.out.printf("%s: too few arguments, expected at %d arguments and got %d\n", prefix, minAmount, parser.getLength());
 		} else if (parser.getLength() > maxAmount) {
-			System.out.printf("%s: too many arguments, expected %d and got %d\n", prefix, minAmount, parser.getLength());
+			System.out.printf("%s: too many arguments, expected %d and got %d\n", prefix, maxAmount, parser.getLength());
 		} else {
 			result = true;
 		}

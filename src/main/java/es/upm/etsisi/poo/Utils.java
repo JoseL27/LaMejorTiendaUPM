@@ -1,6 +1,5 @@
 package es.upm.etsisi.poo;
 import java.lang.StringBuilder;
-import java.util.function.Predicate;
 
 /**
  * Static Utilities class.
