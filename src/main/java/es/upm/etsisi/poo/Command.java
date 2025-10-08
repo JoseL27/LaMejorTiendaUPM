@@ -15,7 +15,7 @@ public class Command {
 	public static Command tryParse(Parser parser) {
 		Command result = null;
 
-		if (Command.checkArgsCountWithPrint("general", parser, 1, 6)) {
+		if (Utils.checkArgsCountWithPrint("general", parser, 1, 6)) {
 			result = switch (parser.getCommand(0)) {
 			case "prod"	  -> ProductCommand.tryParse(parser);
 			case "ticket" -> TicketCommand.tryParse(parser);
@@ -29,52 +29,6 @@ public class Command {
 	
 	public void tryExecute(Ticket ticket, ArrayDataManager dataManager) {
 		assert false;
-	}
-
-	public static boolean checkArgsCountWithPrint(String prefix, Parser parser, int minAmount, int maxAmount) {
-		boolean result = false;
-		if (parser.getLength() < minAmount) {
-			System.out.printf("%s: too few arguments, expected at %d arguments and got %d\n", prefix, minAmount, parser.getLength());
-		} else if (parser.getLength() > maxAmount) {
-			System.out.printf("%s: too many arguments, expected %d and got %d\n", prefix, maxAmount, parser.getLength());
-		} else {
-			result = true;
-		}
-		
-		return result;
-	}
-
-	public static boolean checkArgsCountWithPrint(String prefix, Parser parser, int expectedAmount) {
-		return checkArgsCountWithPrint(prefix, parser, expectedAmount, expectedAmount);
-	}
-
-	public static void printInvalidEnum(String prefix, String label, String invalidValue, Enum[] possibleValues) {
-		System.out.printf("%s: error: invalid %s '%s', expected one of: %s\n",
-						  prefix, label, invalidValue, Utils.arrayToString(possibleValues, "|"));
-	}
-	
-	public static Product.Category tryParseCategoryWithPrint(String prefix, String categoryString) {
-		Product.Category category = Product.Category.fromLabel(categoryString);
-		if (category == null) {
-			printInvalidEnum(prefix, "category", categoryString, Product.Category.values());
-		}
-		return category;
-	}
-
-	public static Product.Field tryParseFieldWithPrint(String prefix, String fieldString) {
-		Product.Field field = Product.Field.fromLabel(fieldString);
-		if (field == null) {
-			printInvalidEnum(prefix, "field", fieldString, Product.Field.values());
-		}
-		return field;
-	}	
-
-	public static Integer tryParseIntWithPrint(String prefix, String intString) {
-		Integer number = Utils.tryParseInt(intString);
-		if (number == null) {
-			System.out.printf("%s: error: expected an integer string, got '%s'\n", prefix, intString);
-		}
-		return number;
 	}
 
 }

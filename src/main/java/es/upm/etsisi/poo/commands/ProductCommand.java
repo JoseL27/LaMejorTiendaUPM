@@ -119,11 +119,11 @@ public class ProductCommand extends Command {
 	 * @return       The result of the parse. Either a valid ProductCommand instance or null
 	 */
 	public static Command tryParse(Parser parser) {
-		if (!Command.checkArgsCountWithPrint("prod", parser, 2, 6)) return null;
+		if (!Utils.checkArgsCountWithPrint("prod", parser, 2, 6)) return null;
 
 		SubCommand subCommand = SubCommand.fromLabel(parser.getCommand(1));
 		if (subCommand == null) {
-			Command.printInvalidEnum("prod", "sub command", parser.getCommand(1), SubCommand.values());
+			Utils.printInvalidEnum("prod", "sub command", parser.getCommand(1), SubCommand.values());
 			return null;
 		}
 
@@ -145,17 +145,17 @@ public class ProductCommand extends Command {
 	 *               or null if it fails
 	 */
 	public static Command tryParseAdd(Parser parser) {
-		if (!Command.checkArgsCountWithPrint("prod add", parser, 6)) return null;
+		if (!Utils.checkArgsCountWithPrint("prod add", parser, 6)) return null;
 
- 		Integer id = Command.tryParseIntWithPrint("prod add", parser.getCommand(2));
+ 		Integer id = Utils.tryParseIntWithPrint("prod add", parser.getCommand(2));
 		if (id == null) return null;
 
 		String name = parser.getCommand(3);
 
-		Product.Category category = Command.tryParseCategoryWithPrint("prod add", parser.getCommand(4));
+		Product.Category category = Utils.tryParseCategoryWithPrint("prod add", parser.getCommand(4));
 		if (category == null) return null;
 
- 		Integer price = Command.tryParseIntWithPrint("prod add", parser.getCommand(5));
+ 		Integer price = Utils.tryParseIntWithPrint("prod add", parser.getCommand(5));
 		if (price == null) return null;
 
 		return new ProductCommand(SubCommand.ADD, id, name, category, price);
@@ -171,7 +171,7 @@ public class ProductCommand extends Command {
 	 *               ProductCommand List instance or null
 	 */
 	public static Command tryParseList(Parser parser) {
-		return Command.checkArgsCountWithPrint("prod list", parser, 2) ? new ProductCommand(SubCommand.LIST, 0, null, null, 0) : null;
+		return Utils.checkArgsCountWithPrint("prod list", parser, 2) ? new ProductCommand(SubCommand.LIST, 0, null, null, 0) : null;
 	}   
 
 	/**
@@ -187,13 +187,18 @@ public class ProductCommand extends Command {
 	 * @see Product.Field
 	 */		
 	public static Command tryParseUpdate(Parser parser) {
-		if (!Command.checkArgsCountWithPrint("prod update", parser, 5)) return null;
+		if (!Utils.checkArgsCountWithPrint("prod update", parser, 5)) return null;
 		
- 		Integer id = Command.tryParseIntWithPrint("prod update", parser.getCommand(2));
+ 		Integer id = Utils.tryParseIntWithPrint("prod update", parser.getCommand(2));
 		if (id == null) return null;
 
-		Product.Field field = Command.tryParseFieldWithPrint("prod update", parser.getCommand(3));
-		if (field == null) return null;
+		Product.Field field = Product.Field.fromLabel(parser.getCommand(3));
+;
+		if (field == null) {
+			System.out.printf("prod update: error: invalid field '%s', expected one of: %s\n",
+					parser.getCommand(3), Utils.arrayToString(Product.Field.values(), "|"));
+			return null;
+		}
 
 		String name = null;
 		Product.Category category = null;
@@ -204,11 +209,11 @@ public class ProductCommand extends Command {
 			name = parser.getCommand(4);
 		} break;
 		case CATEGORY: {
-			category = Command.tryParseCategoryWithPrint("prod update", parser.getCommand(4));
+			category = Utils.tryParseCategoryWithPrint("prod update", parser.getCommand(4));
 			if (category == null) return null;
 		} break;
 		case PRICE: {
-			price = Command.tryParseIntWithPrint("prod update", parser.getCommand(4));
+			price = Utils.tryParseIntWithPrint("prod update", parser.getCommand(4));
 			if (price == null) return null;
 		} break;
 		}
@@ -225,9 +230,9 @@ public class ProductCommand extends Command {
 	 *               ProductCommand Remove instance or null
 	 */		
 	public static Command tryParseRemove(Parser parser) {
-		if (!Command.checkArgsCountWithPrint("prod remove", parser, 3)) return null;
+		if (!Utils.checkArgsCountWithPrint("prod remove", parser, 3)) return null;
 
- 		Integer id = Command.tryParseIntWithPrint("prod remove", parser.getCommand(2));
+ 		Integer id = Utils.tryParseIntWithPrint("prod remove", parser.getCommand(2));
 		if (id == null) return null;
 		
 		return new ProductCommand(SubCommand.REMOVE, id, null, null, 0);
