@@ -2,6 +2,7 @@ package es.upm.etsisi.poo;
 
 import java.io.File;
 import java.util.Scanner;
+import java.util.Locale;
 
 public class App {
     private ArrayDataManager dataManager;
@@ -50,6 +51,8 @@ public class App {
      * @param args
      */
     public static void main(String[] args) {
+		Locale.setDefault(new Locale("en", "US"));
+		
         App app = new App();
         Scanner sc;
         if (args.length == 0) {
