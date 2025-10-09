@@ -222,7 +222,7 @@ public class TicketCommand extends Command{
         } else {
 			Product removed = ticket.removeProduct(this.productId);
 			if (removed != null) {
-				System.out.println(removed.toString());
+				System.out.println(ticket.summaryString());
 				System.out.println("ticket remove: ok");
 			
 			} else {
