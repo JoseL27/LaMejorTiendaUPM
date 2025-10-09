@@ -238,6 +238,7 @@ public class TicketCommand extends Command{
      */
     private void tryExecutePrint(Ticket ticket){
         System.out.println(ticket.summaryString());
+        ticket.reset();
 		System.out.println("ticket print: ok");
     }
 
