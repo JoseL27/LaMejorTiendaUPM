@@ -127,12 +127,18 @@ public class TicketCommand extends Command{
     public static Command tryParseAdd(Parser parser) {
 		if (!Utils.checkArgsCountWithPrint("ticket add", parser, 4)) return null ;
 		
-		Integer productId = Utils.tryParseIntWithPrint("ticket add", parser.getCommand(2));
-		if (productId == null) return null;
+		Integer productId = Utils.tryParseInt(parser.getCommand(2));
+		if (productId == null){
+            Utils.printInvalidDataType("ticket add", "integer", parser.getCommand(2));
+            return null;
+        }
 
-		Integer quantity = Utils.tryParseIntWithPrint("ticket add", parser.getCommand(3));
-		if (quantity == null) return null;
-	
+		Integer quantity = Utils.tryParseInt(parser.getCommand(3));
+        if (quantity == null){
+            Utils.printInvalidDataType("ticket add", "integer", parser.getCommand(3));
+            return null;
+        }
+
 		return new TicketCommand(SubCommand.ADD, productId, quantity);
     }
 	
@@ -148,8 +154,11 @@ public class TicketCommand extends Command{
     public static Command tryParseRemove(Parser parser) {
 		if (!Utils.checkArgsCountWithPrint("ticket remove", parser, 3)) return null;
 		
-		Integer productId = Utils.tryParseIntWithPrint("ticket remove", parser.getCommand(2));
-		if (productId == null) return null;
+		Integer productId = Utils.tryParseInt(parser.getCommand(2));
+		if (productId == null){
+            Utils.printInvalidDataType("ticket remove", "integer", parser.getCommand(2));
+            return null;
+        }
 		
 		return new TicketCommand(SubCommand.REMOVE, productId);
     }

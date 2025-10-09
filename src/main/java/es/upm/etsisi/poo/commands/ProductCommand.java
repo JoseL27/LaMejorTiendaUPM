@@ -250,9 +250,11 @@ public class ProductCommand extends Command {
 	public static Command tryParseRemove(Parser parser) {
 		if (!Utils.checkArgsCountWithPrint("prod remove", parser, 3)) return null;
 
- 		Integer id = Utils.tryParseIntWithPrint("prod remove", parser.getCommand(2));
-		if (id == null) return null;
-		
+ 		Integer id = Utils.tryParseInt(parser.getCommand(2));
+		 if (id == null){
+			 Utils.printInvalidDataType("prod remove", "integer", parser.getCommand(2));
+		 }
+
 		return new ProductCommand(SubCommand.REMOVE, id, null, null, 0);
 	} 
 
