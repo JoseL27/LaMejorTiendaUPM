@@ -55,9 +55,13 @@ public class Utils {
         return checkArgsCountWithPrint(prefix, parser, expectedAmount, expectedAmount);
     }
 
-    public static void printInvalidEnum(String prefix, String label, String invalidValue, Enum[] possibleValues) {
+    public static void printInvalidEnum(String failedCommand, String enumName, String receivedValue, Enum[] possibleValues) {
         System.out.printf("%s: error: invalid %s '%s', expected one of: %s\n",
-                          prefix, label, invalidValue, arrayToString(possibleValues, "|"));
+                          failedCommand, enumName, receivedValue, arrayToString(possibleValues, "|"));
+    }
+
+    public static void printInvalidDataType(String failedCommand, String expectedDataType, String receivedValue){
+        System.out.printf("%s: error: expected %s, got '%s'\n", failedCommand, expectedDataType, receivedValue);
     }
 
     public static Product.Category tryParseCategoryWithPrint(String prefix, String categoryString) {

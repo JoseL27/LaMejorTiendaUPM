@@ -7,6 +7,7 @@ import es.upm.etsisi.poo.Parser;
 import es.upm.etsisi.poo.DataManager.DataResult;
 import es.upm.etsisi.poo.ArrayDataManager;
 import es.upm.etsisi.poo.Ticket;
+import jdk.jshell.execution.Util;
 
 /**
  *  ProductCommand class that parses a stream of tokens into a specific ProductCommand,
@@ -147,19 +148,25 @@ public class ProductCommand extends Command {
 	public static Command tryParseAdd(Parser parser) {
 		if (!Utils.checkArgsCountWithPrint("prod add", parser, 6)) return null;
 
- 		Integer id = Utils.tryParseIntWithPrint("prod add", parser.getCommand(2));
-		if (id == null) return null;
+ 		Integer id = Utils.tryParseInt(parser.getCommand(2));
+		if (id == null){
+			Utils.printInvalidDataType("prod add", "integer", parser.getCommand(2));
+			return null;
+		}
 
 		String name = parser.getCommand(3);
 
 		Product.Category category = Product.Category.fromLabel(parser.getCommand(4));
 		if (category == null){
-			System.out.printf("prod add: error: invalid category '%s', expected one of: %s\n", parser.getCommand(4), Utils.arrayToString(Product.Category.values(), "|"));
+			Utils.printInvalidEnum("prod add", "category", parser.getCommand(4), Product.Category.values());
 			return null;
 		}
 
- 		Integer price = Utils.tryParseIntWithPrint("prod add", parser.getCommand(5));
-		if (price == null) return null;
+ 		Integer price = Utils.tryParseInt(parser.getCommand(5));
+		if (price == null){
+			Utils.printInvalidDataType("prod add", "integer", parser.getCommand(5));
+			return null;
+		}
 
 		return new ProductCommand(SubCommand.ADD, id, name, category, price);
 	}    
@@ -192,14 +199,16 @@ public class ProductCommand extends Command {
 	public static Command tryParseUpdate(Parser parser) {
 		if (!Utils.checkArgsCountWithPrint("prod update", parser, 5)) return null;
 		
- 		Integer id = Utils.tryParseIntWithPrint("prod update", parser.getCommand(2));
-		if (id == null) return null;
+ 		Integer id = Utils.tryParseInt(parser.getCommand(2));
+		if (id == null){
+			Utils.printInvalidDataType("prod update", "integer", parser.getCommand(2));
+			return null;
+		}
 
 		Product.Field field = Product.Field.fromLabel(parser.getCommand(3));
 ;
 		if (field == null) {
-			System.out.printf("prod update: error: invalid field '%s', expected one of: %s\n",
-					parser.getCommand(3), Utils.arrayToString(Product.Field.values(), "|"));
+				Utils.printInvalidEnum("prod update", "field", parser.getCommand(3), Product.Field.values());
 			return null;
 		}
 
@@ -214,13 +223,16 @@ public class ProductCommand extends Command {
 		case CATEGORY: {
 			category = Product.Category.fromLabel(parser.getCommand(4));
 			if (category == null){
-				System.out.printf("prod update: error: invalid category '%s', expected one of: %s", parser.getCommand(4), Utils.arrayToString(Product.Category.values(), "|"));
+				Utils.printInvalidEnum("prod update", "category", parser.getCommand(4), Product.Category.values());
 				return null;
 			}
 		} break;
 		case PRICE: {
-			price = Utils.tryParseIntWithPrint("prod update", parser.getCommand(4));
-			if (price == null) return null;
+			price = Utils.tryParseInt(parser.getCommand(4));
+			if (price == null){
+				Utils.printInvalidDataType("prod update", "integer", parser.getCommand(4));
+				return null;
+			}
 		} break;
 		}
 
