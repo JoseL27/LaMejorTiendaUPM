@@ -32,6 +32,7 @@ public class HelpCommand extends Command{
         System.out.println(" echo \"<texto>\"");
         System.out.println(" help");
         System.out.println(" exit");
+		System.out.println();
 
 		Product.Category[] categoryValues = Product.Category.values();
         System.out.printf("Categories: %s\n", Utils.arrayToString(categoryValues, ", "));

@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach; 
 import org.junit.jupiter.api.AfterEach; 
@@ -125,6 +126,10 @@ public class AppTest {
 		runAppWithInput(new Scanner(inputString));
 	}
 
+	// ======================================================================
+	// TESTS
+	// ======================================================================
+
 	@Test
 	void fullAppTest() throws IOException {
 		Scanner testInScanner = new Scanner(new File("full-app-in.txt"));
@@ -132,4 +137,313 @@ public class AppTest {
 		app.run(testInScanner);
 		assertEqualOutputsByLine(Paths.get("full-app-expected-out.txt"));
 	}
+
+	@Test
+	void auxCommandsTest() throws IOException {
+		String inputString =
+			"echo \"SamekoSaba\"\n"
+			+"help\n"
+			+"exit";
+			
+		String expectedString =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			+"tUPM> echo \"SamekoSaba\"\n"
+			+"echo \"SamekoSaba\"\n"
+			+"tUPM> help\n"
+			+"Commands:\n"
+			+" prod add <id> \"<name>\" <category> <price>\n"
+			+" prod list\n"
+			+" prod update <id> NAME|CATEGORY|PRICE <value>\n"
+			+" prod remove <id>\n"
+			+" ticket new\n"
+			+" ticket add <prodId> <quantity>\n"
+			+" ticket remove <prodId>\n"
+			+" ticket print\n"
+			+" echo \"<texto>\"\n"
+			+" help\n"
+			+" exit\n"
+			+"\n"
+			+"Categories: MERCH, STATIONERY, CLOTHES, BOOK, ELECTRONICS\n"
+			+"Discounts if there are ≥2 units in the category: MERCH 0%, STATIONERY 5%, CLOTHES 7%, BOOK 10%, ELECTRONICS 3%.\n"
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedString);
+	}
+
+
+	@Test
+	void cliInterfaceTest() throws IOException {
+		String inputString =
+			"echo \"Hola mundo\"\n"
+			+"help\n"
+			+"exit";
+		
+		String expectedString =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			+"tUPM> echo \"Hola mundo\"\n"
+			+"echo \"Hola mundo\"\n"
+			+"tUPM> help\n"
+			+"Commands:\n"
+			+" prod add <id> \"<name>\" <category> <price>\n"
+			+" prod list\n"
+			+" prod update <id> NAME|CATEGORY|PRICE <value>\n"
+			+" prod remove <id>\n"
+			+" ticket new\n"
+			+" ticket add <prodId> <quantity>\n"
+			+" ticket remove <prodId>\n"
+			+" ticket print\n"
+			+" echo \"<texto>\"\n"
+			+" help\n"
+			+" exit\n"
+			+"\n"
+			+"Categories: MERCH, STATIONERY, CLOTHES, BOOK, ELECTRONICS\n"
+			+"Discounts if there are ≥2 units in the category: MERCH 0%, STATIONERY 5%, CLOTHES 7%, BOOK 10%, ELECTRONICS 3%.\n"
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedString);
+	}
+
+	@Test
+	void echoCommandTest() {
+		String inputString = "echo \"test\"\n"+"exit\n";
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			+"tUPM> echo \"test\"\n"
+			+"echo \"test\"\n"
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+		
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);
+	}
+
+	@Test
+	void helpCommandTest() {
+		String inputString = "help\n"+"exit\n";
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			+"tUPM> help\n"
+			+"Commands:\n"
+			+" prod add <id> \"<name>\" <category> <price>\n"
+			+" prod list\n"
+			+" prod update <id> NAME|CATEGORY|PRICE <value>\n"
+			+" prod remove <id>\n"
+			+" ticket new\n"
+			+" ticket add <prodId> <quantity>\n"
+			+" ticket remove <prodId>\n"
+			+" ticket print\n"
+			+" echo \"<texto>\"\n"
+			+" help\n"
+			+" exit\n"
+			+"\n"
+			+"Categories: MERCH, STATIONERY, CLOTHES, BOOK, ELECTRONICS\n"
+			+"Discounts if there are ≥2 units in the category: MERCH 0%, STATIONERY 5%, CLOTHES 7%, BOOK 10%, ELECTRONICS 3%.\n"			
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+		
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);
+	}
+
+	@Test
+	void prodAddTest() {
+		String inputString = "prod add 1 \"Libro POO\" BOOK 25\n"
+			+"exit\n";
+		
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			+"tUPM> prod add 1 \"Libro POO\" BOOK 25\n"
+			+"{class:Product, id:1, name:'Libro POO', category:BOOK, price:25.0}\n"
+			+"prod add: ok\n"
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);
+	}
+	
+	@Test
+	void prodAddTest2() {
+		String inputString = 		
+			"prod add 2 \"Camiseta talla:M UPM\" CLOTHES 15\n"
+			+"exit\n";
+		
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			+"tUPM> prod add 2 \"Camiseta talla:M UPM\" CLOTHES 15\n"
+			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
+			+"prod add: ok\n"
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);
+	}
+
+	@Test
+	void prodAddList() {
+		String inputString =
+			"prod add 1 \"Libro POO\" BOOK 25\n"			
+			+"prod add 2 \"Camiseta talla:M UPM\" CLOTHES 15\n"
+			+"prod list\n"
+			+"exit\n";
+		
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			+"tUPM> prod add 1 \"Libro POO\" BOOK 25\n"
+			+"{class:Product, id:1, name:'Libro POO', category:BOOK, price:25.0}\n"
+			+"prod add: ok\n"
+			
+			+"tUPM> prod add 2 \"Camiseta talla:M UPM\" CLOTHES 15\n"
+			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
+			+"prod add: ok\n"
+
+			+"tUPM> prod list\n"
+			+"Catalog:\n"
+			+" {class:Product, id:1, name:'Libro POO', category:BOOK, price:25.0}\n"
+			+" {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
+			+"prod list: ok\n"
+			
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);
+	}
+
+
+	@Test
+	void prodUpdateNameTest() {
+		String inputString = "prod add 1 \"Libro POO\" BOOK 25\n"
+			+"prod update 1 NAME \"Libro POO V2\"\n"
+			+"exit\n";
+		
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			
+			+"tUPM> prod add 1 \"Libro POO\" BOOK 25\n"
+			+"{class:Product, id:1, name:'Libro POO', category:BOOK, price:25.0}\n"
+			+"prod add: ok\n"
+
+			+"tUPM> prod update 1 NAME \"Libro POO V2\"\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:25.0}\n"
+			+"prod update: ok\n"
+			
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);
+	}
+
+	@Test
+	void prodUpdatePriceTest() {
+		String inputString = "prod add 1 \"Libro POO V2\" BOOK 25\n"
+			+"prod update 1 PRICE 30\n"
+			+"exit\n";
+		
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			
+			+"tUPM> prod add 1 \"Libro POO V2\" BOOK 25\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:25.0}\n"
+			+"prod add: ok\n"
+
+			+"tUPM> prod update 1 PRICE 30\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n"
+			+"prod update: ok\n"
+			
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);
+	}
+
+	@Test
+	void prodUpdateCategoryTest() {
+		String inputString = "prod add 1 \"Libro POO\" BOOK 25\n"
+			+"prod update 1 CATEGORY MERCH\n"
+			+"exit\n";
+		
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			
+			+"tUPM> prod add 1 \"Libro POO\" BOOK 25\n"
+			+"{class:Product, id:1, name:'Libro POO', category:BOOK, price:25.0}\n"
+			+"prod add: ok\n"
+
+			+"tUPM> prod update 1 CATEGORY MERCH\n"
+			+"{class:Product, id:1, name:'Libro POO', category:MERCH, price:25.0}\n"
+			+"prod update: ok\n"
+			
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);
+	}
+
+	@Test
+	void prodRemoveTest() {
+		
+		String inputString = 
+			"prod add 3 \"Libro POO repetido Error\" BOOK 25\n"			
+			+"prod remove 3\n"
+			+"exit\n";
+		
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			
+			+"tUPM> prod add 3 \"Libro POO repetido Error\" BOOK 25\n"
+			+"{class:Product, id:3, name:'Libro POO repetido Error', category:BOOK, price:25.0}\n"
++"prod add: ok\n"
+
+			+"tUPM> prod remove 3\n"
+			+"{class:Product, id:3, name:'Libro POO repetido Error', category:BOOK, price:25.0}\n"
++"prod remove: ok\n"
+			
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);
+	}	
 }
