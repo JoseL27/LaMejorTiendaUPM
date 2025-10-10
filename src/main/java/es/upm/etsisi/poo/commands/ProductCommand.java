@@ -7,6 +7,7 @@ import es.upm.etsisi.poo.Parser;
 import es.upm.etsisi.poo.DataManager.DataResult;
 import es.upm.etsisi.poo.ArrayDataManager;
 import es.upm.etsisi.poo.Ticket;
+import jdk.jshell.execution.Util;
 
 /**
  *  ProductCommand class that parses a stream of tokens into a specific ProductCommand,
@@ -119,11 +120,11 @@ public class ProductCommand extends Command {
 	 * @return       The result of the parse. Either a valid ProductCommand instance or null
 	 */
 	public static Command tryParse(Parser parser) {
-		if (!Command.checkArgsCountWithPrint("prod", parser, 2, 6)) return null;
+		if (!Utils.checkArgsCountWithPrint("prod", parser, 2, 6)) return null;
 
 		SubCommand subCommand = SubCommand.fromLabel(parser.getCommand(1));
 		if (subCommand == null) {
-			Command.printInvalidEnum("prod", "sub command", parser.getCommand(1), SubCommand.values());
+			Utils.printInvalidEnum("prod", "sub command", parser.getCommand(1), SubCommand.values());
 			return null;
 		}
 
@@ -145,18 +146,27 @@ public class ProductCommand extends Command {
 	 *               or null if it fails
 	 */
 	public static Command tryParseAdd(Parser parser) {
-		if (!Command.checkArgsCountWithPrint("prod add", parser, 6)) return null;
+		if (!Utils.checkArgsCountWithPrint("prod add", parser, 6)) return null;
 
- 		Integer id = Command.tryParseIntWithPrint("prod add", parser.getCommand(2));
-		if (id == null) return null;
+ 		Integer id = Utils.tryParseInt(parser.getCommand(2));
+		if (id == null){
+			Utils.printInvalidDataType("prod add", "integer", parser.getCommand(2));
+			return null;
+		}
 
 		String name = parser.getCommand(3);
 
-		Product.Category category = Command.tryParseCategoryWithPrint("prod add", parser.getCommand(4));
-		if (category == null) return null;
+		Product.Category category = Product.Category.fromLabel(parser.getCommand(4));
+		if (category == null){
+			Utils.printInvalidEnum("prod add", "category", parser.getCommand(4), Product.Category.values());
+			return null;
+		}
 
- 		Integer price = Command.tryParseIntWithPrint("prod add", parser.getCommand(5));
-		if (price == null) return null;
+ 		Integer price = Utils.tryParseInt(parser.getCommand(5));
+		if (price == null){
+			Utils.printInvalidDataType("prod add", "integer", parser.getCommand(5));
+			return null;
+		}
 
 		return new ProductCommand(SubCommand.ADD, id, name, category, price);
 	}    
@@ -171,7 +181,7 @@ public class ProductCommand extends Command {
 	 *               ProductCommand List instance or null
 	 */
 	public static Command tryParseList(Parser parser) {
-		return Command.checkArgsCountWithPrint("prod list", parser, 2) ? new ProductCommand(SubCommand.LIST, 0, null, null, 0) : null;
+		return Utils.checkArgsCountWithPrint("prod list", parser, 2) ? new ProductCommand(SubCommand.LIST, 0, null, null, 0) : null;
 	}   
 
 	/**
@@ -187,13 +197,20 @@ public class ProductCommand extends Command {
 	 * @see Product.Field
 	 */		
 	public static Command tryParseUpdate(Parser parser) {
-		if (!Command.checkArgsCountWithPrint("prod update", parser, 5)) return null;
+		if (!Utils.checkArgsCountWithPrint("prod update", parser, 5)) return null;
 		
- 		Integer id = Command.tryParseIntWithPrint("prod update", parser.getCommand(2));
-		if (id == null) return null;
+ 		Integer id = Utils.tryParseInt(parser.getCommand(2));
+		if (id == null){
+			Utils.printInvalidDataType("prod update", "integer", parser.getCommand(2));
+			return null;
+		}
 
-		Product.Field field = Command.tryParseFieldWithPrint("prod update", parser.getCommand(3));
-		if (field == null) return null;
+		Product.Field field = Product.Field.fromLabel(parser.getCommand(3));
+;
+		if (field == null) {
+				Utils.printInvalidEnum("prod update", "field", parser.getCommand(3), Product.Field.values());
+			return null;
+		}
 
 		String name = null;
 		Product.Category category = null;
@@ -204,12 +221,18 @@ public class ProductCommand extends Command {
 			name = parser.getCommand(4);
 		} break;
 		case CATEGORY: {
-			category = Command.tryParseCategoryWithPrint("prod update", parser.getCommand(4));
-			if (category == null) return null;
+			category = Product.Category.fromLabel(parser.getCommand(4));
+			if (category == null){
+				Utils.printInvalidEnum("prod update", "category", parser.getCommand(4), Product.Category.values());
+				return null;
+			}
 		} break;
 		case PRICE: {
-			price = Command.tryParseIntWithPrint("prod update", parser.getCommand(4));
-			if (price == null) return null;
+			price = Utils.tryParseInt(parser.getCommand(4));
+			if (price == null){
+				Utils.printInvalidDataType("prod update", "integer", parser.getCommand(4));
+				return null;
+			}
 		} break;
 		}
 
@@ -225,11 +248,13 @@ public class ProductCommand extends Command {
 	 *               ProductCommand Remove instance or null
 	 */		
 	public static Command tryParseRemove(Parser parser) {
-		if (!Command.checkArgsCountWithPrint("prod remove", parser, 3)) return null;
+		if (!Utils.checkArgsCountWithPrint("prod remove", parser, 3)) return null;
 
- 		Integer id = Command.tryParseIntWithPrint("prod remove", parser.getCommand(2));
-		if (id == null) return null;
-		
+ 		Integer id = Utils.tryParseInt(parser.getCommand(2));
+		 if (id == null){
+			 Utils.printInvalidDataType("prod remove", "integer", parser.getCommand(2));
+		 }
+
 		return new ProductCommand(SubCommand.REMOVE, id, null, null, 0);
 	} 
 

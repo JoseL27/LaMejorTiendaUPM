@@ -75,11 +75,11 @@ public class TicketCommand extends Command{
      * @return Parse result. Either a valid TicketCommand instance or a failure code
      */
     public static Command tryParse(Parser parser){
-		if (!Command.checkArgsCountWithPrint("ticket", parser, 2, 4)) return null;
+		if (!Utils.checkArgsCountWithPrint("ticket", parser, 2, 4)) return null;
 
 		SubCommand subCommand = SubCommand.fromLabel(parser.getCommand(1));
 		if (subCommand == null) {
-			Command.printInvalidEnum("ticket", "sub command", parser.getCommand(1), SubCommand.values());
+			Utils.printInvalidEnum("ticket", "sub command", parser.getCommand(1), SubCommand.values());
 			return null;
 		}
 
@@ -100,7 +100,7 @@ public class TicketCommand extends Command{
 	 * TicketCommand New instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
 	 */
     public static Command tryParseNew(Parser parser) {
-		return Command.checkArgsCountWithPrint("ticket new", parser, 2) ? new TicketCommand(SubCommand.NEW) : null;
+		return Utils.checkArgsCountWithPrint("ticket new", parser, 2) ? new TicketCommand(SubCommand.NEW) : null;
     }
 	
     /**
@@ -112,7 +112,7 @@ public class TicketCommand extends Command{
 	 * TicketCommand Print instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
 	 */
     public static Command tryParsePrint(Parser parser) {
-		return Command.checkArgsCountWithPrint("ticket print", parser, 2) ? new TicketCommand(SubCommand.PRINT) : null; 
+		return Utils.checkArgsCountWithPrint("ticket print", parser, 2) ? new TicketCommand(SubCommand.PRINT) : null;
     }
 	
     /**
@@ -125,14 +125,20 @@ public class TicketCommand extends Command{
 	 * specifying productId and quantity. Or a failure code specifying which part of the parsing went wrong.
 	 */
     public static Command tryParseAdd(Parser parser) {
-		if (!Command.checkArgsCountWithPrint("ticket add", parser, 4)) return null ;
+		if (!Utils.checkArgsCountWithPrint("ticket add", parser, 4)) return null ;
 		
-		Integer productId = Command.tryParseIntWithPrint("ticket add", parser.getCommand(2));
-		if (productId == null) return null;
+		Integer productId = Utils.tryParseInt(parser.getCommand(2));
+		if (productId == null){
+            Utils.printInvalidDataType("ticket add", "integer", parser.getCommand(2));
+            return null;
+        }
 
-		Integer quantity = Command.tryParseIntWithPrint("ticket add", parser.getCommand(3));
-		if (quantity == null) return null;
-	
+		Integer quantity = Utils.tryParseInt(parser.getCommand(3));
+        if (quantity == null){
+            Utils.printInvalidDataType("ticket add", "integer", parser.getCommand(3));
+            return null;
+        }
+
 		return new TicketCommand(SubCommand.ADD, productId, quantity);
     }
 	
@@ -146,10 +152,13 @@ public class TicketCommand extends Command{
 	 * specifying productId. Or a failure code specifying which part of the parsing went wrong.
 	 */
     public static Command tryParseRemove(Parser parser) {
-		if (!Command.checkArgsCountWithPrint("ticket remove", parser, 3)) return null;
+		if (!Utils.checkArgsCountWithPrint("ticket remove", parser, 3)) return null;
 		
-		Integer productId = Command.tryParseIntWithPrint("ticket remove", parser.getCommand(2));
-		if (productId == null) return null;
+		Integer productId = Utils.tryParseInt(parser.getCommand(2));
+		if (productId == null){
+            Utils.printInvalidDataType("ticket remove", "integer", parser.getCommand(2));
+            return null;
+        }
 		
 		return new TicketCommand(SubCommand.REMOVE, productId);
     }

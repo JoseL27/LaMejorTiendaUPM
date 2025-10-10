@@ -25,7 +25,7 @@ public class EchoCommand extends Command {
 	}
 
     public static Command tryParse(Parser parser) {
-		return Command.checkArgsCountWithPrint("echo", parser, 2) 
+		return Utils.checkArgsCountWithPrint("echo", parser, 2)
 			? new EchoCommand(parser.getCommand(1)) : null;
     }
 

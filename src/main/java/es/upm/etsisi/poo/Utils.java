@@ -37,4 +37,54 @@ public class Utils {
 	public static boolean nullOrEquals(Object a, Object b) {
 		return (a == b) || (a != null && a.equals(b));
 	}
+
+    public static boolean checkArgsCountWithPrint(String prefix, Parser parser, int minAmount, int maxAmount) {
+        boolean result = false;
+        if (parser.getLength() < minAmount) {
+            System.out.printf("%s: too few arguments, expected at %d arguments and got %d\n", prefix, minAmount, parser.getLength());
+        } else if (parser.getLength() > maxAmount) {
+            System.out.printf("%s: too many arguments, expected %d and got %d\n", prefix, maxAmount, parser.getLength());
+        } else {
+            result = true;
+        }
+
+        return result;
+    }
+
+    public static boolean checkArgsCountWithPrint(String prefix, Parser parser, int expectedAmount) {
+        return checkArgsCountWithPrint(prefix, parser, expectedAmount, expectedAmount);
+    }
+
+    public static void printInvalidEnum(String failedCommand, String enumName, String receivedValue, Enum[] possibleValues) {
+        System.out.printf("%s: error: invalid %s '%s', expected one of: %s\n",
+                          failedCommand, enumName, receivedValue, arrayToString(possibleValues, "|"));
+    }
+
+    public static void printInvalidDataType(String failedCommand, String expectedDataType, String receivedValue){
+        System.out.printf("%s: error: expected %s, got '%s'\n", failedCommand, expectedDataType, receivedValue);
+    }
+
+    public static Product.Category tryParseCategoryWithPrint(String prefix, String categoryString) {
+        Product.Category category = Product.Category.fromLabel(categoryString);
+        if (category == null) {
+            printInvalidEnum(prefix, "category", categoryString, Product.Category.values());
+        }
+        return category;
+    }
+
+    public static Product.Field tryParseFieldWithPrint(String prefix, String fieldString) {
+        Product.Field field = Product.Field.fromLabel(fieldString);
+        if (field == null) {
+            printInvalidEnum(prefix, "field", fieldString, Product.Field.values());
+        }
+        return field;
+    }
+
+    public static Integer tryParseIntWithPrint(String prefix, String intString) {
+        Integer number = tryParseInt(intString);
+        if (number == null) {
+            System.out.printf("%s: error: expected an integer string, got '%s'\n", prefix, intString);
+        }
+        return number;
+    }
 }
