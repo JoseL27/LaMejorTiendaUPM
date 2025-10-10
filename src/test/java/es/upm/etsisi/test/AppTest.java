@@ -1,6 +1,9 @@
 package es.upm.etsisi.test;
 
 import es.upm.etsisi.poo.App;
+import es.upm.etsisi.poo.Ticket;
+import es.upm.etsisi.poo.Product.Category;
+import es.upm.etsisi.poo.ArrayDataManager;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,8 +20,8 @@ import java.nio.file.Files;
 import java.util.Scanner;
 import java.util.List;
 import java.util.Iterator;
-
 import java.util.Locale;
+import java.lang.StringBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -445,5 +448,330 @@ public class AppTest {
 		App app = new App();
 		app.run(new Scanner(inputString));
 		assertEqualOutputsByLine(expectedOutput);
-	}	
+	}
+
+	@Test
+	void ticketNewTest() {
+		String inputString = "ticket new\n"
+			+"exit\n";
+		
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			+"tUPM> ticket new\n"
+			+"ticket new: ok\n"
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);		
+	}
+
+	@Test
+	void ticketAddTest() {
+		String inputString = "prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+"ticket add 1 2\n"
+			+"exit\n";
+		
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			
+			+"tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n"
+			+"prod add: ok\n"
+			+"tUPM> ticket add 1 2\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"Total price: 60.0\n"
+			+"Total discount: 6.0\n"
+			+"Final Price: 54.0\n"
+			+"ticket add: ok\n"
+
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);		
+	}
+
+	@Test
+	void ticketAddTest2() {
+		String inputString = "prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+"prod add 2 \"Camiseta talla:M UPM\" CLOTHES 15\n"
+			+"ticket add 1 2\n"
+			+"ticket add 2 1\n"
+			+"exit\n";
+		
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			
+			+"tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n"
+			+"prod add: ok\n"
+
+			+"tUPM> prod add 2 \"Camiseta talla:M UPM\" CLOTHES 15\n"
+			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
+			+"prod add: ok\n"
+			
+			+"tUPM> ticket add 1 2\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"Total price: 60.0\n"
+			+"Total discount: 6.0\n"
+			+"Final Price: 54.0\n"
+			+"ticket add: ok\n"
+
+			+"tUPM> ticket add 2 1\n"
+			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"Total price: 75.0\n"
+			+"Total discount: 6.0\n"
+			+"Final Price: 69.0\n"
+			+"ticket add: ok\n"
+
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);		
+	}
+
+	@Test
+	void ticketPrintTest() {
+		String inputString = "prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+"prod add 2 \"Camiseta talla:M UPM\" CLOTHES 15\n"
+			+"ticket add 1 2\n"
+			+"ticket add 2 1\n"
+			+"ticket print\n"
+			+"exit\n";
+		
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			
+			+"tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n"
+			+"prod add: ok\n"
+
+			+"tUPM> prod add 2 \"Camiseta talla:M UPM\" CLOTHES 15\n"
+			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
+			+"prod add: ok\n"
+			
+			+"tUPM> ticket add 1 2\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"Total price: 60.0\n"
+			+"Total discount: 6.0\n"
+			+"Final Price: 54.0\n"
+			+"ticket add: ok\n"
+
+			+"tUPM> ticket add 2 1\n"
+			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"Total price: 75.0\n"
+			+"Total discount: 6.0\n"
+			+"Final Price: 69.0\n"
+			+"ticket add: ok\n"
+
+			+"tUPM> ticket print\n"
+			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"Total price: 75.0\n"
+			+"Total discount: 6.0\n"
+			+"Final Price: 69.0\n"
+			+"ticket print: ok\n"
+
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);		
+	}
+
+	@Test
+	void ticketResetAfterPrint() {
+		String inputString = "prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+"ticket add 1 2\n"
+			+"ticket print\n"
+			+"ticket print\n"
+			+"exit\n";
+		
+		String expectedOutput =
+			"Welcome to the ticket module App.\n"
+			+"Ticket module. Type 'help' to see commands.\n"
+			
+			+"tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n"
+			+"prod add: ok\n"
+			+"tUPM> ticket add 1 2\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"Total price: 60.0\n"
+			+"Total discount: 6.0\n"
+			+"Final Price: 54.0\n"
+			+"ticket add: ok\n"
+
+			+"tUPM> ticket print\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
+			+"Total price: 60.0\n"
+			+"Total discount: 6.0\n"
+			+"Final Price: 54.0\n"
+			+"ticket print: ok\n"
+			
+			+"tUPM> ticket print\n"
+			+"Total price: 0.0\n"
+			+"Total discount: 0.0\n"
+			+"Final Price: 0.0\n"
+			+"ticket print: ok\n"
+
+			+"tUPM> exit\n"
+			+"Closing application.\n"
+			+"Goodbye!\n";
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);		
+	}
+
+	String ticketItemsPrint(int amount) {
+		StringBuilder sb = new StringBuilder();
+		
+		float discountValue = (float)amount * Category.BOOK.getDiscountPercent() * 30.0f;
+		float totalPrice = (float)amount*30;
+		for (int i = 0; i < amount; i++) {
+			sb.append("{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n");
+		}
+
+		sb.append(String.format("Total price: %.1f\n", totalPrice));
+		sb.append(String.format("Total discount: %.1f\n", discountValue));
+		sb.append(String.format("Final Price: %.1f\n", totalPrice - discountValue));
+
+		return sb.toString();
+	}
+
+	@Test
+	void ticketMaxItemsTest() {
+		String inputString = "prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+String.format("ticket add 1 %d\n", Ticket.MAX_TICKET_ITEMS)
+			+"ticket add 1 1\n"
+			+"ticket print\n"
+			+"exit\n";
+
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("Welcome to the ticket module App.\n");
+		sb.append("Ticket module. Type 'help' to see commands.\n");
+		sb.append("tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n");
+		sb.append("{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n");
+		sb.append("prod add: ok\n");
+		sb.append(String.format("tUPM> ticket add 1 %d\n", Ticket.MAX_TICKET_ITEMS));
+
+		String ticketItemsPrint	= ticketItemsPrint(Ticket.MAX_TICKET_ITEMS);
+		sb.append(ticketItemsPrint);
+		sb.append("ticket add: ok\n");
+
+		sb.append("tUPM> ticket add 1 1\n");
+		sb.append("ticket add: error: ticket is full (100 items max)\n");
+		
+		sb.append("tUPM> ticket print\n");
+		sb.append(ticketItemsPrint);
+		sb.append("ticket print: ok\n");
+		
+		sb.append("tUPM> exit\n");
+		sb.append("Closing application.\n");
+		sb.append("Goodbye!\n");
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(sb.toString());
+	}
+
+	@Test
+	void ticketMaxItemsDistinctTest() {
+		String inputString = 
+			"prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+String.format("ticket add 1 %d\n", Ticket.MAX_TICKET_ITEMS)
+			+"prod add 2 \"Libro POO V3\" BOOK 30\n"
+			+"ticket add 2 1\n"
+			+"ticket print\n"
+			+"exit\n";
+
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("Welcome to the ticket module App.\n");
+		sb.append("Ticket module. Type 'help' to see commands.\n");
+		sb.append("tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n");
+		sb.append("{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n");
+		sb.append("prod add: ok\n");
+		sb.append(String.format("tUPM> ticket add 1 %d\n", Ticket.MAX_TICKET_ITEMS));
+
+		String ticketItemsPrint	= ticketItemsPrint(Ticket.MAX_TICKET_ITEMS);
+		sb.append(ticketItemsPrint);
+		sb.append("ticket add: ok\n");
+
+		sb.append("tUPM> prod add 2 \"Libro POO V3\" BOOK 30\n");
+		sb.append("{class:Product, id:2, name:'Libro POO V3', category:BOOK, price:30.0}\n");
+		sb.append("prod add: ok\n");
+
+		sb.append("tUPM> ticket add 2 1\n");
+		sb.append("ticket add: error: ticket is full (100 items max)\n");
+		
+		sb.append("tUPM> ticket print\n");
+		sb.append(ticketItemsPrint);
+		sb.append("ticket print: ok\n");
+		
+		sb.append("tUPM> exit\n");
+		sb.append("Closing application.\n");
+		sb.append("Goodbye!\n");
+
+		App app = new App();
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(sb.toString());
+	}
+
+	@Test
+	void prodMaxCapacityTest() {
+		StringBuilder inputSb = new StringBuilder();
+		for (int i = 0; i < ArrayDataManager.MAX_CAPACITY; i++) {
+			inputSb.append(String.format("prod add %d \"Book(%d)\" BOOK %d\n", i, i, (i+1)*10));
+		}
+		inputSb.append("prod add 1000 \"Max Test\" BOOK 1000\n");
+		inputSb.append("exit\n");
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("Welcome to the ticket module App.\n");
+		sb.append("Ticket module. Type 'help' to see commands.\n");
+
+		for (int i = 0; i < ArrayDataManager.MAX_CAPACITY; i++) {
+			sb.append(String.format("tUPM> prod add %d \"Book(%d)\" BOOK %d\n", i, i, (i+1)*10));
+			sb.append(String.format("{class:Product, id:%d, name:'Book(%d)', category:BOOK, price:%d.0}\n", i, i, (i+1)*10));
+			sb.append("prod add: ok\n");				
+		}		
+
+		sb.append("tUPM> prod add 1000 \"Max Test\" BOOK 1000\n");
+
+		sb.append("prod add: error: inventory full\n");
+		
+		sb.append("tUPM> exit\n");
+		sb.append("Closing application.\n");
+		sb.append("Goodbye!\n");
+
+		App app = new App();
+		app.run(new Scanner(inputSb.toString()));
+		assertEqualOutputsByLine(sb.toString());
+	}
 }
