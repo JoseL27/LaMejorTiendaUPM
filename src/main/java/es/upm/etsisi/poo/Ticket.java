@@ -72,13 +72,11 @@ public class Ticket {
 	/**
 	 * Max amount of products allowed in the Ticket, as the requirement documents specifies.
 	 */
-	public static final int MAX_TICKET_PRODUCTS = 100;
-	public static final int MAX_TICKET_ITEMS = 100;
+	public static final int TICKET_MAX_PRODUCTS = 100;
 
 	/**
-	 * The current products the ticket holds. Static array of products-amount pairs.
-	 * Has a fixed size of 'MAX_TICKET_PRODUCTS' and holds 'count' product infos.
-	 * Items amount (sum of all of the products info's amount) is capped to  'MAX_TICKET_ITEMS', and holds itemCount of those.
+	 * The current products the ticket holds. static array of products-amount pairs.
+	 * Has a fixed size of 'TICKET_MAX_PRODUCTS' and holds 'count' product infos.
 	 */
 	private ProductInfo[] productInfos;
 
@@ -86,11 +84,6 @@ public class Ticket {
 	 * The count of product infos to manage the static array.
 	 */
 	private int count;
-
-	/**
-	 * The count of product infos to manage the static array.
-	 */
-	private int itemCount;
 
 	/**
 	 * Basic constructor
@@ -103,9 +96,8 @@ public class Ticket {
 	 * Resets the Ticket resources
 	 */
 	public void reset() {
-		productInfos = new ProductInfo[MAX_TICKET_PRODUCTS];
+		productInfos = new ProductInfo[TICKET_MAX_PRODUCTS];
 		count = 0;
-		itemCount = 0;
 	}
 	
 
@@ -113,12 +105,12 @@ public class Ticket {
 	 * Adds a product asociated to an amount to the ticket. Too things may happen:
 	 * Checks if the product allready exists 
 	 *  - If the product does not exist it will be added by appendProductInfo
-	 *    which will check if the current 'count' is less than the 'MAX_TICKET_PRODUCTS'.
+	 *    which will check if the current 'count' is less than the 'TICKET_MAX_PRODUCTS'.
 	 *  - If the product exists (equality is checked by id) its amount is incremented
 	 *
 	 * @param product  the product to add or increment
 	 * @param amount   the amount to increment
-	 * @return         false if the product was attempted to be added and MAX_TICKET_PRODUCTS was hit.
+	 * @return         false if the product was attempted to be added and TICKET_MAX_PRODUCTS was hit.
 	 *
 	 * @see findProductInfo
 	 * @see appendProductInfo
@@ -129,10 +121,8 @@ public class Ticket {
 		ProductInfo foundProductInfo = findProductInfo(product.getId());
 			
 		if (foundProductInfo != null) {
-			if (itemCount + amount <= MAX_TICKET_ITEMS) { 
-				foundProductInfo.incrementAmount(amount);
-				result = true;
-			}
+			foundProductInfo.incrementAmount(amount);
+			result = true;
 		} else {
 			result = appendProductInfo(new ProductInfo(product, amount));
 		}
@@ -157,8 +147,6 @@ public class Ticket {
 		
 		if (foundIndex != -1) {
 			Product removed = productInfos[foundIndex].getProduct();
-			itemCount -= productInfos[foundIndex].getAmount();
-			
 			productInfos[foundIndex] = productInfos[count];
 			productInfos[count]	= null;
 			count--;
@@ -278,10 +266,9 @@ public class Ticket {
 	 * @return              false if 'count == productInfos.length'
 	 */
 	private boolean appendProductInfo(ProductInfo productInfo) {
-		if (count + 1 < MAX_TICKET_PRODUCTS && itemCount + productInfo.getAmount() <= MAX_TICKET_ITEMS) {
+		if (count + 1 < productInfos.length) {
 			productInfos[count] = productInfo;
 			count++;
-			itemCount += productInfo.getAmount();
 			return true;
 		}
 		return false;
