@@ -252,7 +252,7 @@ public class TicketCommand extends Command{
     }
 
     private boolean isValidAmount(int quantity){
-        return quantity >= 0 && quantity <= Ticket.TICKET_MAX_PRODUCTS;
+        return quantity > 0 && quantity <= Ticket.TICKET_MAX_PRODUCTS;
     }
 
     @Override
