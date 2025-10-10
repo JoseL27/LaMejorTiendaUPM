@@ -131,7 +131,7 @@ public class Ticket {
                 } else {
                     result = appendProductInfo(new ProductInfo(product, amount));
                 }
-                numTotal += amount;
+                if(result) numTotal+=amount;
             }
 		return result;
 	}
