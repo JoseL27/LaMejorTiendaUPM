@@ -127,10 +127,11 @@ public class Ticket {
                 if (foundProductInfo != null) {
                     foundProductInfo.incrementAmount(amount);
                     result = true;
-                    numTotal += amount;
+
                 } else {
                     result = appendProductInfo(new ProductInfo(product, amount));
                 }
+                numTotal += amount;
             }
 		return result;
 	}
