@@ -84,7 +84,10 @@ public class Ticket {
 	 * The count of product infos to manage the static array.
 	 */
 	private int count;
-
+    /**
+     * The total number of items in the Ticket
+     */
+    private int numTotal;
 	/**
 	 * Basic constructor
 	 */
@@ -98,6 +101,7 @@ public class Ticket {
 	public void reset() {
 		productInfos = new ProductInfo[TICKET_MAX_PRODUCTS];
 		count = 0;
+        numTotal = 0;
 	}
 	
 
@@ -119,14 +123,15 @@ public class Ticket {
 		boolean result = false;
 
 		ProductInfo foundProductInfo = findProductInfo(product.getId());
-			
-		if (foundProductInfo != null) {
-			foundProductInfo.incrementAmount(amount);
-			result = true;
-		} else {
-			result = appendProductInfo(new ProductInfo(product, amount));
-		}
-
+			if(numTotal+amount<=TICKET_MAX_PRODUCTS){
+                if (foundProductInfo != null) {
+                    foundProductInfo.incrementAmount(amount);
+                    result = true;
+                    numTotal += amount;
+                } else {
+                    result = appendProductInfo(new ProductInfo(product, amount));
+                }
+            }
 		return result;
 	}
 
@@ -147,6 +152,7 @@ public class Ticket {
 		
 		if (foundIndex != -1) {
 			Product removed = productInfos[foundIndex].getProduct();
+            numTotal -= productInfos[foundIndex].getAmount();
 			productInfos[foundIndex] = productInfos[count];
 			productInfos[count]	= null;
 			count--;

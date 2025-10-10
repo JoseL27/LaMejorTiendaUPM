@@ -86,7 +86,7 @@ public class Product {
 
 	@Override
 	public String toString() {
-		return String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}", 
+		return String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}",
 							 this.id, this.name, this.category, this.price);
 	}
 
