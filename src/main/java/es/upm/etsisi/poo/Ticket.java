@@ -147,8 +147,8 @@ public class Ticket {
 		
 		if (foundIndex != -1) {
 			Product removed = productInfos[foundIndex].getProduct();
-			productInfos[foundIndex] = productInfos[count];
-			productInfos[count]	= null;
+			productInfos[foundIndex] = productInfos[count - 1];
+			productInfos[count - 1]	= null;
 			count--;
 			return removed;
 		}
