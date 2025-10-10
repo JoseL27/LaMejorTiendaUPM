@@ -666,7 +666,7 @@ public class AppTest {
 	@Test
 	void ticketMaxItemsTest() {
 		String inputString = "prod add 1 \"Libro POO V2\" BOOK 30\n"
-			+String.format("ticket add 1 %d\n", Ticket.MAX_TICKET_ITEMS)
+			+String.format("ticket add 1 %d\n", Ticket.TICKET_MAX_PRODUCTS)
 			+"ticket add 1 1\n"
 			+"ticket print\n"
 			+"exit\n";
@@ -678,9 +678,9 @@ public class AppTest {
 		sb.append("tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n");
 		sb.append("{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n");
 		sb.append("prod add: ok\n");
-		sb.append(String.format("tUPM> ticket add 1 %d\n", Ticket.MAX_TICKET_ITEMS));
+		sb.append(String.format("tUPM> ticket add 1 %d\n", Ticket.TICKET_MAX_PRODUCTS));
 
-		String ticketItemsPrint	= ticketItemsPrint(Ticket.MAX_TICKET_ITEMS);
+		String ticketItemsPrint	= ticketItemsPrint(Ticket.TICKET_MAX_PRODUCTS);
 		sb.append(ticketItemsPrint);
 		sb.append("ticket add: ok\n");
 
@@ -704,7 +704,7 @@ public class AppTest {
 	void ticketMaxItemsDistinctTest() {
 		String inputString = 
 			"prod add 1 \"Libro POO V2\" BOOK 30\n"
-			+String.format("ticket add 1 %d\n", Ticket.MAX_TICKET_ITEMS)
+			+String.format("ticket add 1 %d\n", Ticket.TICKET_MAX_PRODUCTS)
 			+"prod add 2 \"Libro POO V3\" BOOK 30\n"
 			+"ticket add 2 1\n"
 			+"ticket print\n"
@@ -717,9 +717,9 @@ public class AppTest {
 		sb.append("tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n");
 		sb.append("{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n");
 		sb.append("prod add: ok\n");
-		sb.append(String.format("tUPM> ticket add 1 %d\n", Ticket.MAX_TICKET_ITEMS));
+		sb.append(String.format("tUPM> ticket add 1 %d\n", Ticket.TICKET_MAX_PRODUCTS));
 
-		String ticketItemsPrint	= ticketItemsPrint(Ticket.MAX_TICKET_ITEMS);
+		String ticketItemsPrint	= ticketItemsPrint(Ticket.TICKET_MAX_PRODUCTS);
 		sb.append(ticketItemsPrint);
 		sb.append("ticket add: ok\n");
 

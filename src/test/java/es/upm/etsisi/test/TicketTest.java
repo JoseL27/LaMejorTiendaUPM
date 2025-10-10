@@ -102,16 +102,16 @@ public class TicketTest {
 	@Test
 	void maxProductTest() {
 		Ticket ticket = new Ticket();
-		for (int i = 0; i < Ticket.MAX_TICKET_PRODUCTS; ++i) { 
+		for (int i = 0; i < Ticket.TICKET_MAX_PRODUCTS; ++i) { 
 			ticket.addProduct(new Product(i, String.format("Product(%d)", i), Product.Category.CLOTHES, (i+1)*10), 1);
 		}
-		assertFalse(ticket.addProduct(new Product(Ticket.MAX_TICKET_PRODUCTS+1, "Product", Product.Category.CLOTHES, 10), 1));
+		assertFalse(ticket.addProduct(new Product(Ticket.TICKET_MAX_PRODUCTS+1, "Product", Product.Category.CLOTHES, 10), 1));
 	}
 
 	@Test
 	void maxItemsTest() {
 		Ticket ticket = new Ticket();
-		ticket.addProduct(new Product(1, "Product(1)", Product.Category.CLOTHES, 10), Ticket.MAX_TICKET_ITEMS);
+		ticket.addProduct(new Product(1, "Product(1)", Product.Category.CLOTHES, 10), Ticket.TICKET_MAX_PRODUCTS);
 		assertFalse(ticket.addProduct(new Product(2, "Product", Product.Category.CLOTHES, 10), 1));
 	}
 }
