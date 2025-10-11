@@ -54,7 +54,7 @@ public class Product {
 		}		
 	}
 	
-	public final int id;
+	private final int id;
 	private String name;
 	private Category category;
 	private double price;
@@ -65,23 +65,6 @@ public class Product {
 		this.name = name;
 		this.category = category;
 		this.price = price;
-	}
-
-	/**
-	 * Checks if this is the same as other product, based on id only
-	 * @param p product to be compared to
-	 * @return true, if the products have the same id, false in other case
-	 */
-	public boolean equals(Product p) {
-		return this.id == p.id;
-	}
-
-	public Category category() {
-		return this.category;
-	}
-
-	public double price(int amount) {
-		return this.price * amount;
 	}
 
 	@Override
