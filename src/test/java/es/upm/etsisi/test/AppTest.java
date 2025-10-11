@@ -151,9 +151,9 @@ public class AppTest {
 		String expectedString =
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
-			+"tUPM> echo \"SamekoSaba\"\n"
+			+"tUPM> "
 			+"echo \"SamekoSaba\"\n"
-			+"tUPM> help\n"
+			+"tUPM> "
 			+"Commands:\n"
 			+" prod add <id> \"<name>\" <category> <price>\n"
 			+" prod list\n"
@@ -169,7 +169,7 @@ public class AppTest {
 			+"\n"
 			+"Categories: MERCH, STATIONERY, CLOTHES, BOOK, ELECTRONICS\n"
 			+"Discounts if there are ≥2 units in the category: MERCH 0%, STATIONERY 5%, CLOTHES 7%, BOOK 10%, ELECTRONICS 3%.\n"
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -189,9 +189,9 @@ public class AppTest {
 		String expectedString =
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
-			+"tUPM> echo \"Hola mundo\"\n"
+			+"tUPM> "
 			+"echo \"Hola mundo\"\n"
-			+"tUPM> help\n"
+			+"tUPM> "
 			+"Commands:\n"
 			+" prod add <id> \"<name>\" <category> <price>\n"
 			+" prod list\n"
@@ -207,7 +207,7 @@ public class AppTest {
 			+"\n"
 			+"Categories: MERCH, STATIONERY, CLOTHES, BOOK, ELECTRONICS\n"
 			+"Discounts if there are ≥2 units in the category: MERCH 0%, STATIONERY 5%, CLOTHES 7%, BOOK 10%, ELECTRONICS 3%.\n"
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -222,9 +222,9 @@ public class AppTest {
 		String expectedOutput =
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
-			+"tUPM> echo \"test\"\n"
+			+"tUPM> "
 			+"echo \"test\"\n"
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 		
@@ -239,7 +239,7 @@ public class AppTest {
 		String expectedOutput =
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
-			+"tUPM> help\n"
+			+"tUPM> "
 			+"Commands:\n"
 			+" prod add <id> \"<name>\" <category> <price>\n"
 			+" prod list\n"
@@ -255,7 +255,7 @@ public class AppTest {
 			+"\n"
 			+"Categories: MERCH, STATIONERY, CLOTHES, BOOK, ELECTRONICS\n"
 			+"Discounts if there are ≥2 units in the category: MERCH 0%, STATIONERY 5%, CLOTHES 7%, BOOK 10%, ELECTRONICS 3%.\n"			
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 		
@@ -272,10 +272,10 @@ public class AppTest {
 		String expectedOutput =
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
-			+"tUPM> prod add 1 \"Libro POO\" BOOK 25\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO', category:BOOK, price:25.0}\n"
 			+"prod add: ok\n"
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -293,10 +293,10 @@ public class AppTest {
 		String expectedOutput =
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
-			+"tUPM> prod add 2 \"Camiseta talla:M UPM\" CLOTHES 15\n"
+			+"tUPM> "
 			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
 			+"prod add: ok\n"
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -316,21 +316,21 @@ public class AppTest {
 		String expectedOutput =
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
-			+"tUPM> prod add 1 \"Libro POO\" BOOK 25\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO', category:BOOK, price:25.0}\n"
 			+"prod add: ok\n"
 			
-			+"tUPM> prod add 2 \"Camiseta talla:M UPM\" CLOTHES 15\n"
+			+"tUPM> "
 			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
 			+"prod add: ok\n"
 
-			+"tUPM> prod list\n"
+			+"tUPM> "
 			+"Catalog:\n"
 			+" {class:Product, id:1, name:'Libro POO', category:BOOK, price:25.0}\n"
 			+" {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
 			+"prod list: ok\n"
 			
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -350,15 +350,15 @@ public class AppTest {
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
 			
-			+"tUPM> prod add 1 \"Libro POO\" BOOK 25\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO', category:BOOK, price:25.0}\n"
 			+"prod add: ok\n"
 
-			+"tUPM> prod update 1 NAME \"Libro POO V2\"\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:25.0}\n"
 			+"prod update: ok\n"
 			
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -377,15 +377,15 @@ public class AppTest {
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
 			
-			+"tUPM> prod add 1 \"Libro POO V2\" BOOK 25\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:25.0}\n"
 			+"prod add: ok\n"
 
-			+"tUPM> prod update 1 PRICE 30\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n"
 			+"prod update: ok\n"
 			
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -404,15 +404,15 @@ public class AppTest {
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
 			
-			+"tUPM> prod add 1 \"Libro POO\" BOOK 25\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO', category:BOOK, price:25.0}\n"
 			+"prod add: ok\n"
 
-			+"tUPM> prod update 1 CATEGORY MERCH\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO', category:MERCH, price:25.0}\n"
 			+"prod update: ok\n"
 			
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -433,15 +433,15 @@ public class AppTest {
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
 			
-			+"tUPM> prod add 3 \"Libro POO repetido Error\" BOOK 25\n"
+			+"tUPM> "
 			+"{class:Product, id:3, name:'Libro POO repetido Error', category:BOOK, price:25.0}\n"
 +"prod add: ok\n"
 
-			+"tUPM> prod remove 3\n"
+			+"tUPM> "
 			+"{class:Product, id:3, name:'Libro POO repetido Error', category:BOOK, price:25.0}\n"
 +"prod remove: ok\n"
 			
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -458,9 +458,9 @@ public class AppTest {
 		String expectedOutput =
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
-			+"tUPM> ticket new\n"
+			+"tUPM> "
 			+"ticket new: ok\n"
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -479,10 +479,10 @@ public class AppTest {
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
 			
-			+"tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n"
 			+"prod add: ok\n"
-			+"tUPM> ticket add 1 2\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"Total price: 60.0\n"
@@ -490,7 +490,7 @@ public class AppTest {
 			+"Final Price: 54.0\n"
 			+"ticket add: ok\n"
 
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -511,15 +511,15 @@ public class AppTest {
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
 			
-			+"tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n"
 			+"prod add: ok\n"
 
-			+"tUPM> prod add 2 \"Camiseta talla:M UPM\" CLOTHES 15\n"
+			+"tUPM> "
 			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
 			+"prod add: ok\n"
 			
-			+"tUPM> ticket add 1 2\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"Total price: 60.0\n"
@@ -527,7 +527,7 @@ public class AppTest {
 			+"Final Price: 54.0\n"
 			+"ticket add: ok\n"
 
-			+"tUPM> ticket add 2 1\n"
+			+"tUPM> "
 			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
@@ -536,7 +536,7 @@ public class AppTest {
 			+"Final Price: 69.0\n"
 			+"ticket add: ok\n"
 
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -558,15 +558,15 @@ public class AppTest {
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
 			
-			+"tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n"
 			+"prod add: ok\n"
 
-			+"tUPM> prod add 2 \"Camiseta talla:M UPM\" CLOTHES 15\n"
+			+"tUPM> "
 			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
 			+"prod add: ok\n"
 			
-			+"tUPM> ticket add 1 2\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"Total price: 60.0\n"
@@ -574,7 +574,7 @@ public class AppTest {
 			+"Final Price: 54.0\n"
 			+"ticket add: ok\n"
 
-			+"tUPM> ticket add 2 1\n"
+			+"tUPM> "
 			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
@@ -583,7 +583,7 @@ public class AppTest {
 			+"Final Price: 69.0\n"
 			+"ticket add: ok\n"
 
-			+"tUPM> ticket print\n"
+			+"tUPM> "
 			+"{class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}\n"
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
@@ -592,7 +592,7 @@ public class AppTest {
 			+"Final Price: 69.0\n"
 			+"ticket print: ok\n"
 
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -613,10 +613,10 @@ public class AppTest {
 			"Welcome to the ticket module App.\n"
 			+"Ticket module. Type 'help' to see commands.\n"
 			
-			+"tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n"
 			+"prod add: ok\n"
-			+"tUPM> ticket add 1 2\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"Total price: 60.0\n"
@@ -624,7 +624,7 @@ public class AppTest {
 			+"Final Price: 54.0\n"
 			+"ticket add: ok\n"
 
-			+"tUPM> ticket print\n"
+			+"tUPM> "
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n"
 			+"Total price: 60.0\n"
@@ -632,13 +632,13 @@ public class AppTest {
 			+"Final Price: 54.0\n"
 			+"ticket print: ok\n"
 			
-			+"tUPM> ticket print\n"
+			+"tUPM> "
 			+"Total price: 0.0\n"
 			+"Total discount: 0.0\n"
 			+"Final Price: 0.0\n"
 			+"ticket print: ok\n"
 
-			+"tUPM> exit\n"
+			+"tUPM> "
 			+"Closing application.\n"
 			+"Goodbye!\n";
 
@@ -675,23 +675,23 @@ public class AppTest {
 		
 		sb.append("Welcome to the ticket module App.\n");
 		sb.append("Ticket module. Type 'help' to see commands.\n");
-		sb.append("tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n");
+		sb.append("tUPM> ");
 		sb.append("{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n");
 		sb.append("prod add: ok\n");
-		sb.append(String.format("tUPM> ticket add 1 %d\n", Ticket.TICKET_MAX_PRODUCTS));
+		sb.append(String.format("tUPM> "));
 
 		String ticketItemsPrint	= ticketItemsPrint(Ticket.TICKET_MAX_PRODUCTS);
 		sb.append(ticketItemsPrint);
 		sb.append("ticket add: ok\n");
 
-		sb.append("tUPM> ticket add 1 1\n");
+		sb.append("tUPM> ");
 		sb.append("ticket add: error: ticket is full (100 items max)\n");
 		
-		sb.append("tUPM> ticket print\n");
+		sb.append("tUPM> ");
 		sb.append(ticketItemsPrint);
 		sb.append("ticket print: ok\n");
 		
-		sb.append("tUPM> exit\n");
+		sb.append("tUPM> ");
 		sb.append("Closing application.\n");
 		sb.append("Goodbye!\n");
 
@@ -714,27 +714,27 @@ public class AppTest {
 		
 		sb.append("Welcome to the ticket module App.\n");
 		sb.append("Ticket module. Type 'help' to see commands.\n");
-		sb.append("tUPM> prod add 1 \"Libro POO V2\" BOOK 30\n");
+		sb.append("tUPM> ");
 		sb.append("{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}\n");
 		sb.append("prod add: ok\n");
-		sb.append(String.format("tUPM> ticket add 1 %d\n", Ticket.TICKET_MAX_PRODUCTS));
+		sb.append(String.format("tUPM> "));
 
 		String ticketItemsPrint	= ticketItemsPrint(Ticket.TICKET_MAX_PRODUCTS);
 		sb.append(ticketItemsPrint);
 		sb.append("ticket add: ok\n");
 
-		sb.append("tUPM> prod add 2 \"Libro POO V3\" BOOK 30\n");
+		sb.append("tUPM> ");
 		sb.append("{class:Product, id:2, name:'Libro POO V3', category:BOOK, price:30.0}\n");
 		sb.append("prod add: ok\n");
 
-		sb.append("tUPM> ticket add 2 1\n");
+		sb.append("tUPM> ");
 		sb.append("ticket add: error: ticket is full (100 items max)\n");
 		
-		sb.append("tUPM> ticket print\n");
+		sb.append("tUPM> ");
 		sb.append(ticketItemsPrint);
 		sb.append("ticket print: ok\n");
 		
-		sb.append("tUPM> exit\n");
+		sb.append("tUPM> ");
 		sb.append("Closing application.\n");
 		sb.append("Goodbye!\n");
 
@@ -757,16 +757,16 @@ public class AppTest {
 		sb.append("Ticket module. Type 'help' to see commands.\n");
 
 		for (int i = 0; i < ArrayDataManager.MAX_CAPACITY; i++) {
-			sb.append(String.format("tUPM> prod add %d \"Book(%d)\" BOOK %d\n", i, i, (i+1)*10));
+			sb.append(String.format("tUPM> "));
 			sb.append(String.format("{class:Product, id:%d, name:'Book(%d)', category:BOOK, price:%d.0}\n", i, i, (i+1)*10));
 			sb.append("prod add: ok\n");				
 		}		
 
-		sb.append("tUPM> prod add 1000 \"Max Test\" BOOK 1000\n");
+		sb.append("tUPM> ");
 
 		sb.append("prod add: error: inventory full\n");
 		
-		sb.append("tUPM> exit\n");
+		sb.append("tUPM> ");
 		sb.append("Closing application.\n");
 		sb.append("Goodbye!\n");
 

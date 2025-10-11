@@ -31,7 +31,6 @@ public class App {
         do {
             System.out.print("tUPM> ");
             command = sc.nextLine();
-			System.out.println(command);
             if (!command.equals("exit")) {
                 Parser pars = new Parser(command);
                 Command parsedCommand = Command.tryParse(pars);
