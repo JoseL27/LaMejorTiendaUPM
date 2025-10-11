@@ -3,11 +3,8 @@ package es.upm.etsisi.test;
 import es.upm.etsisi.poo.App;
 import es.upm.etsisi.poo.Ticket;
 import es.upm.etsisi.poo.Product.Category;
-import es.upm.etsisi.poo.ArrayDataManager;
+import es.upm.etsisi.poo.Inventory;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.File;
@@ -746,7 +743,7 @@ public class AppTest {
 	@Test
 	void prodMaxCapacityTest() {
 		StringBuilder inputSb = new StringBuilder();
-		for (int i = 0; i < ArrayDataManager.MAX_CAPACITY; i++) {
+		for (int i = 0; i < Inventory.MAX_CAPACITY; i++) {
 			inputSb.append(String.format("prod add %d \"Book(%d)\" BOOK %d\n", i, i, (i+1)*10));
 		}
 		inputSb.append("prod add 1000 \"Max Test\" BOOK 1000\n");
@@ -756,7 +753,7 @@ public class AppTest {
 		sb.append("Welcome to the ticket module App.\n");
 		sb.append("Ticket module. Type 'help' to see commands.\n");
 
-		for (int i = 0; i < ArrayDataManager.MAX_CAPACITY; i++) {
+		for (int i = 0; i < Inventory.MAX_CAPACITY; i++) {
 			sb.append(String.format("tUPM> "));
 			sb.append(String.format("{class:Product, id:%d, name:'Book(%d)', category:BOOK, price:%d.0}\n", i, i, (i+1)*10));
 			sb.append("prod add: ok\n");				

@@ -4,10 +4,9 @@ import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.Product;
 import es.upm.etsisi.poo.Utils;
 import es.upm.etsisi.poo.Parser;
-import es.upm.etsisi.poo.DataManager.DataResult;
-import es.upm.etsisi.poo.ArrayDataManager;
+import es.upm.etsisi.poo.Inventory.DataResult;
+import es.upm.etsisi.poo.Inventory;
 import es.upm.etsisi.poo.Ticket;
-import jdk.jshell.execution.Util;
 
 /**
  *  ProductCommand class that parses a stream of tokens into a specific ProductCommand,
@@ -272,10 +271,10 @@ public class ProductCommand extends Command {
 	 * The specific action performed depends on the value of {@code this.subCommand}.
 	 * 
 	 * @param ticket the {@link Ticket} associated with the command execution (may be used for logging or tracking)
-	 * @param store  the {@link ArrayDataManager} representing the store's data manager
+	 * @param store  the {@link Inventory} representing the store's data manager
 	 */
 	@Override
-	public void tryExecute(Ticket ticket, ArrayDataManager store) {
+	public void tryExecute(Ticket ticket, Inventory store) {
 
 		switch (this.subCommand) {
 			case ADD -> {

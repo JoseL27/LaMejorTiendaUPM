@@ -3,8 +3,8 @@ package es.upm.etsisi.test;
 import java.util.Locale;
 
 import es.upm.etsisi.poo.Product;
-import es.upm.etsisi.poo.ArrayDataManager;
-import es.upm.etsisi.poo.DataManager.DataResult;
+import es.upm.etsisi.poo.Inventory;
+import es.upm.etsisi.poo.Inventory.DataResult;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
 
-public class ArrayDataManagerTest {
+public class InventoryTest {
 
 	// DICTATOR LOCALE 
 	@BeforeAll
@@ -28,27 +28,27 @@ public class ArrayDataManagerTest {
 	// Success
 	@Test
 	void addBookProductTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 		Product prod = new Product(1, "Libro POO", Product.Category.BOOK, 25);
 		
 		DataResult result = adm.createProduct(prod.getId(), prod.getName(), prod.getCategory(), prod.getPrice());
-		assertEquals(result, DataResult.SUCCESS);
+		assertEquals(result, Inventory.DataResult.SUCCESS);
 		assertEquals(prod, adm.readProduct(prod.getId()));
 	}
 	
 	@Test
 	void addShirtProductTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 		Product prod = new Product(1, "Camiseta talla:M UPM", Product.Category.CLOTHES, 15);
 		
 		DataResult result = adm.createProduct(prod.getId(), prod.getName(), prod.getCategory(), prod.getPrice());
-		assertEquals(result, DataResult.SUCCESS);
+		assertEquals(result, Inventory.DataResult.SUCCESS);
 		assertEquals(prod, adm.readProduct(prod.getId()));
 	}
 
 	@Test 
 	void productListTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 
 		Product.Category[] categoryValues = Product.Category.values();
 		Product[] testProducts = new Product[50];
@@ -57,7 +57,7 @@ public class ArrayDataManagerTest {
 			Product prod = new Product(i, String.format("Producto(%d)", i), category, (i+1)*10);
 			testProducts[i] = prod;
 			DataResult result = adm.createProduct(prod.getId(), prod.getName(), prod.getCategory(), prod.getPrice());
-			assertEquals(result, DataResult.SUCCESS);
+			assertEquals(result, Inventory.DataResult.SUCCESS);
 		}
 
 		Product[] listProducts = adm.listProducts();
@@ -71,7 +71,7 @@ public class ArrayDataManagerTest {
 
 	@Test
 	void updateProductNameTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 		Product prod = new Product(1, "Libro POO", Product.Category.BOOK, 25);
 		
 		adm.createProduct(prod.getId(), prod.getName(), prod.getCategory(), prod.getPrice());
@@ -79,13 +79,13 @@ public class ArrayDataManagerTest {
 		prod.setName("Libro POO V2"); // Update
         DataResult result = adm.updateProductName(prod.getId(), prod.getName());
 		
-		assertEquals(result, DataResult.SUCCESS);
+		assertEquals(result, Inventory.DataResult.SUCCESS);
 		assertEquals(prod, adm.readProduct(prod.getId()));
 	}
 
 	@Test
 	void updateProductPriceTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 		Product prod = new Product(1, "Libro POO", Product.Category.BOOK, 25);
 		
 		adm.createProduct(prod.getId(), prod.getName(), prod.getCategory(), prod.getPrice());
@@ -93,73 +93,73 @@ public class ArrayDataManagerTest {
 		prod.setPrice(30.0); // Update
         DataResult result = adm.updateProductPrice(prod.getId(), prod.getPrice());
 		
-		assertEquals(result, DataResult.SUCCESS);
+		assertEquals(result, Inventory.DataResult.SUCCESS);
 		assertEquals(prod, adm.readProduct(prod.getId()));
 	}
 
 	@Test
 	void removeProductTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 
 		int productId = 1;
 		adm.createProduct(productId, "Camiseta talla:M UPM", Product.Category.CLOTHES, 15);
 
 		DataResult result = adm.deleteProduct(productId);
-		assertEquals(result, DataResult.SUCCESS);
+		assertEquals(result, Inventory.DataResult.SUCCESS);
 		assertNull(adm.readProduct(productId));
 	}
 
 	@Test
 	void readMissingProductTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 		assertNull(adm.readProduct(1));
 	}
 
 	// Failures
 	@Test
 	void addAllreadyExistsTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 		int productId = 1;
         adm.createProduct(productId, "Libro POO", Product.Category.BOOK, 25);
         DataResult result = adm.createProduct(productId, "Duplicate Libro POO", Product.Category.BOOK, 25);
 
-		assertEquals(result, DataResult.PRODUCT_ALREADY_EXISTS);
+		assertEquals(result, Inventory.DataResult.PRODUCT_ALREADY_EXISTS);
 	}
 
 	@Test
 	void addInvalidIdTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 		int productId = -1;
         DataResult result = adm.createProduct(productId, "Libro POO", Product.Category.BOOK, 25);
 		
-		assertEquals(result, DataResult.INVALID_ID);
+		assertEquals(result, Inventory.DataResult.INVALID_ID);
 		assertNull(adm.readProduct(productId)); // Wasn't added
 	}
 
 	@Test
 	void addInvalidNameLengthTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 		int productId = 1;
         DataResult result = adm.createProduct(productId, "Libro POOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", Product.Category.BOOK, 25);
 		
-		assertEquals(result, DataResult.INVALID_NAME);
+		assertEquals(result, Inventory.DataResult.INVALID_NAME);
 		assertNull(adm.readProduct(productId)); // Wasn't added
 	}
 
 	@Test
 	void addInvalidNegativePriceTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 		
 		int productId = 1;
         DataResult result = adm.createProduct(productId, "Libro POO", null, -2.5);
 		
-		assertEquals(result, DataResult.INVALID_PRICE);
+		assertEquals(result, Inventory.DataResult.INVALID_PRICE);
 		assertNull(adm.readProduct(productId)); // Wasn't added
 	}
 
 	@Test
 	void updateInvalidNameLengthTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 		Product prod = new Product(1, "Libro POO", Product.Category.BOOK, 25);
 		
 		adm.createProduct(prod.getId(), prod.getName(), prod.getCategory(), prod.getPrice());
@@ -167,13 +167,13 @@ public class ArrayDataManagerTest {
 		String newName = "Libro POO V2 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO";		
         DataResult result = adm.updateProductName(prod.getId(), newName);
 		
-		assertEquals(result, DataResult.INVALID_NAME);
+		assertEquals(result, Inventory.DataResult.INVALID_NAME);
 		assertEquals(prod, adm.readProduct(prod.getId())); // Name didn't change
 	}
 
 	@Test
 	void updateInvalidPriceTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 		Product prod = new Product(1, "Libro POO", Product.Category.BOOK, 25);
 		
 		adm.createProduct(prod.getId(), prod.getName(), prod.getCategory(), prod.getPrice());
@@ -181,22 +181,22 @@ public class ArrayDataManagerTest {
 		int newPrice = -1;
         DataResult result = adm.updateProductPrice(prod.getId(), newPrice);
 		
-		assertEquals(result, DataResult.INVALID_PRICE);
+		assertEquals(result, Inventory.DataResult.INVALID_PRICE);
 		assertEquals(prod, adm.readProduct(prod.getId())); // Price didn't change
 	}
 
 	@Test
 	void addMoreThanMaxTest() {
-        ArrayDataManager adm = new ArrayDataManager();
+        Inventory adm = new Inventory();
 		
-        for (int i = 0; i < ArrayDataManager.MAX_CAPACITY; i++) {
+        for (int i = 0; i < Inventory.MAX_CAPACITY; i++) {
             adm.createProduct(i, String.format("Product(%d)", i), Product.Category.BOOK, (i+1)*10);
         }
 
-		int productId = ArrayDataManager.MAX_CAPACITY+1;
+		int productId = Inventory.MAX_CAPACITY+1;
 		DataResult result = adm.createProduct(productId, "Libro POO", Product.Category.BOOK, 25);
 
-		assertEquals(result, DataResult.INVENTORY_FULL);
+		assertEquals(result, Inventory.DataResult.INVENTORY_FULL);
 		assertNull(adm.readProduct(productId));
 	}
 }

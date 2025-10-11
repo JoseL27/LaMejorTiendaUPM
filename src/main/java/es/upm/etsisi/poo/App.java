@@ -5,14 +5,14 @@ import java.util.Scanner;
 import java.util.Locale;
 
 public class App {
-    private ArrayDataManager dataManager;
+    private Inventory dataManager;
     private Ticket ticket;
 
     /**
      * Builder of the app
      */
     public App() {
-        dataManager = new ArrayDataManager();
+        dataManager = new Inventory();
         ticket = new Ticket();
     }
 

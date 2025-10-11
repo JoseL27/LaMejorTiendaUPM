@@ -4,10 +4,20 @@ package es.upm.etsisi.poo;
  * Manages Create Read Update Delete operations for Products using Array to store the products. Provides input
  * sanity checks for all operations.
  */
-public class ArrayDataManager implements DataManager {
+public class Inventory {
 
     public static final int MAX_CAPACITY = 200; // E1: no more than 200 products
     public static final int MAX_NAME_LENGTH = 100; // E1: product name contains no more than 100 characters
+
+    public enum DataResult {
+        SUCCESS,
+        INVALID_NAME,
+        INVALID_ID,
+        PRODUCT_NOT_FOUND,
+        PRODUCT_ALREADY_EXISTS,
+        INVALID_PRICE,
+        INVENTORY_FULL
+    }
 
     private Product[] inventory; // List
     private int productAmount;
@@ -15,7 +25,7 @@ public class ArrayDataManager implements DataManager {
     /**
      * Creates a new ArrayDataManager with an empty inventory
      */
-    public ArrayDataManager() {
+    public Inventory() {
         this.inventory = new Product[this.MAX_CAPACITY];
         this.productAmount = 0;
     }
@@ -215,4 +225,5 @@ public class ArrayDataManager implements DataManager {
         }
         return arrayProducts;
     }
+
 }
