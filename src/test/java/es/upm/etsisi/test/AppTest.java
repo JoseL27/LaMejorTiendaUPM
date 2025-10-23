@@ -761,7 +761,7 @@ public class AppTest {
 
 		sb.append("tUPM> ");
 
-		sb.append("prod add: error: inventory full\n");
+		sb.append("prod add: error in execution\n");
 		
 		sb.append("tUPM> ");
 		sb.append("Closing application.\n");

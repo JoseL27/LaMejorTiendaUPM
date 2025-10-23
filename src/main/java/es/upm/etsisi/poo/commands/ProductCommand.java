@@ -4,7 +4,6 @@ import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.Product;
 import es.upm.etsisi.poo.Utils;
 import es.upm.etsisi.poo.Parser;
-import es.upm.etsisi.poo.Inventory.DataResult;
 import es.upm.etsisi.poo.Inventory;
 import es.upm.etsisi.poo.Ticket;
 
@@ -279,21 +278,15 @@ public class ProductCommand extends Command {
 		switch (this.subCommand) {
 			case ADD -> {
 				// Add product to the store
-				DataResult dataResult = store.createProduct(this.productId, this.productName, this.productCategory, this.productPrice);
+				boolean success = store.createProduct(this.productId, this.productName, this.productCategory, this.productPrice);
 
-				switch (dataResult) {
-					case SUCCESS -> {
-						System.out.println(new Product(this.productId, this.productName, this.productCategory, this.productPrice));
-						System.out.println("prod add: ok");
-					}
-					case PRODUCT_ALREADY_EXISTS -> System.out.printf("prod add: error: product with id %d already exists\n", this.productId);
-					case INVALID_ID             -> System.out.printf("prod add: error: expected id greater or equal than zero\n");
-					case INVALID_NAME           -> System.out.printf("prod add: error: expected name with less than 100 characters\n");
-					case INVALID_PRICE          -> System.out.printf("prod add: error: expected price greater than zero\n");
-					case INVENTORY_FULL         -> System.out.printf("prod add: error: inventory full\n");
-					default                     -> System.out.printf("prod add: error: unexpected issue\n");
+				if (success){
+					System.out.println(new Product(this.productId, this.productName, this.productCategory, this.productPrice));
+					System.out.println("prod add: ok");
+				}else{
+					System.out.println("prod add: error in execution");
+
 				}
-
 			}
 
 			case LIST -> {
@@ -309,22 +302,17 @@ public class ProductCommand extends Command {
 
 			case UPDATE -> {
 				// Update product in the store
-				DataResult dataResult = switch (this.productField) {
+				boolean success = switch (this.productField) {
 					case NAME -> store.updateProductName(this.productId, this.productName);
-					case CATEGORY -> store.updateProductCategory(this.productId, this.productCategory);
-					case PRICE -> store.updateProductPrice(this.productId, this.productPrice);
+					case CATEGORY ->  store.updateProductCategory(this.productId, this.productCategory);
+					case PRICE ->  store.updateProductPrice(this.productId, this.productPrice);
 				};
 
-				switch (dataResult) {
-					case SUCCESS -> {
-						System.out.println(store.readProduct(this.productId));
-						System.out.printf("prod update: ok\n");
-					}
-					case INVALID_ID        -> System.out.printf("prod update: error: expected id greater or equal than zero\n");
-					case INVALID_NAME      -> System.out.printf("prod update: error: expected name with less than 100 characters\n");
-					case INVALID_PRICE     -> System.out.printf("prod update: error: expected price greater than zero\n");
-					case PRODUCT_NOT_FOUND -> System.out.printf("prod update: error: product with id %d not found\n", this.productId);
-					default                -> System.out.printf("prod update: error: unexpected issue\n");
+				if(success) {
+					System.out.println(store.readProduct(this.productId));
+					System.out.println("prod update: ok");
+				}else {
+					System.out.println("prod update: error in execution");
 				}
 
 			}
@@ -333,15 +321,13 @@ public class ProductCommand extends Command {
 				Product productToRemove = store.readProduct(this.productId);
 				if (productToRemove != null) {
 					ticket.removeProduct(this.productId);
-					DataResult dataResult = store.deleteProduct(this.productId);
+					boolean success = store.deleteProduct(this.productId);
 
-					switch (dataResult) {
-						case SUCCESS -> {
-							System.out.println(productToRemove.toString());
-							System.out.printf("prod remove: ok\n");
-						}
-						case INVALID_ID -> System.out.printf("prod remove: error: expected id greater or equal than zero\n");
-						default         -> System.out.printf("prod remove: error: unexpected issue\n");
+					if (success) {
+						System.out.println(productToRemove.toString());
+						System.out.println("prod remove: ok");
+					}else{
+						System.out.println("prod remove: error in execution");
 					}
 
 				} else {
