@@ -166,7 +166,7 @@ public class App {
             case "help":
                 help ();
                 break;
-            case null:
+            case null: default:
                 System.err.println("Command not recognized");
                 break;
         }
