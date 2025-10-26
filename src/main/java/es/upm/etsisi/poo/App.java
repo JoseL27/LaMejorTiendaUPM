@@ -33,7 +33,6 @@ public class App {
             command = sc.nextLine();
             if (!command.equals("exit")) {
                 firstParse(command);
-                Parser pars = new Parser(command);
             } else {
 				System.out.println("Closing application.");
 				System.out.println("Goodbye!");
@@ -66,7 +65,7 @@ public class App {
 
     private String[] parser(String command) {
         int n = command.length();
-        commands = new String[n];
+        String[] commands = new String[n];
         for (int k = 0; k < n; k++) {
             commands[k] = "";
         }
