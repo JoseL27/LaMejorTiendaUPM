@@ -1,50 +1,19 @@
 # La Mejor Tienda UPM 
 
-## Tareas
-- [x] Julio - Escribir metodo(s)/clase(s) para capturar y tokenizar input 
-- [x] Jinxian - Implementar ArrayDataManager (o DataManager con la estructura que hayamos decidido)
-  - [x] Decidir valores de DataResult
-- [x] Jose - Implementar TryParse de Command (general)
-  - [x] Decidir valores de ParseResult y ExecuteResult
-- [x] Andres - Escribir clase Product 
-  - constructor
-  - getters
-  - setters
-  - toString
-- [x] Enrique - Implementar TryParse de Product (ProductCommand)
-  - NOTA: dejar TryExecute vacio
-- [x] Andres - Escribir clase Ticket (hecha todos)
-  - constructor
-  - getters
-  - setters
-  - getProducts()/toString/print()
-- [x] Andres - Implementar parseo commandos auxiliares de Help, Echo, Exit (HelpCommand)
-  - NOTA: dejar TryExecute vacio
-- [x] Jinxian - Implementar tryParse de TicketCommand
-  - NOTA: dejar tryExecute vacio
-- [x] Enrique - Configurar y reunir test en JUNIT
-- [x] Julio - Hacer el bucle principal del programa
-- [x] Andres - Implementar tryExecute de producto
-- [x] Jose - Implementar tryExecute de ticket
-  
-## Merges de tareas
-- [x] Andres: Quitar 'Diseño ...' y 'Inventory.java'
-- [x] Jose <- Enrique
-- [x] Enrique apaga
-- [x] Jose <- main
-- [x] main <- Jose
-- [x] Julio <- main
-- [x] main <- Julio
-- [x] Jinxian <- main
-- [x] main <- Jinxian
-- [x] Andres inventory dejar en local
-- [x] Andres cambio al Ticket
-- [x] Andres <- main
-- [x] main <- Andres
-- [x] Actualizar todos los inputs en main
-
-## Mas tarde
-- [ ] Mensajes de usuario para los errores
+## Tareas - Refactor E1
+ - (ENRIQUE)  28/10 Terminar UML.
+ - (ANDRES)   28/10 Cambiar Parser main; Cambiar commandos Help y Exit App; Llamadas de commandos a App.
+ - (JIN XIAN) 02/10 Cambiar arquitectura de commandos (interfaz y juntar parseo y ejecucion), borrar Product.Field.
+ - (JOSE)     28/10 Cambiar nombre ArrayDataManager -> Inventory; borrar ParseResult del codigo.
+ 
+## Tareas - E2
+ - Crear BaseProduct y TimedProduct como hijos de Product; Crear enum TimedType; Adicionar boolean personalizable.
+ - Adicionar boolean abierto/cerrado a Ticket; ProductInfo ahora representa un producto con personalizables.
+ - Crear clase Client
+ - Crear clase Cashier y manejar Ticket's
+ - Crear UserManager y manejar Clients y Cashiers
+ - Crear CashCommand
+ - Crear ClientCommand
 
 ## Como hacer una tarea
 1. Programar
