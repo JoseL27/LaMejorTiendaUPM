@@ -27,7 +27,7 @@ public class Command {
 		return result;
 	}
 	
-	public void tryExecute(Ticket ticket, ArrayDataManager dataManager) {
+	public void tryExecute(Ticket ticket, Inventory dataManager) {
 		assert false;
 	}
 

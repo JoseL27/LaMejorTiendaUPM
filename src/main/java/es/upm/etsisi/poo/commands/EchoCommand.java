@@ -5,7 +5,7 @@ import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.Parser;
 import es.upm.etsisi.poo.Utils;
 import es.upm.etsisi.poo.Ticket;
-import es.upm.etsisi.poo.ArrayDataManager;
+import es.upm.etsisi.poo.Inventory;
 
 /**
  * Represents a command that echoes to the standard output a given message.
@@ -30,7 +30,7 @@ public class EchoCommand extends Command {
     }
 
 	@Override
-	public void tryExecute(Ticket ticket, ArrayDataManager data) { 
+	public void tryExecute(Ticket ticket, Inventory data) {
 		System.out.printf("echo \"%s\"\n", this.message);
     }
 

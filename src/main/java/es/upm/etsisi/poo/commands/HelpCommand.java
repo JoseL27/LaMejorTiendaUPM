@@ -2,7 +2,7 @@ package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.Ticket;
-import es.upm.etsisi.poo.ArrayDataManager;
+import es.upm.etsisi.poo.Inventory;
 import es.upm.etsisi.poo.Product;
 import es.upm.etsisi.poo.Utils;
 
@@ -17,7 +17,7 @@ public class HelpCommand extends Command{
 
     public HelpCommand() {}
 
-	public void tryExecute(Ticket ticket, ArrayDataManager dataManager) {
+	public void tryExecute(Ticket ticket, Inventory dataManager) {
         System.out.println("Commands:");
         System.out.println(" prod add <id> \"<name>\" <category> <price>");
         System.out.println(" prod list" );

@@ -4,7 +4,7 @@ package es.upm.etsisi.poo;
  * Manages Create Read Update Delete operations for Products using Array to store the products. Provides input
  * sanity checks for all operations.
  */
-public class ArrayDataManager implements DataManager {
+public class Inventory {
 
     public static final int MAX_CAPACITY = 200; // E1: no more than 200 products
     public static final int MAX_NAME_LENGTH = 100; // E1: product name contains no more than 100 characters
@@ -15,7 +15,7 @@ public class ArrayDataManager implements DataManager {
     /**
      * Creates a new ArrayDataManager with an empty inventory
      */
-    public ArrayDataManager() {
+    public Inventory() {
         this.inventory = new Product[this.MAX_CAPACITY];
         this.productAmount = 0;
     }
@@ -89,17 +89,15 @@ public class ArrayDataManager implements DataManager {
      * @param name Product name (length must be less than 100)
      * @param category Product Category
      * @param price Product price (must be greater than 0)
-     * @return DataResult enum: SUCCESS, INVALID_ID, INVALID_NAME, INVALID_PRICE, INVALID_CATEGORY, INVENTORY_FULL, PRODUCT_ALREADY_EXISTS
+     * @return true if the product is created correctly, false in other case
      */
-    public DataResult createProduct(int id, String name, Product.Category category, double price) {
+    public boolean createProduct(int id, String name, Product.Category category, double price) {
         // Sanity checks: ID >= 0, name.length < 100, price > 0
-        if (!isValidId(id)) return DataResult.INVALID_ID;
-        if (!isValidName(name)) return DataResult.INVALID_NAME;
-        if (!isValidPrice(price)) return DataResult.INVALID_PRICE;
+        if (!isValidId(id) || !isValidName(name) || !isValidPrice(price)) return false;
         // if (category == null) return DataResult.INVALID_CATEGORY;
 
         // Check inventory full
-        if (this.productAmount >= this.MAX_CAPACITY) return DataResult.INVENTORY_FULL;
+        if (this.productAmount >= this.MAX_CAPACITY) return false;
 
         Product selectedProduct = this.readProduct(id);
 
@@ -108,9 +106,9 @@ public class ArrayDataManager implements DataManager {
             Product prodToAdd = new Product(id, name, category, price);
             this.inventory[this.productAmount] = prodToAdd;
             this.productAmount++;
-            return DataResult.SUCCESS;
+            return true;
         } else {
-            return DataResult.PRODUCT_ALREADY_EXISTS;
+            return false;
         }
     }
 
@@ -118,21 +116,20 @@ public class ArrayDataManager implements DataManager {
      * Updates a product's name specifying its product ID
      * @param id Product ID (must be a positive integer)
      * @param name Product name (length must be less than 100)
-     * @return DataResult enum: SUCCESS, INVALID_ID, INVALID_NAME, PRODUCT_NOT_FOUND
+     * @return true if the product's name is updated correctly, false in other case
      */
-    public DataResult updateProductName(int id, String name) {
+    public boolean updateProductName(int id, String name) {
         // Sanity checks: ID >= 0, name.length < 100
-        if (!isValidId(id)) return DataResult.INVALID_ID;
-        if (!isValidName(name)) return DataResult.INVALID_NAME;
+        if (!isValidId(id) || !isValidName(name)) return false;
 
         Product selectedProduct = this.readProduct(id);
 
         if (selectedProduct != null) {
             // Update product's name
             selectedProduct.setName(name);
-            return DataResult.SUCCESS;
+            return true;
         } else {
-            return DataResult.PRODUCT_NOT_FOUND;
+            return false;
         }
     }
 
@@ -140,33 +137,32 @@ public class ArrayDataManager implements DataManager {
      * Updates a product's price specifying its product ID
      * @param id Product ID (must be a positive integer)
      * @param price Product price (must be greater than 0)
-     * @return DataResult enum: SUCCESS, INVALID_ID, INVALID_PRICE, PRODUCT_NOT_FOUND
+     * @return true if the product's price is updated correctly, false in other case
      */
-    public DataResult updateProductPrice(int id, double price) {
+    public boolean updateProductPrice(int id, double price) {
         // Sanity checks: ID >= 0, price > 0
-        if (!isValidId(id)) return DataResult.INVALID_ID;
-        if (!isValidPrice(price)) return DataResult.INVALID_PRICE;
+        if (!isValidId(id) || !isValidPrice(price)) return false;
 
         Product selectedProduct = this.readProduct(id);
 
         if (selectedProduct != null) {
             // Update product's price
             selectedProduct.setPrice(price);
-            return DataResult.SUCCESS;
+            return true;
         } else {
-            return DataResult.PRODUCT_NOT_FOUND;
+            return false;
         }
     }
 
     /**
-     * Updates a product's price specifying its product ID
+     * Updates a product's category specifying its product ID
      * @param id Product ID (must be a positive integer)
      * @param category Product Category
-     * @return DataResult enum: SUCCESS, INVALID_ID, INVALID_PRICE, INVALID_CATEGORY
+     * @return true if the product's category is updated correctly, false in other case
      */
-    public DataResult updateProductCategory(int id, Product.Category category) {
+    public boolean updateProductCategory(int id, Product.Category category) {
         // Sanity checks: ID >= 0, category != null
-        if (!isValidId(id)) return DataResult.INVALID_ID;
+        if (!isValidId(id)) return false;
         // if (category == null) return DataResult.INVALID_CATEGORY;
 
         Product selectedProduct = this.readProduct(id);
@@ -174,20 +170,20 @@ public class ArrayDataManager implements DataManager {
         if (selectedProduct != null) {
             // Update product's category
             selectedProduct.setCategory(category);
-            return DataResult.SUCCESS;
+            return true;
         } else {
-            return DataResult.PRODUCT_NOT_FOUND;
+            return false;
         }
     }
 
     /**
      * Deletes a product specifying its product ID from the array
      * @param id Product ID (must be a positive integer)
-     * @return DataResult enum: SUCCESS, INVALID_ID, PRODUCT_NOT_FOUND
+     * @return true if the product is deleted correctly, false in other case
      */
-    public DataResult deleteProduct(int id) {
+    public boolean deleteProduct(int id) {
         // Sanity checks: ID >= 0
-        if (!isValidId(id)) return DataResult.INVALID_ID;
+        if (!isValidId(id)) return false;
 
         int selectedProductIndex = this.readProductIndex(id);
 
@@ -197,9 +193,9 @@ public class ArrayDataManager implements DataManager {
             for (int i = selectedProductIndex; i < this.productAmount; i++) {
                 this.inventory[i] = this.inventory[i + 1];
             }
-            return DataResult.SUCCESS;
+            return true;
         } else {
-            return DataResult.PRODUCT_NOT_FOUND;
+            return false;
         }
     }
 
@@ -215,4 +211,5 @@ public class ArrayDataManager implements DataManager {
         }
         return arrayProducts;
     }
+
 }
