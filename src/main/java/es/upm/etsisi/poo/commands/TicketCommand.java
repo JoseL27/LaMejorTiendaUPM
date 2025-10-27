@@ -170,7 +170,7 @@ public class TicketCommand extends Command{
 	 * @return SUCCESS, if the command is executed correctly, and the error code if not
 	 */
     @Override
-    public void tryExecute(Ticket ticket, ArrayDataManager dataManager) {
+    public void tryExecute(Ticket ticket, Inventory dataManager) {
 		switch (this.subCommand) {
 		case NEW	-> tryExecuteNew(ticket);
 		case ADD	-> tryExecuteAdd(ticket, dataManager);
@@ -195,8 +195,8 @@ public class TicketCommand extends Command{
      * @param dataManager dataManager from which the product will be taken
      * @return SUCCESS, if the product is added correctly, or the corresponding error if not
      */
-    private void tryExecuteAdd(Ticket ticket, ArrayDataManager dataManager) {
-        if (!ArrayDataManager.isValidId(this.productId)) { // Use the one from DataManager when it is public
+    private void tryExecuteAdd(Ticket ticket, Inventory dataManager) {
+        if (!Inventory.isValidId(this.productId)) { // Use the one from DataManager when it is public
 			System.out.printf("ticket add: error: expected id greater or equal than zero\n");
 			
         } else if (!isValidAmount(this.amount)) {
@@ -225,7 +225,7 @@ public class TicketCommand extends Command{
      * @return SUCCESS, if the product is removed correctly, or the corresponding error if not
      */
     private void tryExecuteRemove(Ticket ticket){
-        if (!ArrayDataManager.isValidId(this.productId)){
+        if (!Inventory.isValidId(this.productId)){
 			System.out.printf("ticket add: error: expected id greater or equal than zero\n");
 			
         } else {
