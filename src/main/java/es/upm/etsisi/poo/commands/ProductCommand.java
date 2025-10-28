@@ -3,9 +3,8 @@ package es.upm.etsisi.poo.commands;
 import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.Product;
 import es.upm.etsisi.poo.Utils;
-import es.upm.etsisi.poo.Parser;
-import es.upm.etsisi.poo.DataManager.DataResult;
-import es.upm.etsisi.poo.ArrayDataManager;
+
+import es.upm.etsisi.poo.Inventory;
 import es.upm.etsisi.poo.Ticket;
 
 /**
@@ -15,36 +14,11 @@ import es.upm.etsisi.poo.Ticket;
  *      - prod list (lista productos actuales)
  *      - prod update <id> campo valor (campos: nombre|categoria|precio)
  *      - prod remove <id>
- *  
  *  @see Command
  */
 public class ProductCommand implements Command {
-
-	/**
-	 * First entry point to parse 'product' command (assumes the parser.getCommand(0) is 'product')
-	 * Is responsible for parsing the 'subcommand' and dispatching to the corresponding one.
-	 * @param parser The stream of tokens to parse
-	 * @return       The result of the parse. Either a valid ProductCommand instance or null
-	 */
-
-	/**
-	 * Attempts to execute a product-related command on the given store and ticket.
-	 * <p>
-	 * Supported subcommands include:
-	 * <ul>
-	 *   <li>ADD: Adds a new product to the store.</li>
-	 *   <li>LIST: Lists all products currently in the store.</li>
-	 *   <li>UPDATE: Updates a specific field (name, category, or price) of an existing product.</li>
-	 *   <li>REMOVE: Removes a product from the store.</li>
-	 * </ul>
-	 * The specific action performed depends on the value of {@code this.subCommand}.
-	 * 
-	 * @param ticket the {@link Ticket} associated with the command execution (may be used for logging or tracking)
-	 * @param store  the {@link ArrayDataManager} representing the store's data manager
-	 */
-	
 	@Override
-	public void eval(String[] args, Ticket ticket, ArrayDataManager inventory) {
+	public void eval(String[] args, Ticket ticket, Inventory inventory) {
 		if (!Utils.checkArgsCountWithPrint("prod", args.length, 2, 6)) return;
 
 		switch (args[1].toLowerCase()) {
@@ -66,7 +40,7 @@ public class ProductCommand implements Command {
 	 *               specifiying productId, productName, productCategory and productPrice,
 	 *               or null if it fails
 	 */	
-	public void evalAdd(String[] params, Ticket ticket, ArrayDataManager inventory) {
+	public void evalAdd(String[] params, Ticket ticket, Inventory inventory) {
 		if (!Utils.checkArgsCountWithPrint("prod add", params.length, 6)) return;
 
  		Integer productId = Utils.tryParseInt(params[2]);
@@ -88,18 +62,10 @@ public class ProductCommand implements Command {
 			return;
 		}
 
-		DataResult dataResult = inventory.createProduct(productId, productName, productCategory, productPrice);
-		switch (dataResult) {
-		case SUCCESS -> {
-			System.out.println(new Product(productId, productName, productCategory, productPrice));
+		if (inventory.createProduct(productId, productName, productCategory, productPrice)) {
 			System.out.println("prod add: ok");
-		}
-		case PRODUCT_ALREADY_EXISTS -> System.out.printf("prod add: error: product with id %d already exists\n", productId);
-		case INVALID_ID             -> System.out.printf("prod add: error: expected id greater or equal than zero\n");
-		case INVALID_NAME           -> System.out.printf("prod add: error: expected name with less than 100 characters\n");
-		case INVALID_PRICE          -> System.out.printf("prod add: error: expected price greater than zero\n");
-		case INVENTORY_FULL         -> System.out.printf("prod add: error: inventory full\n");
-		default                     -> System.out.printf("prod add: error: unexpected issue\n");
+		} else {
+			System.out.println("prod add: error: unexpected error");
 		}
 	}
 	
@@ -115,7 +81,7 @@ public class ProductCommand implements Command {
 	 *               or null
 	 * @see Product.Field
 	 */		
-	public void evalUpdate(String[] params, Ticket ticket, ArrayDataManager inventory) {
+	public void evalUpdate(String[] params, Ticket ticket, Inventory inventory) {
 		if (!Utils.checkArgsCountWithPrint("prod update", params.length, 5)) return;
 		
  		Integer productId = Utils.tryParseInt(params[2]);
@@ -125,7 +91,8 @@ public class ProductCommand implements Command {
 		}
 
 		String productFieldStr = params[3].toLowerCase();
-		DataResult result = null;
+
+		boolean result = false;
 		switch (params[3]) {
 		case "name" -> {
 			String productName = params[4];
@@ -152,24 +119,16 @@ public class ProductCommand implements Command {
 		}
 		}
 
-		switch (result) {
-		case SUCCESS -> {
-			System.out.println(inventory.readProduct(productId));
-			System.out.printf("prod update: ok\n");
-		}
-		case INVALID_ID        -> System.out.printf("prod update: error: expected id greater or equal than zero\n");
-		case INVALID_NAME      -> System.out.printf("prod update: error: expected name with less than 100 characters\n");
-		case INVALID_PRICE     -> System.out.printf("prod update: error: expected price greater than zero\n");
-		case PRODUCT_NOT_FOUND -> System.out.printf("prod update: error: product with id %d not found\n", productId);
-		default                -> System.out.printf("prod update: error: unexpected issue\n");
+		if (!result) {
+			System.out.printf("prod update: error: unexpected issue\n");
 		}
 	}
 
-	public void evalAddFood(String[] params, Ticket ticket, ArrayDataManager inventory) {
+	public void evalAddFood(String[] params, Ticket ticket, Inventory inventory) {
 		System.out.println("ProductCommand.evalAddFood: NOT IMPLEMENTED");
 	}
 
-	public void evalAddMeeting(String[] params, Ticket ticket, ArrayDataManager inventory) {
+	public void evalAddMeeting(String[] params, Ticket ticket, Inventory inventory) {
 		System.out.println("ProductCommand.evalAddMeeting: NOT IMPLEMENTED");
 	}
 
@@ -181,7 +140,7 @@ public class ProductCommand implements Command {
 	 * @return       The result of the parse. If the amount of tokens is 3 and the 'id' parse succedes then a valid
 	 *               ProductCommand Remove instance or null
 	 */			
-	public void evalRemove(String[] params, Ticket ticket, ArrayDataManager inventory) {
+	public void evalRemove(String[] params, Ticket ticket, Inventory inventory) {
 		if (!Utils.checkArgsCountWithPrint("prod remove", params.length, 3)) return;
 
  		Integer productId = Utils.tryParseInt(params[2]);
@@ -193,17 +152,13 @@ public class ProductCommand implements Command {
 		Product productToRemove = inventory.readProduct(productId);
 		if (productToRemove != null) {
 			ticket.removeProduct(productId);
-			DataResult dataResult = inventory.deleteProduct(productId);
-
-			switch (dataResult) {
-			case SUCCESS -> {
-				System.out.println(productToRemove.toString());
+			
+			if (inventory.deleteProduct(productId)) {
 				System.out.printf("prod remove: ok\n");
+			} else {
+				System.out.printf("prod remove: error: unexpected error\n");
 			}
-			case INVALID_ID -> System.out.printf("prod remove: error: expected id greater or equal than zero\n");
-			default         -> System.out.printf("prod remove: error: unexpected issue\n");
-			}
-
+			
 		} else {
 			System.out.printf("prod remove: error: product with id %d not found\n", productId);
 		}		
@@ -218,7 +173,7 @@ public class ProductCommand implements Command {
 	 * @return       The result of the parse. If the amount of tokens is 2 then a valid
 	 *               ProductCommand List instance or null
 	 */
-	public void evalList(String[] params, Ticket ticket, ArrayDataManager inventory) {
+	public void evalList(String[] params, Ticket ticket, Inventory inventory) {
 		if (Utils.checkArgsCountWithPrint("prod list", params.length, 2)) return;
 
 		Product[] products = inventory.listProducts();

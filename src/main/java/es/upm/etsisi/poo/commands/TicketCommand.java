@@ -12,7 +12,7 @@ import es.upm.etsisi.poo.*;
 public class TicketCommand implements Command {
 
     /**
-     * First entrypoint to parse 'ticket' command (assumes the parser.getCommand(0) is 'ticket').
+     * First entrypoint to parse 'ticket' command (assumes the params.getCommand(0) is 'ticket').
      * This method is responsible for parsing different subcommands, it also invokes other parsing
      * methods if the subcommand in question needs more arguments.
      * This tryParse ignores extra arguments unless the arguments which are actually used have the wrong type.
@@ -27,7 +27,7 @@ public class TicketCommand implements Command {
      * @param ticket    The ticket on which the changes corresponding to the command will be applied
      * @param inventory manager from which necessary products will be taken
      */
-    public void eval(String[] params, Ticket ticket, ArrayDataManager inventory) {
+    public void eval(String[] params, Ticket ticket, Inventory inventory) {
         // Parse
         if (!Utils.checkArgsCountWithPrint("ticket", params.length, 2, 4)) return;
 
@@ -52,14 +52,13 @@ public class TicketCommand implements Command {
      * @return The result of the parse. If the amount of tokens is 2 then a valid
      * TicketCommand New instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
      */
-
     /**
      * Converts this instance of Ticket into a new one
      *
      * @param ticket ticket to be reset or created
      * @return SUCCESS always, since no recognisable error can happen
      */
-    private void evalNew(String[] params, Ticket ticket, ArrayDataManager inventory) {
+    private void evalNew(String[] params, Ticket ticket, Inventory inventory) {
         // Parse
         if (!Utils.checkArgsCountWithPrint("ticket new", params.length, 2))
             return;
@@ -87,7 +86,7 @@ public class TicketCommand implements Command {
      * @param inventory dataManager from which the product will be taken
      * @return SUCCESS, if the product is added correctly, or the corresponding error if not
      */
-    private void evalAdd(String[] params, Ticket ticket, ArrayDataManager inventory) {
+    private void evalAdd(String[] params, Ticket ticket, Inventory inventory) {
         // Parse
         if (!Utils.checkArgsCountWithPrint("ticket add", params.length, 4))
             return;
@@ -105,7 +104,7 @@ public class TicketCommand implements Command {
         }
 
         // Execute
-        if (!ArrayDataManager.isValidId(productId)) { // Use the one from DataManager when it is public
+        if (!Inventory.isValidId(productId)) { // Use the one from DataManager when it is public
             System.out.printf("ticket add: error: expected id greater or equal than zero\n");
         } else if (!isValidAmount(quantity)) {
             System.out.printf("ticket add: error: expected amount greater or equal than zero\n");
@@ -140,7 +139,7 @@ public class TicketCommand implements Command {
      * @param ticket ticket from which the product will be removed
      * @return SUCCESS, if the product is removed correctly, or the corresponding error if not
      */
-    private void evalRemove(String[] params, Ticket ticket, ArrayDataManager inventory) {
+    private void evalRemove(String[] params, Ticket ticket, Inventory inventory) {
         // Parse
         if (!Utils.checkArgsCountWithPrint("ticket remove", params.length, 3)) return;
         Integer productId = Utils.tryParseInt(params[2]);
@@ -150,7 +149,7 @@ public class TicketCommand implements Command {
         }
 
         // Execute
-        if (!ArrayDataManager.isValidId(productId)) {
+        if (!Inventory.isValidId(productId)) {
             System.out.printf("ticket add: error: expected id greater or equal than zero\n");
         } else {
             Product removed = ticket.removeProduct(productId);
@@ -179,7 +178,7 @@ public class TicketCommand implements Command {
      * @param ticket ticket to be printed
      * @return SUCCESS always, since no recognisable error can happen
      */
-    private void evalPrint(String[] params, Ticket ticket, ArrayDataManager inventory) {
+    private void evalPrint(String[] params, Ticket ticket, Inventory inventory) {
         // Parse
         if (!Utils.checkArgsCountWithPrint("ticket print", params.length, 2)) return;
 
@@ -189,7 +188,7 @@ public class TicketCommand implements Command {
         System.out.println("ticket print: ok");
     }
 
-    private void evalList(String[] params, Ticket ticket, ArrayDataManager inventory) {
+    private void evalList(String[] params, Ticket ticket, Inventory inventory) {
         System.out.println("TicketCommand.evalList() NOT IMPLEMENTED");
     }
 

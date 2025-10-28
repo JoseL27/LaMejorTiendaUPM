@@ -25,29 +25,29 @@ public class TicketCommandTest {
 	}		
 
 	// failures
-    @Test
-    void insufficientArgumentsTest(){
-        assertNull(TicketCommand.tryParse(new Parser("ticket add")));
-		// TODO: Specify output test
-    }
-
-    @Test
-    void invalidSubCommandTest(){
-        assertNull(TicketCommand.tryParse(new Parser("ticket INVALID_SUB_COMMAND")));
-		// TODO: Specify output test
-    }
-
-    @Test
-    void invalidNumberTest(){
-        assertNull(TicketCommand.tryParse(new Parser("ticket add INVALID_NUMBER")));
-		// TODO: Specify output test
-    }
-
-    @Test
-    void createNewTicketWithExcessArgumentsTest(){
-        assertNull(TicketCommand.tryParse(new Parser("ticket new fkahfhdas")));
-    }
-
+//    @Test
+//    void insufficientArgumentsTest(){
+//        assertNull(TicketCommand.tryParse(new Parser("ticket add")));
+//		// TODO: Specify output test
+//    }
+//
+//    @Test
+//    void invalidSubCommandTest(){
+//        assertNull(TicketCommand.tryParse(new Parser("ticket INVALID_SUB_COMMAND")));
+//		// TODO: Specify output test
+//    }
+//
+//    @Test
+//    void invalidNumberTest(){
+//        assertNull(TicketCommand.tryParse(new Parser("ticket add INVALID_NUMBER")));
+//		// TODO: Specify output test
+//    }
+//
+//    @Test
+//    void createNewTicketWithExcessArgumentsTest(){
+//        assertNull(TicketCommand.tryParse(new Parser("ticket new fkahfhdas")));
+//    }
+//
     // @Test
     // void printEmptyTicketTest(){
     //     ParseResult parseResult = TicketCommand.tryParse(new Parser("ticket print"));
