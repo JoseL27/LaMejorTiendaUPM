@@ -24,24 +24,24 @@ public class App {
     public void run(Scanner sc) {
 		Locale.setDefault(new Locale("en", "US"));
 		
-		System.out.println("Welcome to the ticket module App.");
-		System.out.println("Ticket module. Type 'help' to see commands.");
+		// System.out.println("Welcome to the ticket module App.");
+		// System.out.println("Ticket module. Type 'help' to see commands.");
 		
-        String command;
-        do {
-            System.out.print("tUPM> ");
-            command = sc.nextLine();
-            if (!command.equals("exit")) {
-                Parser pars = new Parser(command);
-                Command parsedCommand = Command.tryParse(pars);
-				if (parsedCommand != null) {
-                    parsedCommand.tryExecute(ticket, dataManager);
-				}
-            } else {
-				System.out.println("Closing application.");
-				System.out.println("Goodbye!");
-			}
-        } while (!command.equals("exit"));
+        // String command;
+        // do {
+        //     System.out.print("tUPM> ");
+        //     command = sc.nextLine();
+        //     if (!command.equals("exit")) {
+        //         Parser pars = new Parser(command);
+        //         Command parsedCommand = Command.tryParse(pars);
+		// 		if (parsedCommand != null) {
+        //             parsedCommand.tryExecute(ticket, dataManager);
+		// 		}
+        //     } else {
+		// 		System.out.println("Closing application.");
+		// 		System.out.println("Goodbye!");
+		// 	}
+        // } while (!command.equals("exit"));
     }
 
     /**
