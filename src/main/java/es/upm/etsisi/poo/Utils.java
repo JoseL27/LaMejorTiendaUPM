@@ -38,12 +38,12 @@ public class Utils {
 		return (a == b) || (a != null && a.equals(b));
 	}
 
-    public static boolean checkArgsCountWithPrint(String prefix, Parser parser, int minAmount, int maxAmount) {
+    public static boolean checkArgsCountWithPrint(String prefix, int amount, int minAmount, int maxAmount) {
         boolean result = false;
-        if (parser.getLength() < minAmount) {
-            System.out.printf("%s: too few arguments, expected at %d arguments and got %d\n", prefix, minAmount, parser.getLength());
-        } else if (parser.getLength() > maxAmount) {
-            System.out.printf("%s: too many arguments, expected %d and got %d\n", prefix, maxAmount, parser.getLength());
+        if (amount < minAmount) {
+            System.out.printf("%s: too few arguments, expected at %d arguments and got %d\n", prefix, minAmount, amount);
+        } else if (amount > maxAmount) {
+            System.out.printf("%s: too many arguments, expected %d and got %d\n", prefix, maxAmount, amount);
         } else {
             result = true;
         }
@@ -51,8 +51,8 @@ public class Utils {
         return result;
     }
 
-    public static boolean checkArgsCountWithPrint(String prefix, Parser parser, int expectedAmount) {
-        return checkArgsCountWithPrint(prefix, parser, expectedAmount, expectedAmount);
+    public static boolean checkArgsCountWithPrint(String prefix, int amount, int expectedAmount) {
+        return checkArgsCountWithPrint(prefix, amount, expectedAmount, expectedAmount);
     }
 
     public static void printInvalidEnum(String failedCommand, String enumName, String receivedValue, Enum[] possibleValues) {
