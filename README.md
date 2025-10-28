@@ -7,10 +7,11 @@
  - (JOSE)     28/10 Cambiar nombre ArrayDataManager -> Inventory; borrar ParseResult del codigo.
  
 ## Tareas - E2
- - Crear BaseProduct y TimedProduct como hijos de Product; Crear enum TimedType; Adicionar boolean personalizable.
- - Adicionar boolean abierto/cerrado a Ticket; ProductInfo ahora representa un producto con personalizables.
- - Crear clase Client
- - Crear clase Cashier y manejar Ticket's
+- (JULIO) Crear BaseProduct y TimedProduct como hijos de Product; Crear enum TimedType; Adicionar boolean personalizable.
+- (ENRIQUE) Adicionar boolean abierto/cerrado a Ticket; ProductInfo ahora representa un producto con personalizables.
+- (ANDRES) Crear clase Client
+   - Jinxian lo revisa
+- (JOSE) Crear clase Cashier y manejar Ticket's
  - Crear UserManager y manejar Clients y Cashiers
  - Crear CashCommand
  - Crear ClientCommand
