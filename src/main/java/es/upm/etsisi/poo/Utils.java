@@ -72,14 +72,6 @@ public class Utils {
         return category;
     }
 
-    public static Product.Field tryParseFieldWithPrint(String prefix, String fieldString) {
-        Product.Field field = Product.Field.fromLabel(fieldString);
-        if (field == null) {
-            printInvalidEnum(prefix, "field", fieldString, Product.Field.values());
-        }
-        return field;
-    }
-
     public static Integer tryParseIntWithPrint(String prefix, String intString) {
         Integer number = tryParseInt(intString);
         if (number == null) {

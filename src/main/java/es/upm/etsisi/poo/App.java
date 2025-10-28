@@ -3,17 +3,24 @@ package es.upm.etsisi.poo;
 import java.io.File;
 import java.util.Scanner;
 import java.util.Locale;
+import es.upm.etsisi.poo.commands.ProductCommand;
+import es.upm.etsisi.poo.commands.TicketCommand;
 
 public class App {
-    private Inventory dataManager;
+    private Inventory inventory;
     private Ticket ticket;
 
+	private ProductCommand productCommand;
+	private TicketCommand ticketCommand;
+
     /**
-     * Builder of the app
+     * Basic constructor
      */
     public App() {
-        dataManager = new Inventory();
+        inventory = new Inventory();
         ticket = new Ticket();
+		productCommand = new ProductCommand();
+		ticketCommand = new TicketCommand();
     }
 
     /**
@@ -63,28 +70,27 @@ public class App {
         }
     }
 
-    private static String[] parser(String command) {
-        int n = command.length();
+    private static String[] parser(String text) {
+        int n = text.length();
         String[] commands = new String[n];
         for (int k = 0; k < n; k++) {
             commands[k] = "";
         }
-        auxParser(command, commands);
-        cutter( commands );
-        return commands;
+        auxParser(text, commands);
+        return cutter(commands);
     }
 
-    private static void auxParser(String command, String[] commands) {
-        final String text = command.trim().replaceAll(" +", " ");     //Elimina espacios
+    private static void auxParser(String input, String[] commands) {
+        final String text = input.trim().replaceAll(" +", " ");     //Elimina espacios
         int i = 0;
-        boolean comillas = false;
+        boolean brackets = false;
         for (int j = 0; j < text.length(); j++) {
             char ch = text.charAt(j);
-            if (ch == ' ' && !comillas) {
+            if (ch == ' ' && !brackets) {
                 i++;
                 commands[i] = "";
             } else if (ch == '"') {
-                comillas = !comillas;
+                brackets = !brackets;
             } else {
                 commands[i] += ch;
             }
@@ -92,7 +98,7 @@ public class App {
 
     }
 
-    private static void cutter(String[] commands) {
+    private static String[] cutter(String[] commands) {
         int i = 0;
         while ((i < commands.length) && (commands[i] != "")) {
             i++;
@@ -101,7 +107,7 @@ public class App {
         for (int j = 0; j < i; j++) {
             aux[j] = commands[j];
         }
-        commands = aux;
+        return aux;
     }
 
     private static void echo(String message) {
@@ -121,7 +127,7 @@ public class App {
         System.out.println(" prod add <id> \"<name>\" <category> <price>");
         System.out.println(" prod list" );
 		
-        System.out.printf(" prod update <id> %s <value>\n", Utils.arrayToString(Product.Field.values(), "|"));
+        System.out.printf(" prod update <id> NAME|CATEGORY|PRICE <value>\n");
 		
         System.out.println(" prod remove <id>");
         System.out.println(" ticket new");
@@ -147,28 +153,30 @@ public class App {
         System.out.println(".");
     }
 
-    private static void firstParse ( String entrada )
+    private void firstParse(String entrada)
     {
-        String[] tokenized = parser( entrada );
-        final String command = tokenized[0];
-        switch ( command )
-        {
-            case "prod":
-                //parseProduct ( text ); reemplazar con llamada a ProductCommand
-                break;
-            case "ticket":
-                //parseTicket ( text ); reemplazar con llamada a TicketCommand
-                break;
-            case "echo":
-                echo ( tokenized[1] );
-                break;
-            case "help":
-                help ();
-                break;
-            case null: default:
-                System.err.println("Command not recognized");
-                break;
-        }
+        String[] tokenized = parser(entrada);
+		if (tokenized.length > 0) {
+			switch (tokenized[0]) {
+			case "prod":
+				productCommand.eval(tokenized, ticket, inventory);
+				break;
+			case "ticket":
+				ticketCommand.eval(tokenized, ticket, inventory);
+				break;
+			case "echo":
+				echo ( tokenized[1] );
+				break;
+			case "help":
+				help ();
+				break;
+			case null: default:
+				System.err.println("Command not recognized");
+				break;
+			}
+		} else {
+			System.out.println("command: error: expected at least one argument");
+		}
     }
 
 }

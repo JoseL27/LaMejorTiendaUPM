@@ -91,13 +91,13 @@ public class Inventory {
      * @param price Product price (must be greater than 0)
      * @return true if the product is created correctly, false in other case
      */
-    public boolean createProduct(int id, String name, Product.Category category, double price) {
+    public Product createProduct(int id, String name, Product.Category category, double price) {
         // Sanity checks: ID >= 0, name.length < 100, price > 0
-        if (!isValidId(id) || !isValidName(name) || !isValidPrice(price)) return false;
+        if (!isValidId(id) || !isValidName(name) || !isValidPrice(price)) return null;
         // if (category == null) return DataResult.INVALID_CATEGORY;
 
         // Check inventory full
-        if (this.productAmount >= this.MAX_CAPACITY) return false;
+        if (this.productAmount >= this.MAX_CAPACITY) return null;
 
         Product selectedProduct = this.readProduct(id);
 
@@ -106,9 +106,9 @@ public class Inventory {
             Product prodToAdd = new Product(id, name, category, price);
             this.inventory[this.productAmount] = prodToAdd;
             this.productAmount++;
-            return true;
+            return prodToAdd;
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -118,19 +118,16 @@ public class Inventory {
      * @param name Product name (length must be less than 100)
      * @return true if the product's name is updated correctly, false in other case
      */
-    public boolean updateProductName(int id, String name) {
+    public Product updateProductName(int id, String name) {
         // Sanity checks: ID >= 0, name.length < 100
-        if (!isValidId(id) || !isValidName(name)) return false;
+        if (!isValidId(id) || !isValidName(name)) return null;
 
         Product selectedProduct = this.readProduct(id);
 
         if (selectedProduct != null) {
-            // Update product's name
             selectedProduct.setName(name);
-            return true;
-        } else {
-            return false;
         }
+		return selectedProduct;
     }
 
     /**
@@ -139,19 +136,16 @@ public class Inventory {
      * @param price Product price (must be greater than 0)
      * @return true if the product's price is updated correctly, false in other case
      */
-    public boolean updateProductPrice(int id, double price) {
+    public Product updateProductPrice(int id, double price) {
         // Sanity checks: ID >= 0, price > 0
-        if (!isValidId(id) || !isValidPrice(price)) return false;
+        if (!isValidId(id) || !isValidPrice(price)) return null;
 
         Product selectedProduct = this.readProduct(id);
 
         if (selectedProduct != null) {
-            // Update product's price
             selectedProduct.setPrice(price);
-            return true;
-        } else {
-            return false;
         }
+		return selectedProduct;
     }
 
     /**
@@ -160,9 +154,9 @@ public class Inventory {
      * @param category Product Category
      * @return true if the product's category is updated correctly, false in other case
      */
-    public boolean updateProductCategory(int id, Product.Category category) {
+    public Product updateProductCategory(int id, Product.Category category) {
         // Sanity checks: ID >= 0, category != null
-        if (!isValidId(id)) return false;
+        if (!isValidId(id)) return null;
         // if (category == null) return DataResult.INVALID_CATEGORY;
 
         Product selectedProduct = this.readProduct(id);
@@ -170,10 +164,8 @@ public class Inventory {
         if (selectedProduct != null) {
             // Update product's category
             selectedProduct.setCategory(category);
-            return true;
-        } else {
-            return false;
         }
+		return selectedProduct;
     }
 
     /**

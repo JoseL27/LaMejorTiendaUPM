@@ -62,7 +62,9 @@ public class ProductCommand implements Command {
 			return;
 		}
 
-		if (inventory.createProduct(productId, productName, productCategory, productPrice)) {
+		Product createdProduct = inventory.createProduct(productId, productName, productCategory, productPrice);		
+		if (createdProduct != null) {
+			System.out.println(createdProduct);
 			System.out.println("prod add: ok");
 		} else {
 			System.out.println("prod add: error: unexpected error");
@@ -92,18 +94,19 @@ public class ProductCommand implements Command {
 
 		String productFieldStr = params[3].toLowerCase();
 
-		boolean result = false;
-		switch (params[3]) {
+		Product updatedProduct = null;
+		String fieldName = params[3].toLowerCase();
+		switch (fieldName) {
 		case "name" -> {
 			String productName = params[4];
-			result = inventory.updateProductName(productId, productName);
+			updatedProduct = inventory.updateProductName(productId, productName);
 		}
 		case "category" -> {
 			Product.Category productCategory = Product.Category.fromLabel(params[4]);
 			if (productCategory == null) {
 				Utils.printInvalidEnum("prod update", "category", params[4], Product.Category.values());
 			} else { 
-				result = inventory.updateProductCategory(productId, productCategory);
+				updatedProduct = inventory.updateProductCategory(productId, productCategory);
 			}
 		}
 		case "price" -> {
@@ -111,15 +114,19 @@ public class ProductCommand implements Command {
 			if (productPrice == null){
 				Utils.printInvalidDataType("prod update", "integer", params[4]);
 			} else { 
-				result = inventory.updateProductPrice(productId, productPrice);
+				updatedProduct = inventory.updateProductPrice(productId, productPrice);
 			}
 		}
 		default -> {
 			System.out.println("prod update: invalid field");
+			return;
 		}
 		}
 
-		if (!result) {
+		if (updatedProduct != null) {
+			System.out.println(updatedProduct);
+			System.out.println("prod update: ok");
+		} else { 
 			System.out.printf("prod update: error: unexpected issue\n");
 		}
 	}
