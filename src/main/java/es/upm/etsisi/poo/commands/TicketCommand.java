@@ -66,28 +66,28 @@ public class TicketCommand extends Command{
     }
 
     /**
-     * First entrypoint to parse 'ticket' command (assumes the parser.getCommand(0) is 'ticket').
+     * First entrypoint to parse 'ticket' command (assumes the params.getCommand(0) is 'ticket').
      * This method is responsible for parsing different subcommands, it also invokes other parsing
      * methods if the subcommand in question needs more arguments.
      * This tryParse ignores extra arguments unless the arguments which are actually used have the wrong type.
      * Prints a warning to STDOUT if excess arguments were found.
-     * @param parser Tokenized command
+     * @param params Tokenized command
      * @return Parse result. Either a valid TicketCommand instance or a failure code
      */
-    public static Command tryParse(Parser parser){
-		if (!Utils.checkArgsCountWithPrint("ticket", parser, 2, 4)) return null;
+    public static Command tryParse(String[] params){
+		if (!Utils.checkArgsCountWithPrint("ticket", params, 2, 4)) return null;
 
-		SubCommand subCommand = SubCommand.fromLabel(parser.getCommand(1));
+		SubCommand subCommand = SubCommand.fromLabel(params[1]);
 		if (subCommand == null) {
-			Utils.printInvalidEnum("ticket", "sub command", parser.getCommand(1), SubCommand.values());
+			Utils.printInvalidEnum("ticket", "sub command", params[1], SubCommand.values());
 			return null;
 		}
 
 		return switch (subCommand) {
-		case NEW	-> tryParseNew(parser);
-		case ADD	-> tryParseAdd(parser);
-		case REMOVE -> tryParseRemove(parser);
-		case PRINT	-> tryParsePrint(parser);
+		case NEW	-> tryParseNew(params);
+		case ADD	-> tryParseAdd(params);
+		case REMOVE -> tryParseRemove(params);
+		case PRINT	-> tryParsePrint(params);
 		};
     }
 	
@@ -95,24 +95,24 @@ public class TicketCommand extends Command{
 	 * Parses the 'new' subcommand of the 'ticket' command.
 	 * This function does not do any parsing besides checking the number of arguments and
 	 * creating a proper TicketCommand New instance.
-	 * @param parser The stream of tokens to parse
+	 * @param params The stream of tokens to parse
 	 * @return The result of the parse. If the amount of tokens is 2 then a valid
 	 * TicketCommand New instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
 	 */
-    public static Command tryParseNew(Parser parser) {
-		return Utils.checkArgsCountWithPrint("ticket new", parser, 2) ? new TicketCommand(SubCommand.NEW) : null;
+    public static Command tryParseNew(String[] params) {
+		return Utils.checkArgsCountWithPrint("ticket new", params, 2) ? new TicketCommand(SubCommand.NEW) : null;
     }
 	
     /**
 	 * Parses the 'print' subcommand of the 'ticket' command.
 	 * This function does not do any parsing besides checking the number of arguments and
 	 * creating a proper TicketCommand Print instance.
-	 * @param parser The stream of tokens to parse
+	 * @param params The stream of tokens to parse
 	 * @return The result of the parse. If the amount of tokens is 2 then a valid
 	 * TicketCommand Print instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
 	 */
-    public static Command tryParsePrint(Parser parser) {
-		return Utils.checkArgsCountWithPrint("ticket print", parser, 2) ? new TicketCommand(SubCommand.PRINT) : null;
+    public static Command tryParsePrint(String[] params) {
+		return Utils.checkArgsCountWithPrint("ticket print", params, 2) ? new TicketCommand(SubCommand.PRINT) : null;
     }
 	
     /**
@@ -120,22 +120,22 @@ public class TicketCommand extends Command{
 	 * This function parses each field sequentially and immediately returns a failed ParseResult if it
 	 * fails to parse any arguments.
 	 * FORMAT: ticket add <productId> <cantidad>
-	 * @param parser The stream of tokens to parse
+	 * @param params The stream of tokens to parse
 	 * @return The result of the parse. If parsing is successful, this will return a valid TicketCommand Add instance
 	 * specifying productId and quantity. Or a failure code specifying which part of the parsing went wrong.
 	 */
-    public static Command tryParseAdd(Parser parser) {
-		if (!Utils.checkArgsCountWithPrint("ticket add", parser, 4)) return null ;
+    public static Command tryParseAdd(String[] params) {
+		if (!Utils.checkArgsCountWithPrint("ticket add", params, 4)) return null ;
 		
-		Integer productId = Utils.tryParseInt(parser.getCommand(2));
+		Integer productId = Utils.tryParseInt(params[2]);
 		if (productId == null){
-            Utils.printInvalidDataType("ticket add", "integer", parser.getCommand(2));
+            Utils.printInvalidDataType("ticket add", "integer", params[2]);
             return null;
         }
 
-		Integer quantity = Utils.tryParseInt(parser.getCommand(3));
+		Integer quantity = Utils.tryParseInt(params[3]);
         if (quantity == null){
-            Utils.printInvalidDataType("ticket add", "integer", parser.getCommand(3));
+            Utils.printInvalidDataType("ticket add", "integer", params[3]);
             return null;
         }
 
@@ -147,16 +147,16 @@ public class TicketCommand extends Command{
 	 * This function parses each field sequentially and immediately returns a failed ParseResult if it
 	 * fails to parse any arguments.
 	 * FORMAT: ticket remove <productId>
-	 * @param parser The stream of tokens to parse
+	 * @param params The stream of tokens to parse
 	 * @return The result of the parse. If parsing is successful, this will return a valid TicketCommand Remove instance
 	 * specifying productId. Or a failure code specifying which part of the parsing went wrong.
 	 */
-    public static Command tryParseRemove(Parser parser) {
-		if (!Utils.checkArgsCountWithPrint("ticket remove", parser, 3)) return null;
+    public static Command tryParseRemove(String[] params) {
+		if (!Utils.checkArgsCountWithPrint("ticket remove", params, 3)) return null;
 		
-		Integer productId = Utils.tryParseInt(parser.getCommand(2));
+		Integer productId = Utils.tryParseInt(params[2]);
 		if (productId == null){
-            Utils.printInvalidDataType("ticket remove", "integer", parser.getCommand(2));
+            Utils.printInvalidDataType("ticket remove", "integer", params[2]);
             return null;
         }
 		

@@ -63,7 +63,7 @@ public class App {
         }
     }
 
-    private String[] parser(String command) {
+    private static String[] parser(String command) {
         int n = command.length();
         String[] commands = new String[n];
         for (int k = 0; k < n; k++) {
@@ -74,7 +74,7 @@ public class App {
         return commands;
     }
 
-    private void auxParser(String command, String[] commands) {
+    private static void auxParser(String command, String[] commands) {
         final String text = command.trim().replaceAll(" +", " ");     //Elimina espacios
         int i = 0;
         boolean comillas = false;
@@ -92,7 +92,7 @@ public class App {
 
     }
 
-    private void cutter(String[] commands) {
+    private static void cutter(String[] commands) {
         int i = 0;
         while ((i < commands.length) && (commands[i] != "")) {
             i++;
@@ -104,19 +104,19 @@ public class App {
         commands = aux;
     }
 
-    private void echo(String message) { 
-        if ( text.isEmpty () )
+    private static void echo(String message) {
+        if ( message.isEmpty () )
         {
             System.err.println ( "Error: echo command requires text to echo" );
         }
         else
         {
-            System.out.println ( "echo" + text );
+            System.out.println ( "echo \"" + message + "\"");
         }
 		//System.out.printf("echo \"%s\"\n", message); not needed, firstParse calles echo with message as parameter
     }
 
-    private void help() {
+    private static void help() {
         System.out.println("Commands:");
         System.out.println(" prod add <id> \"<name>\" <category> <price>");
         System.out.println(" prod list" );
