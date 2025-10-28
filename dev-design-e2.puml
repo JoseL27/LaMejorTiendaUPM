@@ -1,0 +1,204 @@
+@startuml
+left to right direction
+
+class App {
+  - inventory: Inventory
+  - userManager: UserManager
+  
+  + App()
+  + main(String[]): void
+  + run(Scanner): void
+  + tokenize(String): String[]
+}
+
+class Product { 
+  - id: int
+  - name: String
+  - price: double
+  + Product(int, String, double): 
+}
+
+enum Category {
+  + CLOTHES	    0.07, true
+  + MERCH	   	0.00, true
+  + STATIONERY 	0.05, false
+  + BOOK	   	0.10, false
+  + ELECTRONICS	0.03, false
+  
+  - discountPercent: float
+  - boolean: isCustom
+}
+
+class BaseProduct extends Product {
+  - category: Category
+  - maxCustomTexts: int
+  + BaseProduct(int, String, double, Category, int):
+}
+
+enum Kind {
+  + FOOD: 72
+  + MEETING: 12
+  - hoursLimit: int
+}
+
+class TimedProduct extends Product {
+  - kind: Kind
+  - participants: int
+
+  + TimedProduct(int, String, double, Kind, int)
+}
+
+class ProductInfo {
+  - product: Product
+  - customTexts: String[]
+
+  + ProductInfo(Product, int): 
+  + ProductInfo(Product, int, String[]):
+}
+
+class Inventory {
+  - products: Product[]
+
+  + createProduct(int, String, Category, double): DataResult
+  + readProduct(int): Product
+  + updateProductName(int, String): DataResult
+  + updateProductCategory(int, Category): DataResult
+  + updateProductPrice(int, double): DataResult
+  + deleteProduct(int): DataResult
+  + listProducts(): Product[]
+  
+  + isValidId(int): boolean
+  + isValidName(String): boolean
+  + isValidPrice(double): boolean
+
+  - readProductIndex(int): int
+}
+
+class Ticket {
+  - id: String
+  - boolean: isOpen
+  - dateOpened: Date
+  - dateClosed: Date
+
+  + Ticket()
+  + Ticket(String)
+
+  + addProduct(Product, int): boolean
+  + addProduct(Product, int, String[]): boolean
+  + removeProduct(int): Product
+  + summaryString(): String
+  + reset(): void
+  
+  - findProductInfo(int): ProductInfo?
+  - productInfoIndex(int): int
+  - getOccurrences(Category): int
+  - appendProductInfo(ProductInfo): boolean
+  - generateId(): String
+}
+
+class Client {
+ - id: String
+ - name: String
+ - dni: String
+ - email: String
+ - managedBy: Cashier
+ - ticketIds: String[]
+
+ + Client(String, String, String, Cashier)
+ + createTicket(String)
+}
+
+class Cashier { 
+  - id: String
+  - name: String
+  - companyEmail: String
+  - tickets: Ticket[]
+  
+  + Cashier(String, String)
+  + newTicket(String, String): boolean
+  + newTicket(String): boolean
+  
+  - verifyCompanyEmail(): String
+  - generateId(): String
+}
+
+class UserManager { 
+  - clients: Client[]
+  - cashiers: Cashier[]
+  
+  + addClient(String, String, String, String): boolean
+  + removeClient(String dni): boolean
+  + listClients(): String
+  
+  + addCashier(String, String, String): boolean
+  + addCashier(String, String): boolean
+  + removeCashier(String): boolean
+  + listCashiers(): String
+  + listCashierTickets(String): String
+}
+
+interface Command {
+  + eval(String[], UserManager, Inventory): void
+}
+
+class ClientCommand implements Command {
+  - evalAdd(String[], UserManager, Inventory): void
+  - evalRemove(String[], UserManager, Inventory): void
+  - evalList(String[], UserManager, Inventory): void
+}
+
+class CashCommand implements Command {
+  - evalNew(String[], UserManager, Inventory): void
+  - evalAdd(String[], UserManager, Inventory): void
+  - evalRemove(String[], UserManager, Inventory): void
+  - evalPrint(String[], UserManager, Inventory): void
+  - evalList(String[], UserManager, Inventory): void
+}
+
+class TicketCommand implements Command {
+  - evalNew(String[], UserManager, Inventory): void
+  - evalAdd(String[], UserManager, Inventory): void
+  - evalRemove(String[], UserManager, Inventory): void
+  - evalPrint(String[], UserManager, Inventory): void
+  - evalList(String[], UserManager, Inventory): void
+}
+
+class ProductCommand implements Command {
+  - evalAdd(String[], UserManager, Inventory): void
+  - evalUpdate(String[], UserManager, Inventory): void
+  - evalUpdate(String[], UserManager, Inventory): void
+  - evalAddFood(String[], UserManager, Inventory): void
+  - evalAddMeeting(String[], UserManager, Inventory): void
+  - evalRemove(String[], UserManager, Inventory): void
+  - evalList(String[], UserManager, Inventory): void
+}
+
+
+class Utils {
+  + checkArgsCountWithPrint(String, Parser, int, int): boolean
+  + tryParseFieldWithPrint(String, String): Field
+  + tryParseIntWithPrint(String, String): Integer
+  + tryParseCategoryWithPrint(String, String): Category
+  + printInvalidEnum(String, String, String, Enum[]): void
+  + tryParseInt(String): Integer
+  + nullOrEquals(Object, Object): boolean
+  + arrayToString(T[], String): String
+  + printInvalidDataType(String, String, String): void
+  + checkArgsCountWithPrint(String, Parser, int): boolean
+}
+
+TimedProduct --> Kind
+BaseProduct --> Category
+Inventory --> Product
+
+App --> Inventory
+Ticket --> ProductInfo
+Cashier --> Ticket
+
+UserManager --> Cashier
+UserManager --> Client
+
+App --> UserManager
+App --> Command
+
+@enduml
