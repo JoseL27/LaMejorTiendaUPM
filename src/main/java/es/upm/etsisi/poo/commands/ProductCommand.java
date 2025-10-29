@@ -161,6 +161,7 @@ public class ProductCommand implements Command {
 			ticket.removeProduct(productId);
 			
 			if (inventory.deleteProduct(productId)) {
+				System.out.println(productToRemove);
 				System.out.printf("prod remove: ok\n");
 			} else {
 				System.out.printf("prod remove: error: unexpected error\n");
@@ -181,7 +182,7 @@ public class ProductCommand implements Command {
 	 *               ProductCommand List instance or null
 	 */
 	public void evalList(String[] params, Ticket ticket, Inventory inventory) {
-		if (Utils.checkArgsCountWithPrint("prod list", params.length, 2)) return;
+		if (!Utils.checkArgsCountWithPrint("prod list", params.length, 2)) return;
 
 		Product[] products = inventory.listProducts();
 

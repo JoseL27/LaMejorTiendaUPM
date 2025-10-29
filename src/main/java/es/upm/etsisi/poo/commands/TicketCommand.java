@@ -39,7 +39,7 @@ public class TicketCommand implements Command {
             case "new"      -> evalNew(params, ticket, inventory);
             case "add"      -> evalAdd(params, ticket, inventory);
             case "remove"   -> evalRemove(params, ticket, inventory);
-            case "print"    -> evalList(params, ticket, inventory);
+            case "print"    -> evalPrint(params, ticket, inventory);
         }
     }
 
