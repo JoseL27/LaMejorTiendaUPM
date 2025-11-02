@@ -91,7 +91,7 @@ public class Inventory {
      * @param price Product price (must be greater than 0)
      * @return true if the product is created correctly, false in other case
      */
-    public Product createProduct(int id, String name, Product.Category category, double price) {
+    public Product createProduct(int id, String name, BaseProduct.Category category, double price) {
         // Sanity checks: ID >= 0, name.length < 100, price > 0
         if (!isValidId(id) || !isValidName(name) || !isValidPrice(price)) return null;
         // if (category == null) return DataResult.INVALID_CATEGORY;
@@ -103,7 +103,7 @@ public class Inventory {
 
         if (selectedProduct == null) {
             // Create product and add it to the array
-            Product prodToAdd = new Product(id, name, category, price);
+            BaseProduct prodToAdd = new BaseProduct(id, name, price,category);
             this.inventory[this.productAmount] = prodToAdd;
             this.productAmount++;
             return prodToAdd;
@@ -154,7 +154,7 @@ public class Inventory {
      * @param category Product Category
      * @return true if the product's category is updated correctly, false in other case
      */
-    public Product updateProductCategory(int id, Product.Category category) {
+    public Product updateProductCategory(int id, BaseProduct.Category category) {
         // Sanity checks: ID >= 0, category != null
         if (!isValidId(id)) return null;
         // if (category == null) return DataResult.INVALID_CATEGORY;
