@@ -23,35 +23,17 @@ public class Product {
         return this.id == p.id;
     }
 
-    public double price(int amount) {
-        return this.price * amount;
-    }
+    public double price(int amount) {return this.price * amount;}
 
-    @Override
-    public String toString() {
-        return String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}",
-                this.id, this.name, this.category, this.price);
-    }
+    public int getId() {return id;}
 
-    public int getId() {
-        return id;
-    }
+    public String getName() {return name;}
 
-    public String getName() {
-        return name;
-    }
+    public void setName(String name) {this.name = name;}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public double getPrice() {return price;}
 
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
+    public void setPrice(double price) {this.price = price;}
 
     /**
      * Checks if this is equal to another object, that has to be a Product, based on id, name, category and price
@@ -65,8 +47,7 @@ public class Product {
 
         Product otherProd = (Product) obj;
         return this.id == otherProd.id
-                && Utils.nullOrEquals(this.name, otherProd.name)
-                //	&& Utils.nullOrEquals(this.category, otherProd.category)
+                && this.name.equals(otherProd.name)
                 && this.price == otherProd.price;
     }
 }

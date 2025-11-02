@@ -47,4 +47,9 @@ public class BaseProduct extends Product {
         super(id, name, price);
         this.category = category;
     }
+    @Override
+    public String toString() {
+        return String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}",
+                this.id, super.getName(), this.category, super.getPrice());
+    }
 }
