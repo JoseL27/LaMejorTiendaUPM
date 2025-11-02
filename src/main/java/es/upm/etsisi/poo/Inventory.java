@@ -154,16 +154,16 @@ public class Inventory {
      * @param category Product Category
      * @return true if the product's category is updated correctly, false in other case
      */
-    public Product updateProductCategory(int id, BaseProduct.Category category) {
+    public BaseProduct updateProductCategory(int id, BaseProduct.Category category) {
         // Sanity checks: ID >= 0, category != null
         if (!isValidId(id)) return null;
         // if (category == null) return DataResult.INVALID_CATEGORY;
 
-        Product selectedProduct = this.readProduct(id);
+        BaseProduct selectedProduct = (BaseProduct) this.readProduct(id);
 
         if (selectedProduct != null) {
             // Update product's category
-            selectedProduct.setCategory(category);
+             selectedProduct.setCategory(category);
         }
 		return selectedProduct;
     }

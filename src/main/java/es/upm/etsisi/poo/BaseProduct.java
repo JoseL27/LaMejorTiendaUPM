@@ -1,7 +1,7 @@
 package es.upm.etsisi.poo;
 
 public class BaseProduct extends Product {
-    private Category category;
+    private static Category category;
 
     public enum Category {
         MERCH	   	(0.00f,true ),
@@ -37,7 +37,7 @@ public class BaseProduct extends Product {
     public Category category() {
         return this.category;
     }
-    public Category getCategory() {
+    public static Category getCategory() {
         return category;
     }
     public void setCategory(Category category) {

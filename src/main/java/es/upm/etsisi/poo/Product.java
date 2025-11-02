@@ -19,9 +19,7 @@ public class Product {
      * @param p product to be compared to
      * @return true, if the products have the same id, false in other case
      */
-    public boolean equals(Product p) {
-        return this.id == p.id;
-    }
+    public boolean equals(Product p) {return this.id == p.id;}
 
     public double price(int amount) {return this.price * amount;}
 
@@ -43,11 +41,12 @@ public class Product {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || this.getClass() != obj.getClass()) return false;
-
-        Product otherProd = (Product) obj;
-        return this.id == otherProd.id
-                && this.name.equals(otherProd.name)
-                && this.price == otherProd.price;
+        boolean resul;
+        if (obj == null || this.getClass() != obj.getClass()) {resul= false;}
+        else{
+            Product otherProd = (Product) obj;
+            resul= this.id == otherProd.id && this.name.equals(otherProd.name) && this.price == otherProd.price;
+        }
+        return resul;
     }
 }

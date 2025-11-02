@@ -195,14 +195,14 @@ public class Ticket {
 			
 			totalPrice += productInfo.getAmount() * product.getPrice();
 
-			boolean hasDiscount = getOccurrences(product.getCategory()) > 1;
+			boolean hasDiscount = getOccurrences(BaseProduct.getCategory()) > 1;
 
 			for (int productCounter = 0; productCounter < productInfo.getAmount(); productCounter++) {
 				sb.append(String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}", 
-										product.getId(), product.getName(), product.getCategory(), product.getPrice()));
+										product.getId(), product.getName(), BaseProduct.getCategory(), product.getPrice()));
 				
 				if (hasDiscount) {
-					double productDiscount = product.getPrice() * product.getCategory().getDiscountPercent();
+					double productDiscount = product.getPrice() * BaseProduct.getCategory().getDiscountPercent();
 					totalDiscount += productDiscount;
 					sb.append(String.format(" **discount -%.1f", productDiscount));
 				}
@@ -222,11 +222,11 @@ public class Ticket {
 	 * @param category Category of which the occurrences will be counted
 	 * @return Number of occurrences of the category, if it does not appear, 0 is returned
 	 */
-	private int getOccurrences(Product.Category category){
+	private int getOccurrences(BaseProduct.Category category){
 		int result = 0;
-
 		for (int i = 0; i < count; i++) {
-			if (category.equals(productInfos[i].getProduct().getCategory())){
+            BaseProduct p=(BaseProduct)productInfos[i].getProduct();
+			if (category.equals(p.getCategory())){
 				result += productInfos[i].getAmount();
 			}
 		}
