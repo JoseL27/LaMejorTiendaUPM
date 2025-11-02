@@ -33,6 +33,7 @@ public class BaseProduct extends Product {
             }
         }
     }
+
     public Category category() {
         return this.category;
     }
