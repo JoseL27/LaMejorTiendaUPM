@@ -11,12 +11,20 @@ public class TimedProduct extends Product {
         this.people = people;
     }
 
+    public TimedType getType() {
+        return type;
+    }
+
+    public int getPeople() {
+        return people;
+    }
+
     // timeForPreparing are de ms minimun to prepare  the activity.
     public enum TimedType {
         MEETING(43200000),
         LAUNCH(259200000);
 
-        private int timeForPreparing;
+        private int  timeForPreparing;
 
         private TimedType(int timeForPreparing) {
             this.timeForPreparing = timeForPreparing;
