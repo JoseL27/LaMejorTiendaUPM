@@ -1,7 +1,7 @@
 package es.upm.etsisi.poo;
 
 public class TimedProduct extends Product {
-    private TimedType type;
+    private static TimedType type;
     private final int MAX_PEOPLE = 100;
     private int people;
 
