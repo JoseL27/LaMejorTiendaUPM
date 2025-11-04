@@ -31,8 +31,8 @@ public class App {
     public void run(Scanner sc) {
 		Locale.setDefault(new Locale("en", "US"));
 		
-		// System.out.println("Welcome to the ticket module App.");
-		// System.out.println("Ticket module. Type 'help' to see commands.");
+		 System.out.println("Welcome to the ticket module App.");
+		 System.out.println("Ticket module. Type 'help' to see commands.");
 
         String command;
         do {

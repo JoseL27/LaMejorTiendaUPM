@@ -45,6 +45,7 @@ public class BaseProduct extends Product {
         this.category = category;
     }
 
+    // It is assumed that all the parameters are valid, this should be handled before creating the object
     public BaseProduct(int id, String name, double price, Category category) {
         super(id, name, price);
         this.category = category;
