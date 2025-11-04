@@ -19,6 +19,7 @@ public class Cashier extends User {
     /**
      * Creates new cashier with the id, name and email given in the parameters
      * @throws IllegalArgumentException when there is already a cashier with this id or email is not a company email
+     * This should receive an already valid id, name and email, so no exception throwing should be needed, remove once the command is implemented
      */
     public Cashier(String id, String name, String email) throws IllegalArgumentException{
 
