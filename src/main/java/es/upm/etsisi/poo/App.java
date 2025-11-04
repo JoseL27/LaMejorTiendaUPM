@@ -9,6 +9,7 @@ import es.upm.etsisi.poo.commands.TicketCommand;
 public class App {
     private Inventory inventory;
     private Ticket ticket;
+    private UserManager userManager;
 
 	private ProductCommand productCommand;
 	private TicketCommand ticketCommand;
@@ -18,7 +19,7 @@ public class App {
      */
     public App() {
         inventory = new Inventory();
-        ticket = new Ticket();
+		userManager = new UserManager();
 		productCommand = new ProductCommand();
 		ticketCommand = new TicketCommand();
     }
@@ -111,6 +112,7 @@ public class App {
     }
 
     private static void echo(String message) {
+<<<<<<< Updated upstream
         if ( message.isEmpty () )
         {
             System.out.println ( "Error: echo command requires text to echo" );
@@ -118,6 +120,12 @@ public class App {
         else
         {
             System.out.println ( "echo \"" + message + "\"");
+=======
+        if (message.isEmpty()) {
+            System.err.println ( "Error: echo command requires text to echo" );
+        } else {
+            System.out.println("echo \""+message+"\"");
+>>>>>>> Stashed changes
         }
 		//System.out.printf("echo \"%s\"\n", message); not needed, firstParse calles echo with message as parameter
     }
@@ -159,16 +167,20 @@ public class App {
 		if (tokenized.length > 0) {
 			switch (tokenized[0]) {
 			case "prod":
-				productCommand.eval(tokenized, ticket, inventory);
+				productCommand.eval(tokenized, userManager, inventory);
 				break;
 			case "ticket":
-				ticketCommand.eval(tokenized, ticket, inventory);
+				ticketCommand.eval(tokenized, userManager, inventory);
 				break;
 			case "echo":
+<<<<<<< Updated upstream
                 if (tokenized.length > 1)
 				    echo ( tokenized[1] );
                 else
                     echo (""); // This would cause echo to print out an error
+=======
+				echo(tokenized[1]);
+>>>>>>> Stashed changes
 				break;
 			case "help":
 				help ();
