@@ -10,17 +10,12 @@ public class App {
     private Inventory inventory;
     private Ticket ticket;
 
-	private ProductCommand productCommand;
-	private TicketCommand ticketCommand;
-
     /**
      * Basic constructor
      */
     public App() {
         inventory = new Inventory();
         ticket = new Ticket();
-		productCommand = new ProductCommand();
-		ticketCommand = new TicketCommand();
     }
 
     /**
@@ -157,12 +152,15 @@ public class App {
     {
         String[] tokenized = parser(entrada);
 		if (tokenized.length > 0) {
+            Command command;
 			switch (tokenized[0]) {
 			case "prod":
-				productCommand.eval(tokenized, ticket, inventory);
+                command = new ProductCommand();
+                command.eval(tokenized, ticket, inventory);
 				break;
 			case "ticket":
-				ticketCommand.eval(tokenized, ticket, inventory);
+                command = new TicketCommand();
+                command.eval(tokenized, ticket, inventory);
 				break;
 			case "echo":
 				echo ( tokenized[1] );
