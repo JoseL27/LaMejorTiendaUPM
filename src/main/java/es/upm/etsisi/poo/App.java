@@ -113,7 +113,7 @@ public class App {
     private static void echo(String message) {
         if ( message.isEmpty () )
         {
-            System.err.println ( "Error: echo command requires text to echo" );
+            System.out.println ( "Error: echo command requires text to echo" );
         }
         else
         {
@@ -165,7 +165,10 @@ public class App {
 				ticketCommand.eval(tokenized, ticket, inventory);
 				break;
 			case "echo":
-				echo ( tokenized[1] );
+                if (tokenized.length > 1)
+				    echo ( tokenized[1] );
+                else
+                    echo (""); // This would cause echo to print out an error
 				break;
 			case "help":
 				help ();
