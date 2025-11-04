@@ -11,7 +11,8 @@
  - [ ] (ENRIQUE) Adicionar boolean abierto/cerrado a Ticket; ProductInfo ahora representa un producto con personalizables.
  - [ ] (ANDRES)  Crear clase Client
    - Jinxian lo revisa
- - [ ] (JOSE)    Crear clase Cashier y manejar Ticket's
+ - [x] (JOSE)    Crear clase Cashier y manejar Ticket's
+ - [ ] (JOSE)    Cambiar app para que se use la interfaz command en vez de una variable de cada comando
    - Crear UserManager y manejar Clients y Cashiers
    - Crear CashCommand
    - Crear ClientCommand
