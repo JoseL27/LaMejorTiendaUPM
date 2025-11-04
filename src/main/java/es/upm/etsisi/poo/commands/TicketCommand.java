@@ -40,6 +40,7 @@ public class TicketCommand implements Command {
             case "add"      -> evalAdd(params, ticket, inventory);
             case "remove"   -> evalRemove(params, ticket, inventory);
             case "print"    -> evalPrint(params, ticket, inventory);
+            default         -> System.out.println("ticket: invalid sub command");
         }
     }
 
@@ -107,7 +108,7 @@ public class TicketCommand implements Command {
         if (!Inventory.isValidId(productId)) { // Use the one from DataManager when it is public
             System.out.printf("ticket add: error: expected id greater or equal than zero\n");
         } else if (!isValidAmount(quantity)) {
-            System.out.printf("ticket add: error: expected amount greater or equal than zero\n");
+            System.out.printf("ticket add: error: expected amount between %d and %d\n", 1, Ticket.TICKET_MAX_PRODUCTS);
         } else {
             Product productToAdd = inventory.readProduct(productId);
 
