@@ -1,6 +1,6 @@
 package es.upm.etsisi.poo;
 
-public class Product {
+public abstract class Product {
 
     public final int id;
     private String name;
