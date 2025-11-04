@@ -126,9 +126,13 @@ public class Ticket {
 	}
 
 	public static int randomId() {
-		return (int)(Math.random() * (double)Integer.MAX_VALUE);		
+		return (int)(Math.random() * 100000);		
 	}
-	
+
+	public static boolean isValidId(int id) {
+		return id >= 0 && id < 100000;
+	}
+
 	/**
 	 * Adds a product asociated to an amount to the ticket. Too things may happen:
 	 * Checks if the product allready exists 

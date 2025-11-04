@@ -45,6 +45,11 @@ public class Cashier extends User {
         createdTickets.add(new Ticket(id));
     }
 
+	public Ticket findTicket(int ticketId) {
+		System.out.println("Cashier.findTicket: NOT IMPLEMENTED");
+		return null;
+	}
+
     /**
      * Returns a string representing the tickets created by this cashier
      * @return A string with the id and state of all the tickets created by this cashier, sorted by id
