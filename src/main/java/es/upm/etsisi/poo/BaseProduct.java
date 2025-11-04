@@ -1,27 +1,27 @@
 package es.upm.etsisi.poo;
 
 public class BaseProduct extends Product {
-    private static Category category;
+    private Category category;
 
     public enum Category {
-        MERCH	   	(0.00f,true ),
-        STATIONERY 	(0.05f, false),
-        CLOTHES	    (0.07f, true),
-        BOOK	   	(0.10f, false),
-        ELECTRONICS	(0.03f, true);
+        MERCH	   	(0.00f,3 ),
+        STATIONERY 	(0.05f, 0),
+        CLOTHES	    (0.07f, 5),
+        BOOK	   	(0.10f, 0),
+        ELECTRONICS	(0.03f, 2);
 
         private final float discountPercent;
-        private final boolean customizable;
+        private final int maxCustomizations;
 
-        private Category(float discountPercent, boolean customizable) {
+        private Category(float discountPercent, int maxCustomizations) {
             this.discountPercent = discountPercent;
-            this.customizable = customizable;
+            this.maxCustomizations = maxCustomizations;
         }
 
         public float getDiscountPercent() {
             return this.discountPercent;
         }
-        public boolean getCustomizable() {return this.customizable;}
+        public int getMaxCustomizations() {return this.maxCustomizations;}
 
         public static Category fromLabel(String label) {
             Category category = null;
@@ -33,11 +33,7 @@ public class BaseProduct extends Product {
             }
         }
     }
-
-    public Category category() {
-        return this.category;
-    }
-    public static Category getCategory() {
+    public Category getCategory() {
         return category;
     }
     public void setCategory(Category category) {

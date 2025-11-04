@@ -21,8 +21,8 @@ public class TimedProduct extends Product {
 
     // timeForPreparing are de ms minimun to prepare  the activity.
     public enum TimedType {
-        MEETING(43200000),
-        LAUNCH(259200000);
+        MEETING(43200000), //12h
+        LAUNCH(259200000); //72h
 
         private int  timeForPreparing;
 
