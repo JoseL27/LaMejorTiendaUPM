@@ -184,7 +184,7 @@ public class Ticket {
 
 		double totalPrice = 0;
 		double totalDiscount = 0;
-		
+		/**
 		if (count > 0) {
 			Arrays.sort(productInfos, 0, count);
 		}
@@ -209,7 +209,7 @@ public class Ticket {
 				sb.append("\n");
 			}
 		}
-		
+		*/
 		sb.append(String.format("Total price: %.1f\n", (float)totalPrice));
 		sb.append(String.format("Total discount: %.1f\n", (float)totalDiscount));
 		sb.append(String.format("Final Price: %.1f", (float)(totalPrice - totalDiscount)));
