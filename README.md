@@ -10,8 +10,8 @@
    - [ ] (JINXIAN) Crear UserManager y manejar Clients y Cashiers
    - [ ] (JULIO)Crear CashCommand
    - [ ] (ANDRES)Crear ClientCommand
--(JOSE y ENRIQUE) Debug y que funcione todo
--Escribir tests para lo nuevo de E2
+- (JOSE y ENRIQUE) Debug y que funcione todo
+- Escribir tests para lo nuevo de E2
 
 ## Como hacer una tarea
 1. Programar
