@@ -37,9 +37,9 @@ public class Utils {
     public static boolean checkArgsCountWithPrint(String prefix, int amount, int minAmount, int maxAmount) {
         boolean result = false;
         if (amount < minAmount) {
-            System.out.printf("%s: too few arguments, expected at %d arguments and got %d\n", prefix, minAmount, amount);
+            System.out.printf("%s: too few arguments, expected at least %d arguments and got %d\n", prefix, minAmount, amount);
         } else if (amount > maxAmount) {
-            System.out.printf("%s: too many arguments, expected %d and got %d\n", prefix, maxAmount, amount);
+            System.out.printf("%s: too many arguments, expected maximum %d and got %d\n", prefix, maxAmount, amount);
         } else {
             result = true;
         }

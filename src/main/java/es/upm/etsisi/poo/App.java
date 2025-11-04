@@ -112,22 +112,11 @@ public class App {
     }
 
     private static void echo(String message) {
-<<<<<<< Updated upstream
-        if ( message.isEmpty () )
-        {
-            System.out.println ( "Error: echo command requires text to echo" );
-        }
-        else
-        {
-            System.out.println ( "echo \"" + message + "\"");
-=======
         if (message.isEmpty()) {
             System.err.println ( "Error: echo command requires text to echo" );
         } else {
             System.out.println("echo \""+message+"\"");
->>>>>>> Stashed changes
         }
-		//System.out.printf("echo \"%s\"\n", message); not needed, firstParse calles echo with message as parameter
     }
 
     private static void help() {
@@ -173,14 +162,10 @@ public class App {
 				ticketCommand.eval(tokenized, userManager, inventory);
 				break;
 			case "echo":
-<<<<<<< Updated upstream
                 if (tokenized.length > 1)
-				    echo ( tokenized[1] );
+				    echo(tokenized[1]);
                 else
-                    echo (""); // This would cause echo to print out an error
-=======
-				echo(tokenized[1]);
->>>>>>> Stashed changes
+                    echo(""); // This would cause echo to print out an error
 				break;
 			case "help":
 				help ();
