@@ -5,6 +5,7 @@ public class TimedProduct extends Product {
     private final int MAX_PEOPLE = 100;
     private int people;
 
+    // It is assumed that all the parameters are valid, this should be handled before creating the object
     public TimedProduct(int id, String name, double price, int people, TimedType type) {
         super(id, name, price * people); // EL precio de la reunión depende del número de individuos
         this.type = type;
