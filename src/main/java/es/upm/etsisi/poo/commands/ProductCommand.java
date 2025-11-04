@@ -1,11 +1,6 @@
 package es.upm.etsisi.poo.commands;
 
-import es.upm.etsisi.poo.Command;
-import es.upm.etsisi.poo.Product;
-import es.upm.etsisi.poo.Utils;
-
-import es.upm.etsisi.poo.Inventory;
-import es.upm.etsisi.poo.Ticket;
+import es.upm.etsisi.poo.*;
 
 /**
  *  ProductCommand class that parses a stream of tokens into a specific ProductCommand,
@@ -50,9 +45,9 @@ public class ProductCommand implements Command {
 		}
 
 		String productName = params[3];
-		Product.Category productCategory = Product.Category.fromLabel(params[4]);
+		BaseProduct.Category productCategory = BaseProduct.Category.fromLabel(params[4]);
 		if (productCategory == null) {
-			Utils.printInvalidEnum("prod add", "category", params[4], Product.Category.values());
+			Utils.printInvalidEnum("prod add", "category", params[4], BaseProduct.Category.values());
 			return;
 		}
 
@@ -102,9 +97,9 @@ public class ProductCommand implements Command {
 			updatedProduct = inventory.updateProductName(productId, productName);
 		}
 		case "category" -> {
-			Product.Category productCategory = Product.Category.fromLabel(params[4]);
+			BaseProduct.Category productCategory = BaseProduct.Category.fromLabel(params[4]);
 			if (productCategory == null) {
-				Utils.printInvalidEnum("prod update", "category", params[4], Product.Category.values());
+				Utils.printInvalidEnum("prod update", "category", params[4], BaseProduct.Category.values());
 			} else { 
 				updatedProduct = inventory.updateProductCategory(productId, productCategory);
 			}
