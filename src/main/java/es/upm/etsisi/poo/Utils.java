@@ -34,10 +34,6 @@ public class Utils {
 		}
 	}
 
-	public static boolean nullOrEquals(Object a, Object b) {
-		return (a == b) || (a != null && a.equals(b));
-	}
-
     public static boolean checkArgsCountWithPrint(String prefix, int amount, int minAmount, int maxAmount) {
         boolean result = false;
         if (amount < minAmount) {
@@ -64,13 +60,16 @@ public class Utils {
         System.out.printf("%s: error: expected %s, got '%s'\n", failedCommand, expectedDataType, receivedValue);
     }
 
-    public static Product.Category tryParseCategoryWithPrint(String prefix, String categoryString) {
-        Product.Category category = Product.Category.fromLabel(categoryString);
-        if (category == null) {
-            printInvalidEnum(prefix, "category", categoryString, Product.Category.values());
-        }
-        return category;
-    }
+    /**
+     * public static Product.Category tryParseCategoryWithPrint(String prefix, String categoryString) {
+     *         Product.Category category = Product.Category.fromLabel(categoryString);
+     *         if (category == null) {
+     *             printInvalidEnum(prefix, "category", categoryString, Product.Category.values());
+     *         }
+     *         return category;
+     *     }
+     */
+
 
     public static Integer tryParseIntWithPrint(String prefix, String intString) {
         Integer number = tryParseInt(intString);

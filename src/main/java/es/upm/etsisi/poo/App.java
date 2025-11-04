@@ -139,7 +139,7 @@ public class App {
         System.out.println(" exit");
 		System.out.println();
 
-		Product.Category[] categoryValues = Product.Category.values();
+		BaseProduct.Category[] categoryValues = BaseProduct.Category.values();
         System.out.printf("Categories: %s\n", Utils.arrayToString(categoryValues, ", "));
         System.out.print("Discounts if there are ≥2 units in the category: ");
 

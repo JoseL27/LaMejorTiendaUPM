@@ -1,111 +1,52 @@
 package es.upm.etsisi.poo;
 
-public class Product {
-	public enum Category {
-		MERCH	   	(0.00f),
-		STATIONERY 	(0.05f),
-		CLOTHES	    (0.07f),
-		BOOK	   	(0.10f),
-		ELECTRONICS	(0.03f);
+public abstract class Product {
 
-		private final float discountPercent;
+    public final int id;
+    private String name;
+    private double price;
 
-		private Category(float discountPercent) {
-			this.discountPercent = discountPercent;
-		}
+    // constructor
+    public Product(int id, String name, double price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+    }
 
-		public float getDiscountPercent() {
-			return this.discountPercent;
-		}
-		
-		public static Category fromLabel(String label) {
-			Category category = null;
-			try {
-				category = Category.valueOf(label.toUpperCase());
-			} catch (Exception e) {
-			} finally {
-				return category;
-			}
-		}
-	}
+    /**
+     * Checks if this is the same as other product, based on id only
+     *
+     * @param p product to be compared to
+     * @return true, if the products have the same id, false in other case
+     */
+    public boolean equals(Product p) {return this.id == p.id;}
 
-	public final int id;
-	private String name;
-	private Category category;
-	private double price;
+    public double price(int amount) {return this.price * amount;}
 
-	// constructor
-	public Product(int id, String name, Category category, double price) {
-		this.id = id;
-		this.name = name;
-		this.category = category;
-		this.price = price;
-	}
+    public int getId() {return id;}
 
-	/**
-	 * Checks if this is the same as other product, based on id only
-	 * @param p product to be compared to
-	 * @return true, if the products have the same id, false in other case
-	 */
-	public boolean equals(Product p) {
-		return this.id == p.id;
-	}
+    public String getName() {return name;}
 
-	public Category category() {
-		return this.category;
-	}
+    public void setName(String name) {this.name = name;}
 
-	public double price(int amount) {
-		return this.price * amount;
-	}
+    public double getPrice() {return price;}
 
-	@Override
-	public String toString() {
-		return String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}",
-							 this.id, this.name, this.category, this.price);
-	}
+    public void setPrice(double price) {this.price = price;}
 
-	public int getId() {
-		return id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Category getCategory() {
-		return category;
-	}
-
-	public void setCategory(Category category) {
-		this.category = category;
-	}
-
-	public double getPrice() {
-		return price;
-	}
-
-	public void setPrice(double price) {
-		this.price = price;
-	}
-
-	/**
-	 * Checks if this is equal to another object, that has to be a Product, based on id, name, category and price
-	 * @param obj Object to be compared to
-	 * @return true, if the objects are equals under this criteria, false in other case
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || this.getClass() != obj.getClass()) return false;
-
-		Product otherProd = (Product)obj;
-		return this.id == otherProd.id
-			&& Utils.nullOrEquals(this.name, otherProd.name)
-			&& Utils.nullOrEquals(this.category, otherProd.category)
-			&& this.price == otherProd.price;
-	}
+    /**
+     * Checks if this is equal to another object, that has to be a Product, based on id, name, category and price
+     *
+     * @param obj Object to be compared to
+     * @return true, if the objects are equals under this criteria, false in other case
+     */
+    @Override
+    public boolean equals(Object obj) {
+        boolean resul;
+        if (obj == null || this.getClass() != obj.getClass()) {resul= false;}
+        else{
+            Product otherProd = (Product) obj;
+            resul= this.id == otherProd.id && this.name.equals(otherProd.name) && this.price == otherProd.price;
+        }
+        return resul;
+    }
 }

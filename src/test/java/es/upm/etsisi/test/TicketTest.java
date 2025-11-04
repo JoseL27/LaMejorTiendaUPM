@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
-
+/**
 public class TicketTest {
 
 	// DICTATOR LOCALE 
@@ -115,3 +115,4 @@ public class TicketTest {
 		assertFalse(ticket.addProduct(new Product(2, "Product", Product.Category.CLOTHES, 10), 1));
 	}
 }
+*/

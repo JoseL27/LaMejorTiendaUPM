@@ -1,8 +1,8 @@
 package es.upm.etsisi.test;
 
 import es.upm.etsisi.poo.App;
+import es.upm.etsisi.poo.BaseProduct;
 import es.upm.etsisi.poo.Ticket;
-import es.upm.etsisi.poo.Product.Category;
 import es.upm.etsisi.poo.Inventory;
 
 import java.io.ByteArrayOutputStream;
@@ -647,7 +647,7 @@ public class AppTest {
 	String ticketItemsPrint(int amount) {
 		StringBuilder sb = new StringBuilder();
 		
-		float discountValue = (float)amount * Category.BOOK.getDiscountPercent() * 30.0f;
+		float discountValue = (float)amount * BaseProduct.Category.BOOK.getDiscountPercent() * 30.0f;
 		float totalPrice = (float)amount*30;
 		for (int i = 0; i < amount; i++) {
 			sb.append("{class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0\n");
