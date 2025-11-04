@@ -111,12 +111,9 @@ public class App {
         return aux;
     }
 
-    private static void echo(String message) {
-        if (message.isEmpty()) {
-            System.err.println ( "Error: echo command requires text to echo" );
-        } else {
-            System.out.println("echo \""+message+"\"");
-        }
+    private static void echo(String[] params) {
+		if (!Utils.checkArgsCountWithPrint("echo", params.length, 2)) return;
+		System.out.printf("echo \"%s\"\n", params[1]);
     }
 
     private static void help() {
@@ -150,32 +147,17 @@ public class App {
         System.out.println(".");
     }
 
-    private void firstParse(String entrada)
+    private void firstParse(String input)
     {
-        String[] tokenized = parser(entrada);
-		if (tokenized.length > 0) {
-			switch (tokenized[0]) {
-			case "prod":
-				productCommand.eval(tokenized, userManager, inventory);
-				break;
-			case "ticket":
-				ticketCommand.eval(tokenized, userManager, inventory);
-				break;
-			case "echo":
-                if (tokenized.length > 1)
-				    echo(tokenized[1]);
-                else
-                    echo(""); // This would cause echo to print out an error
-				break;
-			case "help":
-				help ();
-				break;
-			case null: default:
-				System.err.println("Command not recognized");
-				break;
-			}
-		} else {
-			System.out.println("command: error: expected at least one argument");
+        String[] params = parser(input);
+		if (!Utils.checkMinArgsCountWithPrint("all", params.length, 1)) return;
+		
+		switch (params[0].toLowerCase()) {
+		case "prod"   -> productCommand.eval(params, userManager, inventory);
+		case "ticket" -> ticketCommand.eval(params, userManager, inventory);
+		case "echo"   -> echo(params);
+		case "help"   -> help();
+		default       -> System.out.println("all: error: command not recognized. type help to see all commands.");
 		}
     }
 
