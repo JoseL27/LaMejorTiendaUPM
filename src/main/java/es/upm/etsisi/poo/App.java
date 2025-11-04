@@ -29,17 +29,22 @@ public class App {
 		 System.out.println("Welcome to the ticket module App.");
 		 System.out.println("Ticket module. Type 'help' to see commands.");
 
-        String command;
+        String input;
         do {
             System.out.print("tUPM> ");
-            command = sc.nextLine();
-            if (!command.equals("exit")) {
-                firstParse(command);
+            input = sc.nextLine();
+            if (!input.equals("exit")) {
+
+                String[] tokenized = parser(input);
+                Command command = firstParse(tokenized);
+                if (command != null){
+                    command.eval(tokenized, ticket, inventory);
+                }
             } else {
 				System.out.println("Closing application.");
 				System.out.println("Goodbye!");
 			}
-        } while (!command.equals("exit"));
+        } while (!input.equals("exit"));
     }
 
     /**
@@ -148,19 +153,16 @@ public class App {
         System.out.println(".");
     }
 
-    private void firstParse(String entrada)
+    private Command firstParse(String[] tokenized)
     {
-        String[] tokenized = parser(entrada);
+        Command result = null;
 		if (tokenized.length > 0) {
-            Command command;
 			switch (tokenized[0]) {
 			case "prod":
-                command = new ProductCommand();
-                command.eval(tokenized, ticket, inventory);
+                result = new ProductCommand();
 				break;
 			case "ticket":
-                command = new TicketCommand();
-                command.eval(tokenized, ticket, inventory);
+                result = new TicketCommand();
 				break;
 			case "echo":
 				echo ( tokenized[1] );
@@ -175,6 +177,7 @@ public class App {
 		} else {
 			System.out.println("command: error: expected at least one argument");
 		}
+        return result;
     }
 
 }
