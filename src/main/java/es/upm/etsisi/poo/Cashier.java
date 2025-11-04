@@ -21,7 +21,7 @@ public class Cashier extends User {
      * @throws IllegalArgumentException when there is already a cashier with this id or email is not a company email
      * This should receive an already valid id, name and email, so no exception throwing should be needed, remove once the command is implemented
      */
-    public Cashier(String id, String name, String email) throws IllegalArgumentException{
+    public Cashier(String id, String name, String email) throws IllegalArgumentException {
 
         super(id, name, email);
         if (!isCompanyEmail(email)){
@@ -39,15 +39,10 @@ public class Cashier extends User {
     }
 
     /**
-     * Creates a new ticket the id given in the parameter
+     * Creates a new ticket the id given in the parameter.
      */
-    public boolean createTicket(String id){
-        boolean result = true;
-
-        createdTickets.add(new Ticket());
-        // TODO: create ticket with generated id once ticket id is implemented
-        //createdTickets.add(new Ticket(id));
-        return result;
+    public void createTicket(int id){
+        createdTickets.add(new Ticket(id));
     }
 
     /**
@@ -82,6 +77,13 @@ public class Cashier extends User {
      * @return String with format UWnnnnnnn, being n integer digits
      */
     private static String generateId(){
-        return "UW" + (int)(Math.random() * 10000000);
+        return String.format("UW%07d", (int)(Math.random() * 10000000));
     }
+
+	public static boolean isValidId(String id) {
+		return id.length() == 9 
+			&& Character.toUpperCase(id.charAt(0)) == 'U'
+			&& Character.toUpperCase(id.charAt(1)) == 'W'
+			&& (Utils.tryParseInt(id.substring(2)) != null);
+	}
 }

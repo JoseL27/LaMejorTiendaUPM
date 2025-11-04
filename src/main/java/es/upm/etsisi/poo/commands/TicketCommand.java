@@ -36,18 +36,11 @@ public class TicketCommand implements Command {
 
         // Execute
         switch (subCommand) {
-<<<<<<< Updated upstream
-            case "new"      -> evalNew(params, ticket, inventory);
-            case "add"      -> evalAdd(params, ticket, inventory);
-            case "remove"   -> evalRemove(params, ticket, inventory);
-            case "print"    -> evalPrint(params, ticket, inventory);
-            default         -> System.out.println("ticket: invalid sub command");
-=======
-            case "new"      -> evalNew(params, userManager, inventory);
-            case "add"      -> evalAdd(params, userManager, inventory);
-            case "remove"   -> evalRemove(params, userManager, inventory);
-            case "print"    -> evalPrint(params, userManager, inventory);
->>>>>>> Stashed changes
+            case "new"    -> evalNew(params, userManager, inventory);
+            case "add"    -> evalAdd(params, userManager, inventory);
+            case "remove" -> evalRemove(params, userManager, inventory);
+            case "print"  -> evalPrint(params, userManager, inventory);
+            default       -> System.out.println("ticket: invalid sub command");
         }
     }
 
@@ -72,23 +65,44 @@ public class TicketCommand implements Command {
             return;
 
 		String cashierId = params[params.length - 2];
-		String userId = params[params.length - 1];
+		if (!Cashier.isValidId(cashierId)) {
+			System.out.println(String.format("ticket new: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId));
+			return;
+		}
+		
+		Cashier cashier = userManager.findCashier(cashierId);
+		if (cashier == null) {
+			System.out.println(String.format("ticket new: error: cashier with id '%s' does not found", cashierId));
+			return;
+		}
+
+		String clientId = params[params.length - 1];
+		if (!Client.isValidId(clientId)) {
+			System.out.println(String.format("ticket new: error: invalid client id '%s' expected 8 digits followed by a letter\n", clientId));
+			return;
+		}
+		
+		Client client = userManager.findClient(clientId);
+		if (client == null) {
+			System.out.println(String.format("ticket new: error: client with id '%s' does not found", clientId));
+			return;
+		}
+
+		Integer ticketId = null;
 
 		if (params.length == 5) {
-			Integer ticketId = Utils.tryParseInt(params[2]);
-
-			if (userManager.newTicket(ticketId)) {
-				System.out.println("ticket new: ok");
-			} else {
+			ticketId = Utils.tryParseInt(params[2]);
+			if (!userManager.isTicketIdUnique(ticketId)) {
 				System.out.println("ticket new: id allready exists");
+				return;
 			}
 		} else {
-			if (userManager.newTicket()) {
-				System.out.println("ticket new: ok");
-			} else {
-				System.out.println("ticket new: unexpected error");
-			}
+			ticketId = userManager.generateUniqueTicketId();
 		}
+
+		cashier.createTicket(ticketId);
+		client.addTicket(ticketId);
+		System.out.println("ticket new: ok");
     }
 
     /**
@@ -126,15 +140,6 @@ public class TicketCommand implements Command {
         //     return;
         // }
 
-<<<<<<< Updated upstream
-        // Execute
-        if (!Inventory.isValidId(productId)) { // Use the one from DataManager when it is public
-            System.out.printf("ticket add: error: expected id greater or equal than zero\n");
-        } else if (!isValidAmount(quantity)) {
-            System.out.printf("ticket add: error: expected amount between %d and %d\n", 1, Ticket.TICKET_MAX_PRODUCTS);
-        } else {
-            Product productToAdd = inventory.readProduct(productId);
-=======
         // // Execute
         // if (!Inventory.isValidId(productId)) { // Use the one from DataManager when it is public
         //     System.out.printf("ticket add: error: expected id greater or equal than zero\n");
@@ -142,8 +147,6 @@ public class TicketCommand implements Command {
         //     System.out.printf("ticket add: error: expected amount greater or equal than zero\n");
         // } else {
         //     Product productToAdd = inventory.readProduct(productId);
->>>>>>> Stashed changes
-
         //     if (productToAdd == null) {
         //         System.out.printf("ticket add: error: product with id %d not found\n", productId);
         //     } else if (!userManager.addProduct(productToAdd, quantity)) {

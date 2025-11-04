@@ -1,15 +1,15 @@
 package es.upm.etsisi.poo;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 /**
  * Ticket class to manage an application ticket which consists of a product list with amounts.
- * 
- * @author Enrique Rocha - 03/10
  * @see Product
  */
 public class Ticket {
-
+	
 	/**
 	 * ProductInfo struct-like holder as a Product-amount pair.
 	 * Has basic constructors and getters.
@@ -17,27 +17,23 @@ public class Ticket {
 	 */
 	private class ProductInfo implements Comparable<ProductInfo> {
 		private Product product;
-		private int amount;
+		private String[] personalizations;
 
-		public ProductInfo(Product product, int amount) {
+		public ProductInfo(Product product) {
 			this.product = product;
-			this.amount = amount;
+		}
+		
+		public ProductInfo(Product product, String[] personalizations) {
+			this.product = product;
+			this.personalizations = personalizations;
 		}
 
 		public Product getProduct() { 
 			return this.product;
 		}
 		
-		public int getAmount() { 
-			return this.amount;
-		}
-
-		public void setProduct(Product product) { 
-			this.product = product;
-		}
-		
-		public void incrementAmount(int increment) { 
-			this.amount += increment;
+		public String[] getPersonalizations() { 
+			return this.personalizations;
 		}
 
 		/**
@@ -48,24 +44,6 @@ public class Ticket {
 		@Override
 		public int compareTo(ProductInfo other) {
 			return this.product.getName().compareTo(other.product.getName());
-		}
-
-		/**
-		 * Checks if this is equal to another object, that has to be a ProductInfo based on the amount and Product.equals()
-		 * @param obj Object to be compared to
-		 * @return true, if both objects are equal under this criteria, false in other case
-		 */
-		@Override
-		public boolean equals(Object obj){
-			boolean result = false;
-
-			if (obj != null && obj.getClass() == this.getClass()){
-				ProductInfo otherProduct = (ProductInfo) obj;
-				result = otherProduct.product.equals(this.product)
-						&& otherProduct.amount == this.amount;
-			}
-
-			return result;
 		}
 	}
 
@@ -81,30 +59,76 @@ public class Ticket {
 	private ProductInfo[] productInfos;
 
 	/**
-	 * The count of product infos to manage the static array.
+	 * The count of products.
 	 */
 	private int count;
-    /**
-     * The total number of items in the Ticket
-     */
-    private int numTotal;
+
+	private int id;
+
+	private Date dateOpened;
+	
+	private Date dateClosed;
+	
+	private boolean isOpen;
+
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("YY-MM-dd-HH:mm");
+
 	/**
-	 * Basic constructor
+	 * Constructor with the id.
+	 * To create a ticket with a "random id" use randomId function
+	 * then check if the id is unique in the store and create it using this constructor.
 	 */
-	public Ticket() {
-		reset();
+	public Ticket(int id) {
+		this.id = id;
+		this.isOpen = false;
+		this.dateOpened = new Date();
+		resetProductInfos();
+	}
+
+	public int getCount() {
+		return this.count;
+	}
+
+	public int getId() {
+		return this.id;
+	}
+	
+	public Date getDateOpened() {
+		return this.dateOpened;
+	}
+	
+	public Date getDateClosed() {
+		return this.dateClosed;
+	}
+
+	public String getComposedId() {
+		return String.format("%s-%s-%s", dateOpened.toString(), id, dateClosed.toString());
+	}
+
+	public boolean getIsOpened() {
+		return this.isOpen;
+	}
+
+	public boolean isEmpty() {
+		return (this.count == 0);
 	}
 
 	/**
 	 * Resets the Ticket resources
 	 */
-	public void reset() {
+	public void resetProductInfos() {
 		productInfos = new ProductInfo[TICKET_MAX_PRODUCTS];
 		count = 0;
-        numTotal = 0;
+	}
+
+	public void close() {
+		this.isOpen = false;
+	}
+
+	public static int randomId() {
+		return (int)(Math.random() * (double)Integer.MAX_VALUE);		
 	}
 	
-
 	/**
 	 * Adds a product asociated to an amount to the ticket. Too things may happen:
 	 * Checks if the product allready exists 
@@ -120,20 +144,13 @@ public class Ticket {
 	 * @see appendProductInfo
 	 */
 	public boolean addProduct(Product product, int amount) {
-		boolean result = false;
+		// ProductInfo foundProductInfo = findProductInfo(product.getId());
 
-		ProductInfo foundProductInfo = findProductInfo(product.getId());
-			if(numTotal+amount<=TICKET_MAX_PRODUCTS){
-                if (foundProductInfo != null) {
-                    foundProductInfo.incrementAmount(amount);
-                    result = true;
-
-                } else {
-                    result = appendProductInfo(new ProductInfo(product, amount));
-                }
-                if(result) numTotal+=amount;
-            }
-		return result;
+		// if(amount <= TICKET_MAX_PRODUCTS) {
+		// 	return appendProductInfo(new ProductInfo(product, amount));
+		// }
+		
+		return false;
 	}
 
 	/**
@@ -149,16 +166,16 @@ public class Ticket {
 	 * sorts the products array
 	 */
 	public Product removeProduct(int id) {
-		int foundIndex = productInfoIndex(id);
+		// int foundIndex = productInfoIndex(id);
 		
-		if (foundIndex != -1) {
-			Product removed = productInfos[foundIndex].getProduct();
-            numTotal -= productInfos[foundIndex].getAmount();
-			productInfos[foundIndex] = productInfos[count - 1];
-			productInfos[count - 1]	= null;
-			count--;
-			return removed;
-		}
+		// if (foundIndex != -1) {
+		// 	Product removed = productInfos[foundIndex].getProduct();
+        //     numTotal -= productInfos[foundIndex].getAmount();
+		// 	productInfos[foundIndex] = productInfos[count - 1];
+		// 	productInfos[count - 1]	= null;
+		// 	count--;
+		// 	return removed;
+		// }
 		
 		return null;
 	}
@@ -224,12 +241,12 @@ public class Ticket {
 	 */
 	private int getOccurrences(BaseProduct.Category category){
 		int result = 0;
-		for (int i = 0; i < count; i++) {
-            BaseProduct p=(BaseProduct)productInfos[i].getProduct();
-			if (category.equals(p.getCategory())){
-				result += productInfos[i].getAmount();
-			}
-		}
+		// for (int i = 0; i < count; i++) {
+        //     BaseProduct p=(BaseProduct)productInfos[i].getProduct();
+		// 	if (category.equals(p.getCategory())){
+		// 		result += productInfos[i];
+		// 	}
+		// }
 		return result;
 	}
 
