@@ -13,9 +13,10 @@
    - Jinxian lo revisa
  - [x] (JOSE)    Crear clase Cashier y manejar Ticket's
  - [ ] (JOSE)    Cambiar app para que se use la interfaz command en vez de una variable de cada comando
-   - Crear UserManager y manejar Clients y Cashiers
-   - Crear CashCommand
-   - Crear ClientCommand
+   - [ ] (JINXIAN) Crear UserManager y manejar Clients y Cashiers
+   - [ ] (JULIO)Crear CashCommand
+   - [ ] (ANDRES)Crear ClientCommand
+ -(JOSE y ENRIQUE) Debug y que funcione todo
 
 ## Como hacer una tarea
 1. Programar
