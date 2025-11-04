@@ -6,7 +6,7 @@ public class TimedProduct extends Product {
     private int people;
 
     public TimedProduct(int id, String name, double price, int people, TimedType type) {
-        super(id, name, price * people);
+        super(id, name, price * people); // EL precio de la reunión depende del número de individuos
         this.type = type;
         this.people = people;
     }
