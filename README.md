@@ -1,22 +1,17 @@
 # La Mejor Tienda UPM 
 
-## Tareas - Refactor E1
- - [x] (ENRIQUE)  28/10 Terminar UML.
- - [x] (ANDRES)   28/10 Cambiar Parser main; Cambiar commandos Help y Exit App; Llamadas de commandos a App.
- - [x] (JIN XIAN) 02/10 Cambiar arquitectura de commandos (interfaz y juntar parseo y ejecucion), borrar Product.Field.
- - [x] (JOSE)     28/10 Cambiar nombre ArrayDataManager -> Inventory; borrar ParseResult del codigo.
- 
 ## Tareas - E2
  - [x] (JULIO)   Crear BaseProduct y TimedProduct como hijos de Product; Crear enum TimedType; Adicionar boolean personalizable.
  - [ ] (ENRIQUE) Adicionar boolean abierto/cerrado a Ticket; ProductInfo ahora representa un producto con personalizables.
- - [ ] (ANDRES)  Crear clase Client
+ - [x] (ANDRES)  Crear clase Client
    - Jinxian lo revisa
  - [x] (JOSE)    Crear clase Cashier y manejar Ticket's
- - [ ] (JOSE)    Cambiar app para que se use la interfaz command en vez de una variable de cada comando
+ - [x] (JOSE)    Cambiar app para que se use la interfaz command en vez de una variable de cada comando
    - [ ] (JINXIAN) Crear UserManager y manejar Clients y Cashiers
    - [ ] (JULIO)Crear CashCommand
    - [ ] (ANDRES)Crear ClientCommand
- -(JOSE y ENRIQUE) Debug y que funcione todo
+-(JOSE y ENRIQUE) Debug y que funcione todo
+-Escribir tests para lo nuevo de E2
 
 ## Como hacer una tarea
 1. Programar
