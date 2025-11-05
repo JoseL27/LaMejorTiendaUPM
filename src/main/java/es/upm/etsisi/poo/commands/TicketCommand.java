@@ -1,6 +1,7 @@
 package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.*;
+import java.util.Arrays;
 
 /**
  * Represents a command that falls under the ticket category, being those:
@@ -29,13 +30,10 @@ public class TicketCommand implements Command {
      */
     public void eval(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
-        if (!Utils.checkArgsCountWithPrint("ticket", params.length, 2, 4)) return;
-
-        String subCommand = params[1];
-        subCommand = subCommand.toLowerCase();
+        if (!Utils.checkMinArgsCountWithPrint("ticket", params.length, 2)) return;
 
         // Execute
-        switch (subCommand) {
+        switch (params[1].toLowerCase()) {
             case "new"    -> evalNew(params, userManager, inventory);
             case "add"    -> evalAdd(params, userManager, inventory);
             case "remove" -> evalRemove(params, userManager, inventory);
@@ -66,25 +64,26 @@ public class TicketCommand implements Command {
 
 		String cashierId = params[params.length - 2];
 		if (!Cashier.isValidId(cashierId)) {
-			System.out.println(String.format("ticket new: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId));
+			System.out.printf("ticket new: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId);
 			return;
 		}
 		
-		Cashier cashier = userManager.findCashier(cashierId);
-		if (cashier == null) {
-			System.out.println(String.format("ticket new: error: cashier with id '%s' does not found", cashierId));
+		String clientId = params[params.length - 1];
+		if (!Client.isValidId(clientId)) {
+			System.out.printf("ticket new: error: invalid client id '%s' expected 8 digits followed by a letter\n", clientId);
 			return;
 		}
 
-		String clientId = params[params.length - 1];
-		if (!Client.isValidId(clientId)) {
-			System.out.println(String.format("ticket new: error: invalid client id '%s' expected 8 digits followed by a letter\n", clientId));
+		// Execution
+		Cashier cashier = userManager.findCashier(cashierId);
+		if (cashier == null) {
+			System.out.printf("ticket new: error: cashier with id '%s' does not found", cashierId);
 			return;
 		}
 		
 		Client client = userManager.findClient(clientId);
 		if (client == null) {
-			System.out.println(String.format("ticket new: error: client with id '%s' does not found", clientId));
+			System.out.printf("ticket new: error: client with id '%s' does not found", clientId);
 			return;
 		}
 
@@ -92,6 +91,16 @@ public class TicketCommand implements Command {
 
 		if (params.length == 5) {
 			ticketId = Utils.tryParseInt(params[2]);
+			if (ticketId == null) {
+				Utils.printInvalidDataType("ticket new", "integer", params[2]);
+				return;
+			}
+			
+			if (!Ticket.isValidId(ticketId)) {
+				System.out.printf("ticket new: error: ticket id '%s' is invalid, expected a 5 digit number\n", ticketId);
+				return;
+			}
+			
 			if (!userManager.isTicketIdUnique(ticketId)) {
 				System.out.println("ticket new: id allready exists");
 				return;
@@ -124,40 +133,74 @@ public class TicketCommand implements Command {
      * @return SUCCESS, if the product is added correctly, or the corresponding error if not
      */
     private void evalAdd(String[] params, UserManager userManager, Inventory inventory) {
-        // // Parse
-        // if (!Utils.checkArgsCountWithPrint("ticket add", params.length, 4))
-        //     return;
+        // Parse
+        if (!Utils.checkMinArgsCountWithPrint("ticket add", params.length, 4))
+            return;
 
-        // Integer productId = Utils.tryParseInt(params[2]);
-        // if (productId == null) {
-        //     Utils.printInvalidDataType("ticket add", "integer", params[2]);
-        //     return;
-        // }
+        Integer ticketId = Utils.tryParseInt(params[2]);
+        if (ticketId == null) {
+            Utils.printInvalidDataType("ticket add", "integer", params[2]);
+            return;
+        }
 
-        // Integer quantity = Utils.tryParseInt(params[3]);
-        // if (quantity == null) {
-        //     Utils.printInvalidDataType("ticket add", "integer", params[3]);
-        //     return;
-        // }
+		String cashierId = params[3];
+		if (!Cashier.isValidId(cashierId)) {
+			System.out.printf("ticket new: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId);
+			return;
+		}
+		
+        Integer productId = Utils.tryParseInt(params[4]);
+        if (productId == null) {
+            Utils.printInvalidDataType("ticket add", "integer", params[4]);
+            return;
+        }
 
-        // // Execute
-        // if (!Inventory.isValidId(productId)) { // Use the one from DataManager when it is public
-        //     System.out.printf("ticket add: error: expected id greater or equal than zero\n");
-        // } else if (!isValidAmount(quantity)) {
-        //     System.out.printf("ticket add: error: expected amount greater or equal than zero\n");
-        // } else {
-        //     Product productToAdd = inventory.readProduct(productId);
-        //     if (productToAdd == null) {
-        //         System.out.printf("ticket add: error: product with id %d not found\n", productId);
-        //     } else if (!userManager.addProduct(productToAdd, quantity)) {
-        //         System.out.printf("ticket add: error: ticket is full (100 items max)\n");
-        //     } else {
-        //         System.out.println(userManager.summaryString());
-        //         System.out.println("ticket add: ok");
-        //     }
-        // }
+        Integer amount = Utils.tryParseInt(params[5]);
+        if (amount == null) {
+            Utils.printInvalidDataType("ticket add", "integer", params[5]);
+            return;
+        }
 
-		System.out.println("ProductCommand.evalAdd: NOT IMPLEMENTED");
+		String[] personalizations = parsePersonalizations(6, params);
+        if (params.length > 6 && personalizations == null) {
+            return;
+		}
+
+        // Execute
+		if (!Ticket.isValidId(ticketId)) {
+			System.out.printf("ticket add: error: ticket id '%d' is invalid, expected a 5 digit number\n", ticketId);
+			return;
+		}
+			
+		if (!Inventory.isValidId(productId)) {
+			System.out.printf("ticket add: error: expected id greater or equal than zero\n");
+			return;
+		}
+		
+		Product productToAdd = inventory.readProduct(productId);
+		if (productToAdd == null) {
+			System.out.printf("ticket add: error: could not find product with id %s\n", productId);
+			return;
+		}
+
+		Cashier cashier = userManager.findCashier(cashierId);
+		if (cashier == null) {
+			System.out.printf("ticket new: error: cashier with id '%s' does not found", cashierId);
+			return;
+		}
+
+		Ticket ticket = cashier.findTicket(ticketId);
+		if (ticket == null) {
+			System.out.printf("ticket add: error: ticket with id '%d' not found in cashier with id '%s'\n", ticketId, cashierId);
+			return;
+		}
+
+		if (ticket.addProduct(productToAdd, amount, personalizations)) {
+			System.out.println(ticket.summaryString());
+			System.out.println("ticket add: ok");
+		} else {
+			System.out.printf("ticket add: error: failed to add product\n");
+		}
     }
 
     /**
@@ -232,7 +275,12 @@ public class TicketCommand implements Command {
         System.out.println("TicketCommand.evalList() NOT IMPLEMENTED");
     }
 
-    private boolean isValidAmount(int quantity) {
-        return quantity > 0 && quantity <= Ticket.TICKET_MAX_PRODUCTS;
+    private boolean isValidAmount(int amount) {
+        return amount > 0 && amount <= Ticket.MAX_PRODUCTS;
     }
+
+	private String[] parsePersonalizations(int beginIndex, String[] params) {
+		System.out.println("TicketCommand.parsePersonalizations: UNIMPLEMENTED");
+		return null;
+	}
 }

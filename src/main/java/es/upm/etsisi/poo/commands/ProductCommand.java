@@ -14,14 +14,15 @@ import es.upm.etsisi.poo.*;
 public class ProductCommand implements Command {
 	@Override
 	public void eval(String[] args, UserManager userManager, Inventory inventory) {
-		if (!Utils.checkArgsCountWithPrint("prod", args.length, 2, 6)) return;
+		if (!Utils.checkArgsCountWithPrint("prod", args.length, 2, 7)) return;
 
 		switch (args[1].toLowerCase()) {
-		case "add"	  -> evalAdd(args, userManager, inventory);
+		case "addFood", "addMeeting" -> evalAddTimed(args, userManager, inventory);
+		case "add"	  -> evalAddBase(args, userManager, inventory);
 		case "list"	  -> evalList(args, userManager, inventory);
 		case "update" -> evalUpdate(args, userManager, inventory);
 		case "remove" -> evalRemove(args, userManager, inventory);
-		default -> System.out.println("prod: invalid sub command");
+		default       -> System.out.println("prod: invalid sub command");
 		}
 	}
 
@@ -29,35 +30,68 @@ public class ProductCommand implements Command {
 	/**
 	 * Parses the 'add' variation of the 'product' command.
 	 * The function parses each field sequentially and short circuits if any fail.
-	 * FORMAT: prod add <id> "<nombre>" <categoria> <precio>
+	 * FORMAT: prod add [<id>] "<name>" <category> <price> [<maxPers>]
 	 * @param parser The stream of tokens to parse
 	 * @return       The result of the parse. If every parse succedes a valid ProductCommand Add instance
 	 *               specifiying productId, productName, productCategory and productPrice,
 	 *               or null if it fails
 	 */	
-	public void evalAdd(String[] params, UserManager userManager, Inventory inventory) {
-		if (!Utils.checkArgsCountWithPrint("prod add", params.length, 6)) return;
+	public void evalAddBase(String[] params, UserManager userManager, Inventory inventory) {
+		// Parse
+		if (!Utils.checkArgsCountWithPrint("prod add", params.length, 5, 7)) return;
+		
+		// NOTE(enrique): Index to consume while parsing
+		int parseIndex = 2; 
 
- 		Integer productId = Utils.tryParseInt(params[2]);
+		String productIdOrName = params[parseIndex++];
+		String productName = null;
+ 		Integer productId = Utils.tryParseInt(productIdOrName);
+		
+		// NOTE(enrique): Check the 3rd argument:
+		//  - If parsing the int succeeds then we assume its the ID and the next token is the name string (advance parsing)
+		//  - If it fails then we assume its the name and no ID was supplied (dont advance parsing), next token is the category
 		if (productId == null) {
-			Utils.printInvalidDataType("prod add", "integer", params[2]);
-			return;
+			productName = productIdOrName;
+		} else {
+			productName = params[parseIndex++];
 		}
 
-		String productName = params[3];
-		BaseProduct.Category productCategory = BaseProduct.Category.fromLabel(params[4]);
+		String productCategoryString = params[parseIndex++];
+		BaseProduct.Category productCategory = BaseProduct.Category.fromLabel(productCategoryString);
 		if (productCategory == null) {
-			Utils.printInvalidEnum("prod add", "category", params[4], BaseProduct.Category.values());
+			Utils.printInvalidEnum("prod add", "category", productCategoryString, BaseProduct.Category.values());
 			return;
 		}
 
- 		Integer productPrice = Utils.tryParseInt(params[5]);
+		String productPriceString = params[parseIndex++];
+ 		Integer productPrice = Utils.tryParseInt(productPriceString);
 		if (productPrice == null){
-			Utils.printInvalidDataType("prod add", "integer", params[5]);
+			Utils.printInvalidDataType("prod add", "integer", productPriceString);
 			return;
 		}
 
-		Product createdProduct = inventory.createProduct(productId, productName, productCategory, productPrice);		
+		Integer productMaxPers = productCategory.getMaxPersonalizations();
+		if (parseIndex < params.length) {
+			String productMaxPersString = params[parseIndex++];
+			productMaxPers = Utils.tryParseInt(productMaxPersString);
+			if (productMaxPers == null){
+				Utils.printInvalidDataType("prod add", "integer", productMaxPersString);
+				return;
+			}
+		}
+		
+		// Execute
+		if (productMaxPers != null && productMaxPers > productCategory.getMaxPersonalizations()) {
+			System.out.printf("prod add: error: category %s only allows a max of %d personalizations, got %d\n",
+							  productCategory, productCategory.getMaxPersonalizations(), productMaxPers);
+			return;
+		}
+
+		if (productId == null) {
+			productId = inventory.generateUniqueProductId();
+		}
+		
+		BaseProduct createdProduct = inventory.createBaseProduct(productId, productName, productCategory, productPrice, productMaxPers);
 		if (createdProduct != null) {
 			System.out.println(createdProduct);
 			System.out.println("prod add: ok");
@@ -65,6 +99,11 @@ public class ProductCommand implements Command {
 			System.out.println("prod add: error: unexpected error");
 		}
 	}
+
+	public void evalAddTimed(String[] params, UserManager userManager, Inventory inventory) {
+		System.out.println("ProductCommand.evalAddTimed: NOT IMPLEMENTED");
+	}
+	
 	
 	/**
 	 * Parses the 'update' variation of the 'product' command.
