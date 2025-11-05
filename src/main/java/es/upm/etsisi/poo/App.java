@@ -1,6 +1,7 @@
 package es.upm.etsisi.poo;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.Locale;
 import es.upm.etsisi.poo.commands.ProductCommand;
@@ -58,15 +59,20 @@ public class App {
     public static void main(String[] args) {
         App app = new App();
         Scanner sc;
+		
         if (args.length == 0) {
             sc = new Scanner(System.in);
             app.run(sc);
         } else {
+			
+			String fileName = args[0];
             try {
-                sc = new Scanner(new File(args[0]));
+                sc = new Scanner(new File(fileName));
                 app.run(sc);
+			} catch (FileNotFoundException e) {
+				System.out.printf("error: file '%s' not found\n", fileName);
             } catch (Exception e) {
-                System.out.println("Error al leer");
+				throw e;
             }
         }
     }
