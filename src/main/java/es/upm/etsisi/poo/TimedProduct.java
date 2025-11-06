@@ -2,7 +2,7 @@ package es.upm.etsisi.poo;
 
 public class TimedProduct extends Product {
     private static TimedType type;
-    private final int MAX_PEOPLE = 100;
+    private static final int MAX_PEOPLE = 100;
     private int people;
 
     // It is assumed that all the parameters are valid, this should be handled before creating the object
