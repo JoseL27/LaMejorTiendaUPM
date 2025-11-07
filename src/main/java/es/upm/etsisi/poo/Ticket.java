@@ -15,7 +15,7 @@ public class Ticket {
 	public static final int MAX_PRODUCTS = 100;
 
 	/**
-	 * The percent cost added to the price of an item per personalization
+	 * The percent cost added to the price of an item per personalization’
 	 */
 	public static final float PERSONALIZATION_EXTRA_PERCENT = 0.1f;
 
@@ -30,11 +30,6 @@ public class Ticket {
 	 */
 	private ProductInfo[] productInfos;
 
-	/**
-	 * The summed amount of all product infos.
-	 */
-	private int totalAmount;
-	
 	/**
 	 * The count of product infos in the productInfos array.
 	 */
@@ -99,7 +94,6 @@ public class Ticket {
 	 * Resets the Ticket resources
 	 */
 	public void resetProductInfos() {
-		this.totalAmount = 0;
 		this.count = 0;
 		this.productInfos = new ProductInfo[MAX_PRODUCTS];
 	}
@@ -135,16 +129,38 @@ public class Ticket {
 	 * @see appendProductInfo
 	 */
 	public boolean addProduct(Product product, int amount, String[] personalizations) {
-		ProductInfo newProductInfo = new ProductInfo(product, amount, personalizations);
-		ProductInfo duplicate = findDuplicateProductInfo(newProductInfo);
-		
+		ProductInfo newProductInfo = new ProductInfo(product, personalizations);
+
 		boolean result = false;
-		if (duplicate != null) {
-			duplicate.incrementAmount(amount);
+		if (product instanceof BaseProduct) {
+			int amountIndex = 0;
 			result = true;
-		} else {
-			result = appendProductInfo(newProductInfo);
+			while (result && amountIndex < amount) {
+				result = appendProductInfo(newProductInfo);
+				amountIndex++;
+			}
+			
+		} else if (product instanceof TimedProduct) {
+
+			boolean found = false;
+			int productIndex = 0;
+			while (!found && productIndex < count) {
+				found = (product.getId() == productInfos[productIndex].getProduct().getId());
+				productIndex++;				
+			}
+			
+			if (!found) {
+				TimedProduct timedProduct = (TimedProduct)product;
+
+				if (amount <= timedProduct.getMaxParticipants()) {
+					result = appendProductInfo(newProductInfo);
+					if (result) { 
+						timedProduct.setAmount(amount);
+					}
+				}
+			}
 		}
+		
 		return result;
 	}
 
@@ -170,7 +186,6 @@ public class Ticket {
 			// NOTE(enrique): Unoredered Remove.
 			// Swap with the last element and remove the last element avoids moving elements.
 			Product removed = productInfos[foundIndex].getProduct();
-            totalAmount -= productInfos[foundIndex].getAmount();
 			productInfos[foundIndex] = productInfos[count - 1];
 			productInfos[count - 1]	= null;
 			count--;
@@ -197,7 +212,7 @@ public class Ticket {
 			if (prod instanceof BaseProduct) {
 				BaseProduct baseProduct = (BaseProduct)prod;
 				int categoryIndex = (int)baseProduct.getCategory().ordinal();
-				categoriesProductCount[categoryIndex] += info.getAmount();
+				categoriesProductCount[categoryIndex]++;
 			}
 		}
 
@@ -219,8 +234,7 @@ public class Ticket {
 	 * Total discount: 6.0
 	 * Final Price: 54.0
 	*/
-	public String summaryString()
-	{
+	public String summaryString() {
 		StringBuilder sb = new StringBuilder();
 
 		double totalPrice = 0;
@@ -234,43 +248,44 @@ public class Ticket {
 		int[] categoriesCount = categoriesProductCount();
 
 		for (int productInfoIndex = 0; productInfoIndex < count; productInfoIndex++) {
+
 			ProductInfo productInfo = productInfos[productInfoIndex];
 			Product product = productInfo.getProduct();
-			int amount = productInfo.getAmount();
 
-			double multipliedPrice = product.getMultipliedPrice(amount);
+			double multipliedPrice = 0;
+
+			sb.append(product.toString());
 
 			int personalizationCount = productInfo.getPersonalizations() != null 
 				? productInfo.getPersonalizations().length : 0;
 			double persExtra = multipliedPrice * PERSONALIZATION_EXTRA_PERCENT * personalizationCount;
 
-			// NOTE(enrique): Think of a more OOP way to do this.
-			boolean hasDiscount = false;
 			if (product instanceof BaseProduct) {
 				BaseProduct baseProduct = (BaseProduct)product;
+
+				multipliedPrice = baseProduct.getPrice();
 				int categoryIndex = (int)baseProduct.getCategory().ordinal();
-				hasDiscount = (categoriesCount[categoryIndex]) > 1;
-			}
+				boolean hasDiscount = (categoriesCount[categoryIndex]) > 1;
 
-			double discountPercent = (hasDiscount) ? product.getAvailableDiscountPercent() : 0; 
-			double discount = discountPercent * multipliedPrice * amount;
-
-			String discountPostfix = (hasDiscount) ? String.format("**discount -%.1f", (float)discount) : "";
-			if (product.canDuplicate()) {
-				for (int i = 0; i < amount; i++) {
-					sb.append(product.toString());
-					sb.append(discountPostfix);
-					sb.append("\n");
+				if (hasDiscount) {
+					double discountPercent = baseProduct.getCategory().getDiscountPercent(); 
+					double discount = discountPercent * multipliedPrice;
+					totalDiscount += discount;
+					sb.append(String.format(" **discount -%.1f", (float)discount));
 				}
-			} else {
-				sb.append(product.toString());
-				sb.append(discountPostfix);
-				sb.append("\n");
+				
+			} else if (product instanceof TimedProduct) {
+				TimedProduct timedProduct = (TimedProduct)product;
+				multipliedPrice = timedProduct.getPrice() * timedProduct.getAmount();
 			}
+
+			if ((int)persExtra != 0) { 
+				sb.append(String.format(" **pers extra -%.1f", (float)persExtra));
+			}
+			sb.append("\n");
 
 			totalPrice += multipliedPrice;
 			totalPersExtra += persExtra;
-			totalDiscount += discount;
 		}
 
 		double finalPrice = (totalPrice - totalDiscount + totalPersExtra);
@@ -315,11 +330,33 @@ public class Ticket {
 	 */
 	private boolean appendProductInfo(ProductInfo productInfo) {
 		boolean result = false;
-		if (totalAmount + productInfo.getAmount() <= MAX_PRODUCTS) {
-			productInfos[count++] = productInfo;
-			totalAmount += productInfo.getAmount();
+		if (count + 1 <= MAX_PRODUCTS) {
+			productInfos[count] = productInfo;
+			count++;
 			result = true;
 		}
 		return result;
+	}
+
+	public static void main(String[] args) {
+		Ticket ticket = new Ticket(0);
+
+		BaseProduct book = new BaseProduct(0, "book", 20, BaseProduct.Category.BOOK, 0);
+		int amount = 2;
+		ticket.addProduct(book, amount, null);
+		ticket.addProduct(book, amount, null);
+		ticket.addProduct(book, amount, null);
+		ticket.addProduct(book, amount, null);
+		ticket.addProduct(book, amount, null);
+
+
+		TimedProduct food = new TimedProduct(1, "food", 10, 30, TimedProduct.TimedType.FOOD);
+		amount = 20;
+		ticket.addProduct(food, amount, null);
+		ticket.addProduct(food, amount, null);
+		ticket.addProduct(food, amount, null);
+		ticket.addProduct(food, amount, null);
+
+		System.out.println(ticket.summaryString());
 	}
 }
