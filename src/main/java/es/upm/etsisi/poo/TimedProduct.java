@@ -17,26 +17,26 @@ public class TimedProduct extends Product {
     private static final int TIMED_PRODUCT_MAX_PEOPLE = 100;
 	
     private TimedType type;
-    private int peopleCount;
+    private int maxParticipants;
 
     // It is assumed that all the parameters are valid, this should be handled before creating the object
-    public TimedProduct(int id, String name, double price, int peopleCount, TimedType type) {
-        super(id, name, price * peopleCount);
+    public TimedProduct(int id, String name, double individualPrice, int maxParticipants, TimedType type) {
+        super(id, name, individualPrice);
         this.type = type;
-        this.peopleCount = peopleCount;
+        this.maxParticipants = maxParticipants;
     }
 
     public TimedType getType() {
         return this.type;
     }
 
-    public int getPeopleCount() {
-        return this.peopleCount;
+    public int getMaxParticipants() {
+        return this.maxParticipants;
     }
 
 	@Override
 	public double getMultipliedPrice(int amount) {
-		return amount * peopleCount * super.getPrice();
+		return amount * maxParticipants * super.getPrice();
 	}
 
 	// NOTE(enrique): A TimedProduct is multiple only of other TimedProduct that don't have the same id as it.
