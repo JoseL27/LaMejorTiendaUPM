@@ -77,13 +77,13 @@ public class TicketCommand implements Command {
 		// Execution
 		Cashier cashier = userManager.findCashier(cashierId);
 		if (cashier == null) {
-			System.out.printf("ticket new: error: cashier with id '%s' does not found", cashierId);
+			System.out.printf("ticket new: error: cashier with id '%s' was not found\n", cashierId);
 			return;
 		}
 		
 		Client client = userManager.findClient(clientId);
 		if (client == null) {
-			System.out.printf("ticket new: error: client with id '%s' does not found", clientId);
+			System.out.printf("ticket new: error: client with id '%s' was not found\n", clientId);
 			return;
 		}
 
@@ -185,7 +185,7 @@ public class TicketCommand implements Command {
 
 		Cashier cashier = userManager.findCashier(cashierId);
 		if (cashier == null) {
-			System.out.printf("ticket new: error: cashier with id '%s' does not found", cashierId);
+			System.out.printf("ticket new: error: cashier with id '%s' was not found\n", cashierId);
 			return;
 		}
 
