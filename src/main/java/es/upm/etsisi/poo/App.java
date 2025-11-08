@@ -37,7 +37,6 @@ public class App {
 		 System.out.println("Ticket module. Type 'help' to see commands.");
 
         String command;
-        String input;
         do {
             System.out.print("tUPM> ");
             command = sc.nextLine();
@@ -165,8 +164,7 @@ public class App {
         System.out.println(".");
     }
 
-    private void firstParse(String input)
-    {
+    private void firstParse(String input) {
         String[] params = parser(input);
 		if (!Utils.checkMinArgsCountWithPrint("all", params.length, 1)) return;
 		
@@ -178,5 +176,4 @@ public class App {
 		default       -> System.out.println("all: error: command not recognized. type help to see all commands.");
 		}
     }
-
 }
