@@ -1,138 +1,166 @@
 package es.upm.etsisi.poo;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 /**
  * Ticket class to manage an application ticket which consists of a product list with amounts.
- * 
- * @author Enrique Rocha - 03/10
  * @see Product
  */
 public class Ticket {
-
-	/**
-	 * ProductInfo struct-like holder as a Product-amount pair.
-	 * Has basic constructors and getters.
-	 * Implements 'Comparable' class to alfabetically order products as in the requirement document.
-	 */
-	private class ProductInfo implements Comparable<ProductInfo> {
-		private Product product;
-		private int amount;
-
-		public ProductInfo(Product product, int amount) {
-			this.product = product;
-			this.amount = amount;
-		}
-
-		public Product getProduct() { 
-			return this.product;
-		}
-		
-		public int getAmount() { 
-			return this.amount;
-		}
-
-		public void setProduct(Product product) { 
-			this.product = product;
-		}
-		
-		public void incrementAmount(int increment) { 
-			this.amount += increment;
-		}
-
-		/**
-		 * Compares this to another ProductInfo based on name only
-		 * @param other the ProductInfo to be compared.
-		 * @return A value less than 0 if this is lesser, 0 if they are equal, and a value greater than if this is greater
-		 */
-		@Override
-		public int compareTo(ProductInfo other) {
-			return this.product.getName().compareTo(other.product.getName());
-		}
-
-		/**
-		 * Checks if this is equal to another object, that has to be a ProductInfo based on the amount and Product.equals()
-		 * @param obj Object to be compared to
-		 * @return true, if both objects are equal under this criteria, false in other case
-		 */
-		@Override
-		public boolean equals(Object obj){
-			boolean result = false;
-
-			if (obj != null && obj.getClass() == this.getClass()){
-				ProductInfo otherProduct = (ProductInfo) obj;
-				result = otherProduct.product.equals(this.product)
-						&& otherProduct.amount == this.amount;
-			}
-
-			return result;
-		}
-	}
-
 	/**
 	 * Max amount of products allowed in the Ticket, as the requirement documents specifies.
 	 */
-	public static final int TICKET_MAX_PRODUCTS = 100;
+	public static final int MAX_PRODUCTS = 100;
+
+	/**
+	 * The percent cost added to the price of an item per personalization’
+	 */
+	public static final float PERSONALIZATION_EXTRA_PERCENT = 0.1f;
+
+	/**
+	 * Date format in which the start and ending dates appear in the string representation of the id
+	 */
+	private static final SimpleDateFormat ID_DATE_FORMAT = new SimpleDateFormat("YY-MM-dd-HH:mm");
 
 	/**
 	 * The current products the ticket holds. static array of products-amount pairs.
-	 * Has a fixed size of 'TICKET_MAX_PRODUCTS' and holds 'count' product infos.
+	 * Has a fixed size of 'MAX_PRODUCTS' and holds 'count' product infos.
 	 */
 	private ProductInfo[] productInfos;
 
 	/**
-	 * The count of product infos to manage the static array.
+	 * The count of product infos in the productInfos array.
 	 */
 	private int count;
-    /**
-     * The total number of items in the Ticket
-     */
-    private int numTotal;
+
 	/**
-	 * Basic constructor
+	 * The number part of the ticket. 5 digit number (between 0 and 99999)
 	 */
-	public Ticket() {
-		reset();
+	private int id;
+
+	/**
+	 * The date in which the Ticket constructor was called.
+	 */
+	private Date dateOpened;
+
+	/**
+	 * The date in which the close() function was called.
+	 */
+	private Date dateClosed;
+
+	private boolean isOpen;
+
+
+	/**
+	 * Constructor with the id.
+	 * To create a ticket with a "random id" use randomId() function
+	 * then check if the id is unique in the store and create it using this constructor.
+	 */
+	public Ticket(int id) {
+		resetProductInfos();
+		this.id = id;
+		this.isOpen = false;
+		this.dateOpened = new Date();
+		this.dateClosed = null;
+	}
+
+	public int getId() {
+		return this.id;
+	}
+	
+	public Date getDateOpened() {
+		return this.dateOpened;
+	}
+	
+	public Date getDateClosed() {
+		return this.dateClosed;
+	}
+
+	public String getComposedId() {
+		return String.format("%s-%s-%s", ID_DATE_FORMAT.format(dateOpened), id, ID_DATE_FORMAT.format(dateClosed));
+	}
+
+	public boolean getIsOpen() {
+		return this.isOpen;
+	}
+
+	public boolean isEmpty() {
+		return (this.count == 0);
 	}
 
 	/**
 	 * Resets the Ticket resources
 	 */
-	public void reset() {
-		productInfos = new ProductInfo[TICKET_MAX_PRODUCTS];
-		count = 0;
-        numTotal = 0;
+	public void resetProductInfos() {
+		this.count = 0;
+		this.productInfos = new ProductInfo[MAX_PRODUCTS];
 	}
-	
+
+	public void close() {
+		if (this.isOpen) { 
+			this.isOpen = false;
+			this.dateClosed = new Date();
+		}
+	}
+
+	public static int randomId() {
+		return (int)(Math.random() * 100000);		
+	}
+
+	public static boolean isValidId(int id) {
+		return id >= 0 && id <= 99999;
+	}
 
 	/**
 	 * Adds a product asociated to an amount to the ticket. Too things may happen:
-	 * Checks if the product allready exists 
-	 *  - If the product does not exist it will be added by appendProductInfo
-	 *    which will check if the current 'count' is less than the 'TICKET_MAX_PRODUCTS'.
+	 *  - If the product does not exist it will be added (as long as there is room)
 	 *  - If the product exists (equality is checked by id) its amount is incremented
+	 *	 
+	 *  Search happens with findDuplicateProductInfo which is not exactly a regular look up. Please take a look.
 	 *
-	 * @param product  the product to add or increment
-	 * @param amount   the amount to increment
-	 * @return         false if the product was attempted to be added and TICKET_MAX_PRODUCTS was hit.
+	 * @param product          the product to add or increment
+	 * @param amount           the amount to increment
+	 * @param personalizations the personalizations of the product
+	 * @return                 false if the product was attempted to be added and MAX_PRODUCTS was hit.
 	 *
-	 * @see findProductInfo
+	 * @see findDuplicateProductInfo
 	 * @see appendProductInfo
 	 */
-	public boolean addProduct(Product product, int amount) {
+	public boolean addProduct(Product product, int amount, String[] personalizations) {
+		ProductInfo newProductInfo = new ProductInfo(product, personalizations);
+
 		boolean result = false;
+		if (product instanceof BaseProduct) {
+			int amountIndex = 0;
+			result = true;
+			while (result && amountIndex < amount) {
+				result = appendProductInfo(newProductInfo);
+				amountIndex++;
+			}
+			
+		} else if (product instanceof TimedProduct) {
 
-		ProductInfo foundProductInfo = findProductInfo(product.getId());
-			if(numTotal+amount<=TICKET_MAX_PRODUCTS){
-                if (foundProductInfo != null) {
-                    foundProductInfo.incrementAmount(amount);
-                    result = true;
+			boolean found = false;
+			int productIndex = 0;
+			while (!found && productIndex < count) {
+				found = (product.getId() == productInfos[productIndex].getProduct().getId());
+				productIndex++;				
+			}
+			
+			if (!found) {
+				TimedProduct timedProduct = (TimedProduct)product;
 
-                } else {
-                    result = appendProductInfo(new ProductInfo(product, amount));
-                }
-                if(result) numTotal+=amount;
-            }
+				if (amount <= timedProduct.getMaxParticipants()) {
+					result = appendProductInfo(newProductInfo);
+					if (result) { 
+						timedProduct.setAmount(amount);
+					}
+				}
+			}
+		}
+		
 		return result;
 	}
 
@@ -144,16 +172,20 @@ public class Ticket {
 	 * 
 	 * @param id  the id of the product to attempt to remove
 	 * @return    the removed product if it was found or null if it wasn't
-	 *
-	 * @note Lookup could be optimized after calling 'printList' which
-	 * sorts the products array
 	 */
 	public Product removeProduct(int id) {
-		int foundIndex = productInfoIndex(id);
-		
+		int foundIndex = -1;
+		int index = 0;
+		while (foundIndex == -1 && index < count) {
+			if (productInfos[index].getProduct().getId() == id) {
+				foundIndex = index;
+			}
+		}
+			
 		if (foundIndex != -1) {
+			// NOTE(enrique): Unoredered Remove.
+			// Swap with the last element and remove the last element avoids moving elements.
 			Product removed = productInfos[foundIndex].getProduct();
-            numTotal -= productInfos[foundIndex].getAmount();
 			productInfos[foundIndex] = productInfos[count - 1];
 			productInfos[count - 1]	= null;
 			count--;
@@ -161,6 +193,30 @@ public class Ticket {
 		}
 		
 		return null;
+	}
+
+	/**
+	 * @return array table of the amount of products in each.
+	 *
+	 * To check the amount of some catagory use category.ordinal() to index the arary.
+	 * E.g. categoriesProductCount[(int)baseProduct.getCategory().ordinal()]
+	 */
+	private int[] categoriesProductCount() {
+		int categoriesCount = BaseProduct.Category.values().length;
+		int[] categoriesProductCount = new int[categoriesCount];
+
+		for (int productInfoIndex = 0; productInfoIndex < count; productInfoIndex++) {
+			ProductInfo info = productInfos[productInfoIndex];
+			Product prod = info.getProduct();
+			// NOTE(enrique): Think of a more OOP way to do this.
+			if (prod instanceof BaseProduct) {
+				BaseProduct baseProduct = (BaseProduct)prod;
+				int categoryIndex = (int)baseProduct.getCategory().ordinal();
+				categoriesProductCount[categoryIndex]++;
+			}
+		}
+
+		return categoriesProductCount;
 	}
 
 
@@ -178,91 +234,91 @@ public class Ticket {
 	 * Total discount: 6.0
 	 * Final Price: 54.0
 	*/
-	public String summaryString()
-	{
+	public String summaryString() {
 		StringBuilder sb = new StringBuilder();
 
 		double totalPrice = 0;
 		double totalDiscount = 0;
-		/**
+		double totalPersExtra = 0;
+		
 		if (count > 0) {
 			Arrays.sort(productInfos, 0, count);
 		}
 
+		int[] categoriesCount = categoriesProductCount();
+
 		for (int productInfoIndex = 0; productInfoIndex < count; productInfoIndex++) {
+
 			ProductInfo productInfo = productInfos[productInfoIndex];
 			Product product = productInfo.getProduct();
-			
-			totalPrice += productInfo.getAmount() * product.getPrice();
 
-			boolean hasDiscount = getOccurrences(BaseProduct.getCategory()) > 1;
+			double multipliedPrice = 0;
 
-			for (int productCounter = 0; productCounter < productInfo.getAmount(); productCounter++) {
-				sb.append(String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}", 
-										product.getId(), product.getName(), BaseProduct.getCategory(), product.getPrice()));
-				
+			sb.append(product.toString());
+
+			int personalizationCount = productInfo.getPersonalizations() != null 
+				? productInfo.getPersonalizations().length : 0;
+			double persExtra = multipliedPrice * PERSONALIZATION_EXTRA_PERCENT * personalizationCount;
+
+			if (product instanceof BaseProduct) {
+				BaseProduct baseProduct = (BaseProduct)product;
+
+				multipliedPrice = baseProduct.getPrice();
+				int categoryIndex = (int)baseProduct.getCategory().ordinal();
+				boolean hasDiscount = (categoriesCount[categoryIndex]) > 1;
+
 				if (hasDiscount) {
-					double productDiscount = product.getPrice() * BaseProduct.getCategory().getDiscountPercent();
-					totalDiscount += productDiscount;
-					sb.append(String.format(" **discount -%.1f", productDiscount));
+					double discountPercent = baseProduct.getCategory().getDiscountPercent(); 
+					double discount = discountPercent * multipliedPrice;
+					totalDiscount += discount;
+					sb.append(String.format(" **discount -%.1f", (float)discount));
 				}
-				sb.append("\n");
+				
+			} else if (product instanceof TimedProduct) {
+				TimedProduct timedProduct = (TimedProduct)product;
+				multipliedPrice = timedProduct.getPrice() * timedProduct.getAmount();
 			}
+
+			if ((int)persExtra != 0) { 
+				sb.append(String.format(" **pers extra -%.1f", (float)persExtra));
+			}
+			sb.append("\n");
+
+			totalPrice += multipliedPrice;
+			totalPersExtra += persExtra;
 		}
-		*/
-		sb.append(String.format("Total price: %.1f\n", (float)totalPrice));
-		sb.append(String.format("Total discount: %.1f\n", (float)totalDiscount));
-		sb.append(String.format("Final Price: %.1f", (float)(totalPrice - totalDiscount)));
+
+		double finalPrice = (totalPrice - totalDiscount + totalPersExtra);
+		
+		sb.append(String.format("Total price: %.1f\n", totalPrice));
+		sb.append(String.format("Total discount: %.1f\n", totalDiscount));
+		sb.append(String.format("Personalization extra: %.1f\n", totalPersExtra));
+		sb.append(String.format("Final Price: %.1f", finalPrice));
 		return sb.toString();
 	}
 
 	/**
-	 * Counts all the occurrences of a category in the ticket.
-	 * A productInfo is considered to have productInfo.getAmount() occurrences
-	 * @param category Category of which the occurrences will be counted
-	 * @return Number of occurrences of the category, if it does not appear, 0 is returned
-	 */
-	private int getOccurrences(BaseProduct.Category category){
-		int result = 0;
-		for (int i = 0; i < count; i++) {
-            BaseProduct p=(BaseProduct)productInfos[i].getProduct();
-			if (category.equals(p.getCategory())){
-				result += productInfos[i].getAmount();
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * Helper to find the index of a product info in the array.
-	 * Standard linear search.
+	 * Searches for a duplicate product info to the product info parameter.
+	 * A duplicate product info constitutes one that has the same 'representation'. Meaning:
+	 *   - A BaseProduct is duplicate of another BaseProduct if it has the same id AND the same personalizations
+	 *   - A TimedProduct is duplicate of another TimedProduct if it has the same id. Meaning you can only add a
+	 *     TimedProduct once to a ticket.
 	 *
-	 * @param id   the id of the product to search for
-	 * @return     the index of the product info in the array or -1 if it wasn't found
+	 * @param productInfo   the product info to search with
+	 * @return              the duplicate product info found or null
 	 */
-	private int productInfoIndex(int id) {
-		int result = -1;
-		int index = 0;
-		while (result == -1 && index < count) {
-			ProductInfo currentProductInfo = productInfos[index];
-			if (currentProductInfo.getProduct().getId() == id) {
-				result = index;
+	private ProductInfo findDuplicateProductInfo(ProductInfo productInfo) {
+		ProductInfo result = null;
+		int productInfoIndex = 0;
+		
+		while (result == null && productInfoIndex < count) {
+			if (productInfo.duplicateOf(productInfos[productInfoIndex])) {
+				result = productInfos[productInfoIndex];
 			}
-			index++;
+			productInfoIndex++;
 		}
+		
 		return result;
-	}
-
-	/**
-	 * Helper to get a productInfo in the product info array.
-	 *
-	 * @param id   the id of the product to search for
-	 * @return     the product info in the array or null if it wasn't found
-	 * @see findProductInfo
-	 */
-	private ProductInfo findProductInfo(int id) {
-		int index = productInfoIndex(id);
-		return (index != -1) ? productInfos[index] : null;
 	}
 
 	/**
@@ -273,29 +329,34 @@ public class Ticket {
 	 * @return              false if 'count == productInfos.length'
 	 */
 	private boolean appendProductInfo(ProductInfo productInfo) {
-		if (count + 1 < productInfos.length) {
+		boolean result = false;
+		if (count + 1 <= MAX_PRODUCTS) {
 			productInfos[count] = productInfo;
 			count++;
-			return true;
+			result = true;
 		}
-		return false;
+		return result;
 	}
 
-	/**
-	 * Checks if this is equal to another object, that has to be a Ticket, based on count and all the productInfos
-	 * @param obj Object to be compared to
-	 * @return true, if both objects are equal under this criteria, false in other case
-	 */
-	@Override
-	public boolean equals(Object obj){
-		boolean result = false;
+	public static void main(String[] args) {
+		Ticket ticket = new Ticket(0);
 
-		if (obj != null && obj.getClass() == this.getClass()){
-			Ticket otherTicket = (Ticket) obj;
-			result = otherTicket.count == this.count
-					&& Arrays.equals(otherTicket.productInfos, this.productInfos);
-		}
+		BaseProduct book = new BaseProduct(0, "book", 20, BaseProduct.Category.BOOK, 0);
+		int amount = 2;
+		ticket.addProduct(book, amount, null);
+		ticket.addProduct(book, amount, null);
+		ticket.addProduct(book, amount, null);
+		ticket.addProduct(book, amount, null);
+		ticket.addProduct(book, amount, null);
 
-		return result;
+
+		TimedProduct food = new TimedProduct(1, "food", 10, 30, TimedProduct.TimedType.FOOD);
+		amount = 20;
+		ticket.addProduct(food, amount, null);
+		ticket.addProduct(food, amount, null);
+		ticket.addProduct(food, amount, null);
+		ticket.addProduct(food, amount, null);
+
+		System.out.println(ticket.summaryString());
 	}
 }

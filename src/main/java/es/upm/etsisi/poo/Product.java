@@ -2,26 +2,18 @@ package es.upm.etsisi.poo;
 
 public abstract class Product {
 
+    public static final int PRODUCT_MAX_NAME_LENGTH = 100; // E1: product name contains no more than 100 characters
+
     public final int id;
     private String name;
     private double price;
 
     // constructor
-    public Product(int id, String name, double price) {
+    protected Product(int id, String name, double price) {
         this.id = id;
         this.name = name;
         this.price = price;
     }
-
-    /**
-     * Checks if this is the same as other product, based on id only
-     *
-     * @param p product to be compared to
-     * @return true, if the products have the same id, false in other case
-     */
-    public boolean equals(Product p) {return this.id == p.id;}
-
-    public double price(int amount) {return this.price * amount;}
 
     public int getId() {return id;}
 
@@ -33,20 +25,9 @@ public abstract class Product {
 
     public void setPrice(double price) {this.price = price;}
 
-    /**
-     * Checks if this is equal to another object, that has to be a Product, based on id, name, category and price
-     *
-     * @param obj Object to be compared to
-     * @return true, if the objects are equals under this criteria, false in other case
-     */
-    @Override
-    public boolean equals(Object obj) {
-        boolean resul;
-        if (obj == null || this.getClass() != obj.getClass()) {resul= false;}
-        else{
-            Product otherProd = (Product) obj;
-            resul= this.id == otherProd.id && this.name.equals(otherProd.name) && this.price == otherProd.price;
-        }
-        return resul;
-    }
+	public double getMultipliedPrice(int amount) {
+		return amount * price;
+	}
+	
+	public abstract boolean duplicateOf(Product product);
 }

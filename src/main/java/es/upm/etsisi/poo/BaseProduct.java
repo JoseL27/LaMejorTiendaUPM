@@ -1,27 +1,28 @@
 package es.upm.etsisi.poo;
 
 public class BaseProduct extends Product {
-    private Category category;
-
     public enum Category {
-        MERCH	   	(0.00f,3 ),
+        MERCH	   	(0.00f, 3),
         STATIONERY 	(0.05f, 0),
         CLOTHES	    (0.07f, 5),
         BOOK	   	(0.10f, 0),
         ELECTRONICS	(0.03f, 2);
 
-        private final float discountPercent;
-        private final int maxCustomizations;
+        public final float discountPercent;
+        public final int maxPersonalizations;
 
-        private Category(float discountPercent, int maxCustomizations) {
+        private Category(float discountPercent, int maxPersonalizations) {
             this.discountPercent = discountPercent;
-            this.maxCustomizations = maxCustomizations;
+            this.maxPersonalizations = maxPersonalizations;
         }
 
         public float getDiscountPercent() {
             return this.discountPercent;
         }
-        public int getMaxCustomizations() {return this.maxCustomizations;}
+		
+        public int getMaxPersonalizations() {
+			return this.maxPersonalizations;
+		}
 
         /**
          * Function use in Parse.
@@ -38,21 +39,40 @@ public class BaseProduct extends Product {
             }
         }
     }
+
+    private Category category;
+	private int maxPersonalizations;
+
+    // It is assumed that all the parameters are valid, this should be handled before creating the object
+    public BaseProduct(int id, String name, double price, Category category, int maxPersonalizations) {
+        super(id, name, price);
+        this.category = category;
+        this.maxPersonalizations = maxPersonalizations;
+    }
+
+	public int getMaxPersonalizations() {
+		return this.maxPersonalizations;
+	}
+
     public Category getCategory() {
         return category;
     }
+	
     public void setCategory(Category category) {
         this.category = category;
     }
-
-    // It is assumed that all the parameters are valid, this should be handled before creating the object
-    public BaseProduct(int id, String name, double price, Category category) {
-        super(id, name, price);
-        this.category = category;
-    }
+	
     @Override
     public String toString() {
-        return String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}",
+        return String.format("{id:%d, name:'%s', category:%s, price:%.1f}",
                 this.id, super.getName(), this.category, super.getPrice());
     }
+
+	// NOTE(enrique): Any BaseProduct is multiple of any product.
+	// Meaning there can be many instances of it in a ticket.
+
+	@Override
+	public boolean duplicateOf(Product product) {
+		return false; 
+	}
 }

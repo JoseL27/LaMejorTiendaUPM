@@ -1,6 +1,7 @@
 package es.upm.etsisi.poo;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.Locale;
 import es.upm.etsisi.poo.commands.ProductCommand;
@@ -9,13 +10,19 @@ import es.upm.etsisi.poo.commands.TicketCommand;
 public class App {
     private Inventory inventory;
     private Ticket ticket;
-
+    private UserManager userManager;
+	
+	private ProductCommand productCommand;
+	private TicketCommand ticketCommand;
+	
     /**
      * Basic constructor
      */
     public App() {
         inventory = new Inventory();
-        ticket = new Ticket();
+		userManager = new UserManager();
+		productCommand = new ProductCommand();
+		ticketCommand = new TicketCommand();
     }
 
     /**
@@ -29,22 +36,17 @@ public class App {
 		 System.out.println("Welcome to the ticket module App.");
 		 System.out.println("Ticket module. Type 'help' to see commands.");
 
-        String input;
+        String command;
         do {
             System.out.print("tUPM> ");
-            input = sc.nextLine();
-            if (!input.equals("exit")) {
-
-                String[] tokenized = parser(input);
-                Command command = firstParse(tokenized);
-                if (command != null){
-                    command.eval(tokenized, ticket, inventory);
-                }
-            } else {
+            command = sc.nextLine();
+            if (!command.equals("exit")) {
+				firstParse(command);
+			} else {
 				System.out.println("Closing application.");
 				System.out.println("Goodbye!");
 			}
-        } while (!input.equals("exit"));
+        } while (!command.equals("exit"));
     }
 
     /**
@@ -57,15 +59,20 @@ public class App {
     public static void main(String[] args) {
         App app = new App();
         Scanner sc;
+		
         if (args.length == 0) {
             sc = new Scanner(System.in);
             app.run(sc);
         } else {
+			
+			String fileName = args[0];
             try {
-                sc = new Scanner(new File(args[0]));
+                sc = new Scanner(new File(fileName));
                 app.run(sc);
+			} catch (FileNotFoundException e) {
+				System.out.printf("error: file '%s' not found\n", fileName);
             } catch (Exception e) {
-                System.out.println("Error al leer");
+				throw e;
             }
         }
     }
@@ -110,16 +117,9 @@ public class App {
         return aux;
     }
 
-    private static void echo(String message) {
-        if ( message.isEmpty () )
-        {
-            System.out.println ( "Error: echo command requires text to echo" );
-        }
-        else
-        {
-            System.out.println ( "echo \"" + message + "\"");
-        }
-		//System.out.printf("echo \"%s\"\n", message); not needed, firstParse calles echo with message as parameter
+    private static void echo(String[] params) {
+		if (!Utils.checkArgsCountWithPrint("echo", params.length, 2)) return;
+		System.out.printf("echo \"%s\"\n", params[1]);
     }
 
     private static void help() {
@@ -164,34 +164,16 @@ public class App {
         System.out.println(".");
     }
 
-    private Command firstParse(String[] tokenized)
-    {
-        Command result = null;
-		if (tokenized.length > 0) {
-			switch (tokenized[0]) {
-			case "prod":
-                result = new ProductCommand();
-				break;
-			case "ticket":
-                result = new TicketCommand();
-				break;
-			case "echo":
-                if (tokenized.length > 1)
-				    echo ( tokenized[1] );
-                else
-                    echo (""); // This would cause echo to print out an error
-				break;
-			case "help":
-				help ();
-				break;
-			case null: default:
-				System.err.println("Command not recognized");
-				break;
-			}
-		} else {
-			System.out.println("command: error: expected at least one argument");
+    private void firstParse(String input) {
+        String[] params = parser(input);
+		if (!Utils.checkMinArgsCountWithPrint("all", params.length, 1)) return;
+		
+		switch (params[0].toLowerCase()) {
+		case "prod"   -> productCommand.eval(params, userManager, inventory);
+		case "ticket" -> ticketCommand.eval(params, userManager, inventory);
+		case "echo"   -> echo(params);
+		case "help"   -> help();
+		default       -> System.out.println("all: error: command not recognized. type help to see all commands.");
 		}
-        return result;
     }
-
 }

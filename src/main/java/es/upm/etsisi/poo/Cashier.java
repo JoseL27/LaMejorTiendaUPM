@@ -18,37 +18,24 @@ public class Cashier extends User {
 
     /**
      * Creates new cashier with the id, name and email given in the parameters
-     * @throws IllegalArgumentException when there is already a cashier with this id or email is not a company email
-     * This should receive an already valid id, name and email, so no exception throwing should be needed, remove once the command is implemented
      */
-    public Cashier(String id, String name, String email) throws IllegalArgumentException{
-
+    public Cashier(String id, String name, String email) {
         super(id, name, email);
-        if (!isCompanyEmail(email)){
-            throw new IllegalArgumentException("Cant create cashier, email " + email + " is not a valid company email");
-        }
-
         createdTickets = new ArrayList<>();
     }
 
     /**
-     * Creates new cashier with the name and email given in the parameters and a randomly generated id
+     * Creates a new ticket the id given in the parameter.
      */
-    public Cashier(String name, String email){
-        this(generateId(), name, email);
+    public boolean createTicket(int id){
+		System.out.println("Cashier.createTicket: NOT IMPLEMENTED");
+		return false;
     }
 
-    /**
-     * Creates a new ticket the id given in the parameter
-     */
-    public boolean createTicket(String id){
-        boolean result = true;
-
-        createdTickets.add(new Ticket());
-        // TODO: create ticket with generated id once ticket id is implemented
-        //createdTickets.add(new Ticket(id));
-        return result;
-    }
+	public Ticket findTicket(int ticketId) {
+		System.out.println("Cashier.findTicket: NOT IMPLEMENTED");
+		return null;
+	}
 
     /**
      * Returns a string representing the tickets created by this cashier
@@ -67,7 +54,7 @@ public class Cashier extends User {
      * Checks if email is a company email
      * @return true if email contains a single @ and COMPANY_DOMAIN after it
      */
-    public boolean isCompanyEmail(String email){
+    public static boolean isCompanyEmail(String email){
         boolean result = true;
         String[] splitEmail = email.split("@");
 
@@ -77,11 +64,10 @@ public class Cashier extends User {
         return result;
     }
 
-    /**
-     * Generates a random cashier id
-     * @return String with format UWnnnnnnn, being n integer digits
-     */
-    private static String generateId(){
-        return "UW" + (int)(Math.random() * 10000000);
-    }
+	public static boolean isValidId(String id) {
+		return id.length() == 9 
+			&& Character.toUpperCase(id.charAt(0)) == 'U'
+			&& Character.toUpperCase(id.charAt(1)) == 'W'
+			&& (Utils.tryParseInt(id.substring(2)) != null);
+	}
 }

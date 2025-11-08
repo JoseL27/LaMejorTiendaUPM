@@ -13,15 +13,16 @@ import es.upm.etsisi.poo.*;
  */
 public class ProductCommand implements Command {
 	@Override
-	public void eval(String[] args, Ticket ticket, Inventory inventory) {
-		if (!Utils.checkArgsCountWithPrint("prod", args.length, 2, 6)) return;
+	public void eval(String[] args, UserManager userManager, Inventory inventory) {
+		if (!Utils.checkArgsCountWithPrint("prod", args.length, 2, 7)) return;
 
 		switch (args[1].toLowerCase()) {
-		case "add"	  -> evalAdd(args, ticket, inventory);
-		case "list"	  -> evalList(args, ticket, inventory);
-		case "update" -> evalUpdate(args, ticket, inventory);
-		case "remove" -> evalRemove(args, ticket, inventory);
-		default -> System.out.println("prod: invalid sub command");
+		case "addFood", "addMeeting" -> evalAddTimed(args, userManager, inventory);
+		case "add"	  -> evalAddBase(args, userManager, inventory);
+		case "list"	  -> evalList(args, userManager, inventory);
+		case "update" -> evalUpdate(args, userManager, inventory);
+		case "remove" -> evalRemove(args, userManager, inventory);
+		default       -> System.out.println("prod: invalid sub command");
 		}
 	}
 
@@ -29,35 +30,68 @@ public class ProductCommand implements Command {
 	/**
 	 * Parses the 'add' variation of the 'product' command.
 	 * The function parses each field sequentially and short circuits if any fail.
-	 * FORMAT: prod add <id> "<nombre>" <categoria> <precio>
+	 * FORMAT: prod add [<id>] "<name>" <category> <price> [<maxPers>]
 	 * @param parser The stream of tokens to parse
 	 * @return       The result of the parse. If every parse succedes a valid ProductCommand Add instance
 	 *               specifiying productId, productName, productCategory and productPrice,
 	 *               or null if it fails
 	 */	
-	public void evalAdd(String[] params, Ticket ticket, Inventory inventory) {
-		if (!Utils.checkArgsCountWithPrint("prod add", params.length, 6)) return;
+	public void evalAddBase(String[] params, UserManager userManager, Inventory inventory) {
+		// Parse
+		if (!Utils.checkArgsCountWithPrint("prod add", params.length, 5, 7)) return;
+		
+		// NOTE(enrique): Index to consume while parsing
+		int parseIndex = 2; 
 
- 		Integer productId = Utils.tryParseInt(params[2]);
+		String productIdOrName = params[parseIndex++];
+		String productName = null;
+ 		Integer productId = Utils.tryParseInt(productIdOrName);
+		
+		// NOTE(enrique): Check the 3rd argument:
+		//  - If parsing the int succeeds then we assume its the ID and the next token is the name string (advance parsing)
+		//  - If it fails then we assume its the name and no ID was supplied (dont advance parsing), next token is the category
 		if (productId == null) {
-			Utils.printInvalidDataType("prod add", "integer", params[2]);
-			return;
+			productName = productIdOrName;
+		} else {
+			productName = params[parseIndex++];
 		}
 
-		String productName = params[3];
-		BaseProduct.Category productCategory = BaseProduct.Category.fromLabel(params[4]);
+		String productCategoryString = params[parseIndex++];
+		BaseProduct.Category productCategory = BaseProduct.Category.fromLabel(productCategoryString);
 		if (productCategory == null) {
-			Utils.printInvalidEnum("prod add", "category", params[4], BaseProduct.Category.values());
+			Utils.printInvalidEnum("prod add", "category", productCategoryString, BaseProduct.Category.values());
 			return;
 		}
 
- 		Integer productPrice = Utils.tryParseInt(params[5]);
+		String productPriceString = params[parseIndex++];
+ 		Integer productPrice = Utils.tryParseInt(productPriceString);
 		if (productPrice == null){
-			Utils.printInvalidDataType("prod add", "integer", params[5]);
+			Utils.printInvalidDataType("prod add", "integer", productPriceString);
 			return;
 		}
 
-		Product createdProduct = inventory.createProduct(productId, productName, productCategory, productPrice);		
+		Integer productMaxPers = productCategory.getMaxPersonalizations();
+		if (parseIndex < params.length) {
+			String productMaxPersString = params[parseIndex++];
+			productMaxPers = Utils.tryParseInt(productMaxPersString);
+			if (productMaxPers == null){
+				Utils.printInvalidDataType("prod add", "integer", productMaxPersString);
+				return;
+			}
+		}
+		
+		// Execute
+		if (productMaxPers != null && productMaxPers > productCategory.getMaxPersonalizations()) {
+			System.out.printf("prod add: error: category %s only allows a max of %d personalizations, got %d\n",
+							  productCategory, productCategory.getMaxPersonalizations(), productMaxPers);
+			return;
+		}
+
+		if (productId == null) {
+			productId = inventory.generateUniqueProductId();
+		}
+		
+		BaseProduct createdProduct = inventory.createBaseProduct(productId, productName, productCategory, productPrice, productMaxPers);
 		if (createdProduct != null) {
 			System.out.println(createdProduct);
 			System.out.println("prod add: ok");
@@ -65,6 +99,11 @@ public class ProductCommand implements Command {
 			System.out.println("prod add: error: unexpected error");
 		}
 	}
+
+	public void evalAddTimed(String[] params, UserManager userManager, Inventory inventory) {
+		System.out.println("ProductCommand.evalAddTimed: NOT IMPLEMENTED");
+	}
+	
 	
 	/**
 	 * Parses the 'update' variation of the 'product' command.
@@ -78,7 +117,7 @@ public class ProductCommand implements Command {
 	 *               or null
 	 * @see Product.Field
 	 */		
-	public void evalUpdate(String[] params, Ticket ticket, Inventory inventory) {
+	public void evalUpdate(String[] params, UserManager userManager, Inventory inventory) {
 		if (!Utils.checkArgsCountWithPrint("prod update", params.length, 5)) return;
 		
  		Integer productId = Utils.tryParseInt(params[2]);
@@ -126,11 +165,11 @@ public class ProductCommand implements Command {
 		}
 	}
 
-	public void evalAddFood(String[] params, Ticket ticket, Inventory inventory) {
+	public void evalAddFood(String[] params, UserManager userManager, Inventory inventory) {
 		System.out.println("ProductCommand.evalAddFood: NOT IMPLEMENTED");
 	}
 
-	public void evalAddMeeting(String[] params, Ticket ticket, Inventory inventory) {
+	public void evalAddMeeting(String[] params, UserManager userManager, Inventory inventory) {
 		System.out.println("ProductCommand.evalAddMeeting: NOT IMPLEMENTED");
 	}
 
@@ -142,29 +181,30 @@ public class ProductCommand implements Command {
 	 * @return       The result of the parse. If the amount of tokens is 3 and the 'id' parse succedes then a valid
 	 *               ProductCommand Remove instance or null
 	 */			
-	public void evalRemove(String[] params, Ticket ticket, Inventory inventory) {
-		if (!Utils.checkArgsCountWithPrint("prod remove", params.length, 3)) return;
+	public void evalRemove(String[] params, UserManager userManager, Inventory inventory) {
+		// if (!Utils.checkArgsCountWithPrint("prod remove", params.length, 3)) return;
 
- 		Integer productId = Utils.tryParseInt(params[2]);
-		if (productId == null) {
-			Utils.printInvalidDataType("prod remove", "integer", params[2]);
-			return;
-		}
+ 		// Integer productId = Utils.tryParseInt(params[2]);
+		// if (productId == null) {
+		// 	Utils.printInvalidDataType("prod remove", "integer", params[2]);
+		// 	return;
+		// }
 
-		Product productToRemove = inventory.readProduct(productId);
-		if (productToRemove != null) {
-			ticket.removeProduct(productId);
+		// Product productToRemove = inventory.readProduct(productId);
+		// if (productToRemove != null) {
+		// 	ticket.removeProduct(productId);
 			
-			if (inventory.deleteProduct(productId)) {
-				System.out.println(productToRemove);
-				System.out.printf("prod remove: ok\n");
-			} else {
-				System.out.printf("prod remove: error: unexpected error\n");
-			}
+		// 	if (inventory.deleteProduct(productId)) {
+		// 		System.out.println(productToRemove);
+		// 		System.out.printf("prod remove: ok\n");
+		// 	} else {
+		// 		System.out.printf("prod remove: error: unexpected error\n");
+		// 	}
 			
-		} else {
-			System.out.printf("prod remove: error: product with id %d not found\n", productId);
-		}		
+		// } else {
+		// 	System.out.printf("prod remove: error: product with id %d not found\n", productId);
+		// }
+		System.out.println("ProductCommand.evalRemove: NOT IMPLEMENTED");
 	}
 
 	/**
@@ -176,7 +216,7 @@ public class ProductCommand implements Command {
 	 * @return       The result of the parse. If the amount of tokens is 2 then a valid
 	 *               ProductCommand List instance or null
 	 */
-	public void evalList(String[] params, Ticket ticket, Inventory inventory) {
+	public void evalList(String[] params, UserManager userManager, Inventory inventory) {
 		if (!Utils.checkArgsCountWithPrint("prod list", params.length, 2)) return;
 
 		Product[] products = inventory.listProducts();
