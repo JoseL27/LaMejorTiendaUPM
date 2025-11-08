@@ -2,16 +2,16 @@
 
 ## Tareas - E2
  - [x] (JULIO)   Crear BaseProduct y TimedProduct como hijos de Product; Crear enum TimedType; Adicionar boolean personalizable.
- - [ ] (ENRIQUE) Adicionar boolean abierto/cerrado a Ticket; ProductInfo ahora representa un producto con personalizables.
+ - [x] (ENRIQUE) Adicionar boolean abierto/cerrado a Ticket; ProductInfo ahora representa un producto con personalizables.
  - [x] (ANDRES)  Crear clase Client
    - Jinxian lo revisa
  - [x] (JOSE)    Crear clase Cashier y manejar Ticket's
  - [x] (JOSE)    Cambiar app para que se use la interfaz command en vez de una variable de cada comando
    - [ ] (JINXIAN) Crear UserManager y manejar Clients y Cashiers
-   - [ ] (JULIO)Crear CashCommand
-   - [ ] (ANDRES)Crear ClientCommand
-- (JOSE y ENRIQUE) Debug y que funcione todo
-- Escribir tests para lo nuevo de E2
+   - [ ] (JULIO) Crear CashCommand
+   - [ ] (ANDRES) Crear ClientCommand
+- [ ] (JOSE y ENRIQUE) Debug y que funcione todo
+- [ ] Escribir tests para lo nuevo de E2
 
 ## Como hacer una tarea
 1. Programar

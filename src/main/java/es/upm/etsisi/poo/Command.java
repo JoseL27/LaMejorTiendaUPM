@@ -11,5 +11,5 @@ import es.upm.etsisi.poo.commands.TicketCommand;
  */
 		
 public interface Command {
-	public void eval(String[] args, Ticket ticket, Inventory dataManager);
+	public void eval(String[] args, UserManager userManager, Inventory dataManager);
 }

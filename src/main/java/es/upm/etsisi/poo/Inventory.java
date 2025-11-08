@@ -6,8 +6,7 @@ package es.upm.etsisi.poo;
  */
 public class Inventory {
 
-    public static final int MAX_CAPACITY = 200; // E1: no more than 200 products
-    public static final int MAX_NAME_LENGTH = 100; // E1: product name contains no more than 100 characters
+    public static final int MAX_PRODUCTS = 200; // E1: no more than 200 products
 
     private Product[] inventory; // List
     private int productAmount;
@@ -16,7 +15,7 @@ public class Inventory {
      * Creates a new Inventory with an empty inventory
      */
     public Inventory() {
-        this.inventory = new Product[this.MAX_CAPACITY];
+        this.inventory = new Product[MAX_PRODUCTS];
         this.productAmount = 0;
     }
 
@@ -36,7 +35,7 @@ public class Inventory {
      * @return true if valid, otherwise return false
      */
     private boolean isValidName(String nameToCheck) {
-        return nameToCheck.length() < this.MAX_NAME_LENGTH;
+        return nameToCheck.length() < Product.PRODUCT_MAX_NAME_LENGTH;
     }
 
     /**
@@ -91,25 +90,27 @@ public class Inventory {
      * @param price Product price (must be greater than 0)
      * @return true if the product is created correctly, false in other case
      */
-    public Product createProduct(int id, String name, BaseProduct.Category category, double price) {
-        // Sanity checks: ID >= 0, name.length < 100, price > 0
+    public BaseProduct createBaseProduct(int id, String name, BaseProduct.Category category, double price, int maxPers) {
         if (!isValidId(id) || !isValidName(name) || !isValidPrice(price)) return null;
-        // if (category == null) return DataResult.INVALID_CATEGORY;
 
         // Check inventory full
-        if (this.productAmount >= this.MAX_CAPACITY) return null;
+        if (this.productAmount >= MAX_PRODUCTS) return null;
 
         Product selectedProduct = this.readProduct(id);
 
         if (selectedProduct == null) {
-            // Create product and add it to the array
-            BaseProduct prodToAdd = new BaseProduct(id, name, price,category);
+            BaseProduct prodToAdd = new BaseProduct(id, name, price, category, maxPers);
             this.inventory[this.productAmount] = prodToAdd;
             this.productAmount++;
             return prodToAdd;
         } else {
             return null;
         }
+    }
+
+    public Product createTimedProduct(int id, String name, double price, int people, TimedProduct.TimedType type) {
+		System.out.println("Inventory.createTimedProduct: NOT IMPLEMENTED");
+		return null;
     }
 
     /**
@@ -203,5 +204,12 @@ public class Inventory {
         }
         return arrayProducts;
     }
+
+	// NOTE(enrique): Implementation Sugestion: loop through all products
+	// and find the greatest id value and add 1 to it (maybe even keep a 'greatest id value')
+	public int generateUniqueProductId() {
+		System.out.println("UserManager.generateUniqueTicketId: NOT IMPLEMENTED");
+		return -1;
+	}
 
 }

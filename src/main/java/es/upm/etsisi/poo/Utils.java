@@ -34,17 +34,24 @@ public class Utils {
 		}
 	}
 
-    public static boolean checkArgsCountWithPrint(String prefix, int amount, int minAmount, int maxAmount) {
-        boolean result = false;
-        if (amount < minAmount) {
-            System.out.printf("%s: too few arguments, expected at %d arguments and got %d\n", prefix, minAmount, amount);
-        } else if (amount > maxAmount) {
-            System.out.printf("%s: too many arguments, expected %d and got %d\n", prefix, maxAmount, amount);
-        } else {
-            result = true;
-        }
+    public static boolean checkMaxArgsCountWithPrint(String prefix, int amount, int maxAmount) {
+        if (amount > maxAmount) {
+            System.out.printf("%s: too many arguments, expected maximum %d and got %d\n", prefix, maxAmount, amount);
+			return false;
+		}
+		return true;
+	}
 
-        return result;
+    public static boolean checkMinArgsCountWithPrint(String prefix, int amount, int minAmount) {
+        if (amount < minAmount) {
+            System.out.printf("%s: too few arguments, expected at least %d arguments and got %d\n", prefix, minAmount, amount);
+			return false;
+		}
+		return true;
+	}
+
+    public static boolean checkArgsCountWithPrint(String prefix, int amount, int minAmount, int maxAmount) {
+        return checkMinArgsCountWithPrint(prefix, amount, minAmount) && checkMaxArgsCountWithPrint(prefix, amount, maxAmount);
     }
 
     public static boolean checkArgsCountWithPrint(String prefix, int amount, int expectedAmount) {
