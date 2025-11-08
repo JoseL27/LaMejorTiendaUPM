@@ -124,16 +124,27 @@ public class App {
 
     private static void help() {
         System.out.println("Commands:");
-        System.out.println(" prod add <id> \"<name>\" <category> <price>");
+        System.out.println(" prod add [<id>] \"<name>\" <category> <price> [<maxPers>]");
         System.out.println(" prod list" );
 		
-        System.out.printf(" prod update <id> NAME|CATEGORY|PRICE <value>\n");
-		
+        System.out.println(" prod update <id> NAME|CATEGORY|PRICE <value>");
+
+        System.out.println(" prod addFood [<id>] \"<name>\" <price> <expiration: yyyy-MM-dd> <max_people>");
+        System.out.println(" prod addMeeting [<id>] \"<name>\" <price> <expiration: yyyy-MM-dd> <max_people>");
         System.out.println(" prod remove <id>");
-        System.out.println(" ticket new");
-        System.out.println(" ticket add <prodId> <quantity>");
-        System.out.println(" ticket remove <prodId>");
-        System.out.println(" ticket print" );
+
+        System.out.println(" ticket new [<id>] <cashId> <userId>");
+        System.out.println(" ticket add <ticketId> <cashId> <prodId> <amount> [--p<txt> --p<txt> ...]");
+        System.out.println(" ticket remove <ticketId> <cashId> <prodId>");
+        System.out.println(" ticket print <ticketId> <cashId>" );
+        System.out.println(" ticket list");
+
+        System.out.println(" client add \"<nombre>\" <DNI> <email> <cashId>");
+        System.out.println(" client remove <DNI>");
+        System.out.println(" client list");
+        System.out.println(" cash add [<id>] \"<nombre>\" <email>");
+        System.out.println(" cash remove <id>");
+        System.out.println(" cash tickets <id>");
         System.out.println(" echo \"<texto>\"");
         System.out.println(" help");
         System.out.println(" exit");
