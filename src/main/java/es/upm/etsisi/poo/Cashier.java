@@ -77,10 +77,15 @@ public class Cashier extends User {
      * @return Array of tickets, zero length array if there are none
      */
     public Ticket[] getTickets() {
-        if (!this.createdTickets.isEmpty())
-            return this.createdTickets.toArray(new Ticket[0]);
-        else
+        if (!this.createdTickets.isEmpty()) {
+            Ticket[] tickets = new Ticket[this.createdTickets.size()];
+            for (int i = 0; i < this.createdTickets.size(); i++) {
+                tickets[i] = this.createdTickets.get(i);
+            }
+            return tickets;
+        } else {
             return new Ticket[0];
+        }
     }
 
     public int getCreatedTicketAmount() {
