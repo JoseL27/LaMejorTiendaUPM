@@ -3,7 +3,7 @@ package es.upm.etsisi.poo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cashier extends User {
+public class Cashier extends User implements Comparable<Cashier> {
     public static final String COMPANY_DOMAIN = "upm.es";
     private List<Ticket> createdTickets;
 
@@ -70,4 +70,15 @@ public class Cashier extends User {
 			&& Character.toUpperCase(id.charAt(1)) == 'W'
 			&& (Utils.tryParseInt(id.substring(2)) != null);
 	}
+
+	@Override
+	public int compareTo(Cashier c) {
+		return this.getName().compareTo(c.getName());
+	}
+
+    @Override
+    public String toString() {
+		return "{Cashier:" + this.getId() + ", name:'" + this.getName() + "', email:'" + this.getEmail() + "'}";
+	}
+
 }
