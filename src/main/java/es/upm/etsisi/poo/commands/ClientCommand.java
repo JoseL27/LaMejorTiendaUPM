@@ -1,7 +1,13 @@
 package es.upm.etsisi.poo.commands;
 
-import es.upm.etsisi.poo.*;
 import java.util.Arrays;
+
+import es.upm.etsisi.poo.Cashier;
+import es.upm.etsisi.poo.Client;
+import es.upm.etsisi.poo.Command;
+import es.upm.etsisi.poo.Inventory;
+import es.upm.etsisi.poo.UserManager;
+import es.upm.etsisi.poo.Utils;
 
 public class ClientCommand implements Command {
 
@@ -25,7 +31,8 @@ public class ClientCommand implements Command {
 			return;
 		}
 		else {
-			manager.createClient(params[2], params[3], params[4], params[5]);
+			final Cashier creator = manager.findCashier(params[5]);
+			manager.addClient(params[2], params[3], params[4], creator);
 		}
 
 	}
@@ -37,7 +44,7 @@ public class ClientCommand implements Command {
 			return;
 		}
 		else {
-			manager.remove(params[2]);
+			manager.removeClient(params[2]);
 		}
 
 	}
