@@ -3,41 +3,25 @@ import java.util.Arrays;
 
 public class ProductInfo implements Comparable<ProductInfo> {
 	/**
-	 * ProductInfo struct-like holder as a Product-amount pair.
+	 * ProductInfo struct-like holder as a Product pair.
 	 * Has basic constructors and getters.
 	 * Implements 'Comparable' class to alfabetically order products as in the requirement document.
 	 */
 
 	private Product product;
-	private int amount;
 	private String[] personalizations;
 		
-	public ProductInfo(Product product, int amount, String[] personalizations) {
+	public ProductInfo(Product product, String[] personalizations) {
 		this.product = product;
-		this.amount = amount;
 		this.personalizations = personalizations;
 	}
 
 	public Product getProduct() { 
 		return this.product;
 	}
-		
-	public int getAmount() { 
-		return this.amount;
-	}
 	
 	public String[] getPersonalizations() { 
 		return this.personalizations;
-	}
-
-	public void incrementAmount(int amount) { 
-		if (amount > 0) {
-			this.amount += amount;
-		}
-	}
-
-	public double getMulbtipliedPrice() {
-		return product.getMultipliedPrice(this.amount);
 	}
 
 	public boolean duplicateOf(ProductInfo other) {

@@ -9,7 +9,7 @@ public abstract class Product {
     private double price;
 
     // constructor
-    public Product(int id, String name, double price) {
+    protected Product(int id, String name, double price) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -28,12 +28,6 @@ public abstract class Product {
 	public double getMultipliedPrice(int amount) {
 		return amount * price;
 	}
-
-	public double getAvailableDiscountPercent()	{
-		return 0;
-	}
-
-	public abstract boolean canDuplicate();
-
+	
 	public abstract boolean duplicateOf(Product product);
 }
