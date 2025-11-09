@@ -51,6 +51,21 @@ public class Cashier extends User implements Comparable<Cashier> {
     }
 
     /**
+     * Returns array of Tickets created by this instance of Cashier
+     * @return Array of tickets, zero length array if there are none
+     */
+    public Ticket[] getTickets() {
+        if (!this.createdTickets.isEmpty())
+            return this.createdTickets.toArray(new Ticket[0]);
+        else
+            return new Ticket[0];
+    }
+
+    public int getCreatedTicketAmount() {
+        return this.createdTickets.size();
+    }
+
+    /**
      * Checks if email is a company email
      * @return true if email contains a single @ and COMPANY_DOMAIN after it
      */

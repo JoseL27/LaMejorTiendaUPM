@@ -85,4 +85,19 @@ public class Utils {
         }
         return number;
     }
+
+	public static String removeLeadingZeros(String str) {
+		int pos = 0;
+		// Find the index of the first non-zero character
+		while (pos < str.length() && str.charAt(pos) == '0') {
+			pos++;
+		}
+
+		// Directly store the result
+		String result = str.substring(pos);
+		if (result.isEmpty())
+			return "0";
+		else
+			return result;
+	}
 }
