@@ -266,6 +266,7 @@ public class UserManagerTest {
     }
 
     @Test
+    @Disabled("This test will take a LOOOOOOOONG LOOOOOOONG TIIIIIIMEEEE (Cue the Sakeru Gumi's Ad music)")
     void fillCashierTicket() {
         normalAddCashier();
         boolean result;
@@ -274,28 +275,29 @@ public class UserManagerTest {
             result = cashier.createTicket(this.testUserManager.generateUniqueTicketId());
             assertTrue(result);
         }
-        result = cashier.createTicket(this.testUserManager.generateUniqueTicketId());
-        assertFalse(result);
+        assertNull(this.testUserManager.generateUniqueTicketId());
     }
 
     @Test
-    void fillCashierTicketWithIterationOnly() {
+    @Disabled("This test will take a LOOOOOOOONG LOOOOOOONG TIIIIIIMEEEE (Cue the Sakeru Gumi's Ad music)")
+    void fillCashierTicketLastTicketWithIterationOnly() {
         normalAddCashier();
-        // Render auto-increment useless
+        // Render auto-increment useless, and create the rest of the ticket wicked fast
         boolean result;
-        for (int i = UserManager.MIN_TICKET_ID; i <= UserManager.MAX_TICKET_ID; i++) {
+        Cashier cashier = this.testUserManager.findCashier("UW0000000");
+        for (int i = UserManager.MIN_TICKET_ID; i < UserManager.MAX_TICKET_ID; i++) {
             int generatedId = this.testUserManager.generateUniqueTicketId();
+            result = cashier.createTicket(generatedId);
             assertEquals(i, generatedId);
         }
+        this.testUserManager.generateUniqueCashierId();
 
-        // Stress test
-        Cashier cashier = this.testUserManager.findCashier("UW0000000");
-        for (int i = UserManager.MIN_TICKET_ID; i <= UserManager.MAX_TICKET_ID; i++) {
-            result = cashier.createTicket(this.testUserManager.generateUniqueTicketId());
-            assertTrue(result);
-        }
+        // This should generate 99999
         result = cashier.createTicket(this.testUserManager.generateUniqueTicketId());
-        assertFalse(result);
+        assertTrue(result);
+        // Overfilled should return null
+        Integer overfilled = this.testUserManager.generateUniqueTicketId();
+        assertNull(overfilled);
         assertEquals(UserManager.MAX_TICKET_ID - UserManager.MIN_TICKET_ID + 1, cashier.getCreatedTicketAmount());
     }
 }

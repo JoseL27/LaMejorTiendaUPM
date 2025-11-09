@@ -41,6 +41,15 @@ public class UserManager {
 	 * @return True if successful, false if otherwise
 	 */
 	public boolean addClient(String clientId, String name, String email, Cashier cashierResponsible) {
+		// Check null in any field
+		if (clientId == null || name == null || email == null || cashierResponsible == null)
+			return false;
+
+		// Make sure cashierResponsible exists within the Cashier set
+		Cashier findCashier = this.findCashier(cashierResponsible.getId());
+		if (findCashier == null || !findCashier.equals(cashierResponsible)) // Shortcircuit is fun
+			return false;
+
 		// Attempt to find the client with the same ID in the cashier set
 		if (this.clients.containsKey(clientId))
 			return false;
@@ -98,29 +107,29 @@ public class UserManager {
 	 * @return True if successful, false if the worker with the same id already exists, or the ID space for cashier is exhausted, or email format is not correct
 	 */
 	public boolean addCashier(String workerId, String name, String email) {
+		// Sanity check for email and workedId
+		if (workerId == null || name == null || email == null)
+			return false;
+		boolean isEmailValid = Cashier.isCompanyEmail(email);
+		boolean isWorkerIdValid = Cashier.isValidId(workerId);
+
 		// If ID space is exhausted, do not add any more Cashiers
 		int maximumCashierAmountLimitedById = UserManager.MAX_CASHIER_ID - UserManager.MIN_CASHIER_ID + 1;
 		if (this.cashiers.size() > maximumCashierAmountLimitedById)
 			return false;
 
-		// Sanity check for email and workedId
-		if (workerId == null || name == null || email == null)
-			return false;
-		boolean isEmailValid, isWorkerIdValid = false;
-		isEmailValid = Cashier.isCompanyEmail(email);
-		isWorkerIdValid = Cashier.isValidId(workerId);
-
-		// Attempt to find the cashier with the same ID in the cashier set
-		if (this.cashiers.containsKey(workerId))
-			return false;
-
-		// Update nextCashierId if needed for auto-increment
-		String number = Utils.removeLeadingZeros(workerId.substring(2)); // Remove 'UW', remove leading 0
-		int cashierIdValue = Integer.parseInt(number);
-		if (cashierIdValue >= this.nextCashierId)
-			this.nextCashierId = cashierIdValue + 1;
-
 		if (isEmailValid && isWorkerIdValid) {
+			// Attempt to find the cashier with the same ID in the cashier set
+			if (this.cashiers.containsKey(workerId))
+				return false;
+
+			// Update nextCashierId if needed for auto-increment
+			String number = Utils.removeLeadingZeros(workerId.substring(2)); // Remove 'UW', remove leading 0
+			int cashierIdValue = Integer.parseInt(number);
+			if (cashierIdValue >= this.nextCashierId)
+				this.nextCashierId = cashierIdValue + 1;
+
+			// Add the cashier to the set
 			Cashier newCashier = new Cashier(workerId, name, email);
 			this.cashiers.put(workerId, newCashier);
 			return true;
@@ -225,8 +234,12 @@ public class UserManager {
 		do {
 			currentCashier = cashierIterator.next();
 			Ticket[] cashierTicketList = currentCashier.getTickets();
-			for (Ticket ticket : cashierTicketList) {
+			int i = 0;
+			Ticket ticket;
+			while (isUnique && i < cashierTicketList.length) {
+				ticket = cashierTicketList[i];
 				isUnique = (ticket.getId() != ticketId);
+				i++;
 			}
 		} while (isUnique && cashierIterator.hasNext());
 		return isUnique;
@@ -244,14 +257,21 @@ public class UserManager {
 		return amount;
 	}
 
+	/**
+	 * Returns either an auto-incremented or any worker ID available (starting from low to high) for tickets.
+	 * Auto-increment ID value takes priority, but will return any ID available if a Ticket with the highest possible
+	 * ID value is found within all tickets.
+	 * @return 5-Digit numeric ID, guaranteed to be unique in the current set, will return null if all
+	 * available numbers are exhausted. Returns ID range between '00000' and '99999'.
+	 */
 	// NOTE(enrique): Implementation Sugestion: loop through all tickets of all cashiers
 	// and find the greatest id value and add 1 to it (maybe even keep a 'greatest id value')
-	public int generateUniqueTicketId() {
+	public Integer generateUniqueTicketId() {
 		// Check if ID space for ticket is exhausted
-		int maximumTicketAmountLimitedById = UserManager.MAX_TICKET_ID - UserManager.MIN_TICKET_ID + 1;
-		int globalTicketAmount = this.getGlobalCashierTicketAmount();
-		if (globalTicketAmount >= maximumTicketAmountLimitedById)
-			return -1;
+		// int maximumTicketAmountLimitedById = UserManager.MAX_TICKET_ID - UserManager.MIN_TICKET_ID + 1;
+		// int globalTicketAmount = this.getGlobalCashierTicketAmount();
+		// if (globalTicketAmount >= maximumTicketAmountLimitedById)
+		//	return -1;
 
 		// Generate
 		if (this.nextTicketId <= MAX_TICKET_ID) { // auto-increment possible
@@ -262,7 +282,11 @@ public class UserManager {
 			do { // Generate possible ID candidate until a unique one is found
 				candidate = i++;
 			} while (!isTicketIdUnique(candidate) && i <= UserManager.MAX_TICKET_ID);
-			return candidate;
+			// Check again if the candidate is unique, or the ID space is already exhausted
+			if (isTicketIdUnique(candidate))
+				return candidate;
+			else
+				return null;
 		}
 	}
 
