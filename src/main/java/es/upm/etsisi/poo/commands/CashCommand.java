@@ -116,4 +116,3 @@ public class CashCommand implements Command {
         System.out.println(cashierTickets);
     }
 }
-}
