@@ -22,4 +22,12 @@ public class User {
     public String getEmail(){
         return this.email;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if ( !(obj instanceof User) )
+            return false;
+        User other = (User)obj;
+        return this.id.equals(other.id); // ID should be a globally unique identifier for any User (Client/Cashier/etc)
+    }
 }

@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
  * Ticket class to manage an application ticket which consists of a product list with amounts.
  * @see Product
  */
-public class Ticket {
+public class Ticket implements Comparable<Ticket> {
 	/**
 	 * Max amount of products allowed in the Ticket, as the requirement documents specifies.
 	 */
@@ -336,6 +336,10 @@ public class Ticket {
 			result = true;
 		}
 		return result;
+	}
+
+	public int compareTo(Ticket ticket) {
+		return this.getComposedId().compareTo(ticket.getComposedId());
 	}
 
 	public static void main(String[] args) {
