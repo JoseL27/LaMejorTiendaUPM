@@ -84,10 +84,18 @@ public class UserManager {
 	 * @return Array of Client, array of zero length if there are none
 	 */
 	public Client[] listClients() {
-		if (!this.clients.isEmpty())
-			return this.clients.values().toArray(new Client[0]); // What the hell Java
-		else
+		if (!this.clients.isEmpty()) {
+			Iterator<Client> clientIterator = this.clients.values().iterator();
+			Client[] arrayClient = new Client[this.clients.size()];
+			int i = 0;
+			while (clientIterator.hasNext()) {
+				arrayClient[i] = clientIterator.next();
+				i++;
+			}
+			return arrayClient;
+		} else {
 			return new Client[0];
+		}
 	}
 
 	/**
@@ -115,7 +123,7 @@ public class UserManager {
 
 		// If ID space is exhausted, do not add any more Cashiers
 		int maximumCashierAmountLimitedById = UserManager.MAX_CASHIER_ID - UserManager.MIN_CASHIER_ID + 1;
-		if (this.cashiers.size() > maximumCashierAmountLimitedById)
+		if (this.cashiers.size() >= maximumCashierAmountLimitedById)
 			return false;
 
 		if (isEmailValid && isWorkerIdValid) {
@@ -173,10 +181,18 @@ public class UserManager {
 	 * @return Array of Cashier, array of zero length if there are none
 	 */
 	public Cashier[] listCashiers() {
-		if (!this.cashiers.isEmpty())
-			return this.cashiers.values().toArray(new Cashier[0]); // What the hell Java
-		else
+		if (!this.cashiers.isEmpty()) {
+			Iterator<Cashier> cashierIterator = this.cashiers.values().iterator();
+			Cashier[] arrayCashier = new Cashier[this.cashiers.size()];
+			int i = 0;
+			while (cashierIterator.hasNext()) {
+				arrayCashier[i] = cashierIterator.next();
+				i++;
+			}
+			return arrayCashier;
+		} else {
 			return new Cashier[0];
+		}
 	}
 
 	/**
