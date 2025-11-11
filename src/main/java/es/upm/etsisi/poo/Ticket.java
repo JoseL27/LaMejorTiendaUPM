@@ -341,6 +341,7 @@ public class Ticket implements Comparable<Ticket> {
 	public int compareTo(Ticket ticket) {
 		return this.getComposedId().compareTo(ticket.getComposedId());
 	}
+
 	public static void main(String[] args) {
 		Ticket ticket = new Ticket(0);
 
