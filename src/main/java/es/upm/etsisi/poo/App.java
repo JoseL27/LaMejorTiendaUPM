@@ -8,20 +8,15 @@ import es.upm.etsisi.poo.commands.TicketCommand;
 
 public class App {
     private Inventory inventory;
-    private Ticket ticket;
     private UserManager userManager;
 	
-	private ProductCommand productCommand;
-	private TicketCommand ticketCommand;
-	
+
     /**
      * Basic constructor
      */
     public App() {
         inventory = new Inventory();
 		userManager = new UserManager();
-		productCommand = new ProductCommand();
-		ticketCommand = new TicketCommand();
     }
 
     /**
@@ -35,17 +30,17 @@ public class App {
 		 System.out.println("Welcome to the ticket module App.");
 		 System.out.println("Ticket module. Type 'help' to see commands.");
 
-        String command;
+        String input;
         do {
             System.out.print("tUPM> ");
-            command = sc.nextLine();
-            if (!command.equals("exit")) {
-				firstParse(command);
+            input = sc.nextLine();
+            if (!input.equals("exit")) {
+				firstParse(input);
 			} else {
 				System.out.println("Closing application.");
 				System.out.println("Goodbye!");
 			}
-        } while (!command.equals("exit"));
+        } while (!input.equals("exit"));
     }
 
     /**
@@ -166,13 +161,18 @@ public class App {
     private void firstParse(String input) {
         String[] params = parser(input);
 		if (!Utils.checkMinArgsCountWithPrint("all", params.length, 1)) return;
-		
+
+        Command command = null;
 		switch (params[0].toLowerCase()) {
-		case "prod"   -> productCommand.eval(params, userManager, inventory);
-		case "ticket" -> ticketCommand.eval(params, userManager, inventory);
+		case "prod"   -> command = new ProductCommand();
+		case "ticket" -> command = new TicketCommand();
 		case "echo"   -> echo(params);
 		case "help"   -> help();
 		default       -> System.out.println("all: error: command not recognized. type help to see all commands.");
 		}
+
+        if (command != null){
+            command.eval(params, userManager, inventory);
+        }
     }
 }
