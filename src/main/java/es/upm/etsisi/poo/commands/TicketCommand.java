@@ -13,20 +13,12 @@ import java.util.Arrays;
 public class TicketCommand implements Command {
 
     /**
-     * First entrypoint to parse 'ticket' command (assumes the params.getCommand(0) is 'ticket').
-     * This method is responsible for parsing different subcommands, it also invokes other parsing
-     * methods if the subcommand in question needs more arguments.
-     * This tryParse ignores extra arguments unless the arguments which are actually used have the wrong type.
-     * Prints a warning to STDOUT if excess arguments were found.
+     * First entrypoint to parse 'ticket' command
+     * This method is responsible for parsing different subcommands.
      *
-     * @param params command
-     */
-
-    /**
-     * Reads the subcommand from this command and calls the corresponding function to execute it
-     *
-     * @param ticket    The ticket on which the changes corresponding to the command will be applied
-     * @param inventory manager from which necessary products will be taken
+     * @param params       The token stream to parse on each subcommand
+	 * @param userManager  The userManager to use for user related operations in subcommands
+	 * @param inventory    The product store to use for product related operations in subcommands
      */
     public void eval(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
@@ -38,24 +30,21 @@ public class TicketCommand implements Command {
             case "add"    -> evalAdd(params, userManager, inventory);
             case "remove" -> evalRemove(params, userManager, inventory);
             case "print"  -> evalPrint(params, userManager, inventory);
+            case "list"   -> evalList(params, userManager, inventory);
             default       -> System.out.println("ticket: invalid sub command");
         }
     }
 
     /**
-     * Parses the 'new' subcommand of the 'ticket' command.
-     * This function does not do any parsing besides checking the number of arguments and
-     * creating a proper TicketCommand New instance.
+     * Parses the 'new' subcommand of the 'ticket' command and
+	 * adds a new creates a new ticket for a client and managed by a cashier.
+	 *
+	 * Format:
+	 * ticket new [<id>] <cashId> <userId>
      *
-     * @param params The stream of tokens to parse
-     * @return The result of the parse. If the amount of tokens is 2 then a valid
-     * TicketCommand New instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
-     */
-    /**
-     * Converts this instance of Ticket into a new one
-     *
-     * @param ticket ticket to be reset or created
-     * @return SUCCESS always, since no recognisable error can happen
+     * @param params      The stream of tokens to parse
+	 * @param userManager Context
+	 * @param inventory   Context
      */
     private void evalNew(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
@@ -109,28 +98,27 @@ public class TicketCommand implements Command {
 			ticketId = userManager.generateUniqueTicketId();
 		}
 
-		cashier.createTicket(ticketId);
-		client.addTicket(ticketId);
-		System.out.println("ticket new: ok");
+		if (client.addTicket(ticketId)) {
+			cashier.createTicket(ticketId);
+			System.out.println("ticket new: ok");
+		} else {
+			System.out.println("ticket new: failed to add the ticket to the client");
+		}
     }
 
     /**
      * Parses the 'add' subcommand of the 'ticket' command.
-     * This function parses each field sequentially and immediately returns a failed ParseResult if it
-     * fails to parse any arguments.
-     * FORMAT: ticket add <productId> <cantidad>
+     * This function parses each field sequentially and fails to parse any arguments.
+	 *	 
+     * Format:
+     * ticket add <ticketId><cashId> <prodId> <amount> [--p<txt> --p<txt>]
+	 * --p for every personalization (optional).
+	 * - Amount is the number of products to add to regular products and the number of people to rooms and foods. 
+	 * - You can't add a new meeting or food that is allready added
      *
-     * @param params The stream of tokens to parse
-     * @return The result of the parse. If parsing is successful, this will return a valid TicketCommand Add instance
-     * specifying productId and quantity. Or a failure code specifying which part of the parsing went wrong.
-     */
-
-    /**
-     * Adds a product from the storage to the ticket
-     *
-     * @param ticket    ticket to which the product will be added
-     * @param inventory dataManager from which the product will be taken
-     * @return SUCCESS, if the product is added correctly, or the corresponding error if not
+     * @param params      The stream of tokens to parse
+	 * @param userManager Context
+	 * @param inventory   Context
      */
     private void evalAdd(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
@@ -204,75 +192,140 @@ public class TicketCommand implements Command {
     }
 
     /**
-     * Parses the 'remove' subcommand of the 'ticket' command.
-     * This function parses each field sequentially and immediately returns a failed ParseResult if it
-     * fails to parse any arguments.
-     * FORMAT: ticket remove <productId>
+     * Parses the 'remove' subcommand of the 'ticket' command and
+     * removes all appearances of a product inside the ticket.
+     * 
+     * Format: 
+	 * ticket remove <ticketId><cashId> <prodId>	 
      *
-     * @param parser The stream of tokens to parse
-     * @return The result of the parse. If parsing is successful, this will return a valid TicketCommand Remove instance
-     * specifying productId. Or a failure code specifying which part of the parsing went wrong.
-     */
-
-    /**
-     * Removes all appearances of a product inside the ticket
-     *
-     * @param ticket ticket from which the product will be removed
-     * @return SUCCESS, if the product is removed correctly, or the corresponding error if not
+	 * @param params      The stream of tokens to parse
+	 * @param userManager Context
+	 * @param inventory   Context
      */
     private void evalRemove(String[] params, UserManager userManager, Inventory inventory) {
-        // // Parse
-        // if (!Utils.checkArgsCountWithPrint("ticket remove", params.length, 3)) return;
-        // Integer productId = Utils.tryParseInt(params[2]);
-        // if (productId == null) {
-        //     Utils.printInvalidDataType("ticket remove", "integer", params[2]);
-        //     return;
-        // }
+		// Parse
+		if (!Utils.checkArgsCountWithPrint("ticket remove", params.length, 5))
+            return;
 
-        // // Execute
-        // if (!Inventory.isValidId(productId)) {
-        //     System.out.printf("ticket add: error: expected id greater or equal than zero\n");
-        // } else {
-        //     Product removed = userManager.removeProduct(productId);
-        //     if (removed != null) {
-        //         System.out.println(ticket.summaryString());
-        //         System.out.println("ticket remove: ok");
-        //     } else {
-        //         System.out.printf("ticket remove: error: product with id %d not in ticket\n", productId);
-        //     }
-        // }
-		System.out.println("ProductCommand.evalRemove: NOT IMPLEMENTED");
+        Integer ticketId = Utils.tryParseInt(params[2]);
+        if (ticketId == null) {
+            Utils.printInvalidDataType("ticket remove", "integer", params[2]);
+            return;
+        }
+
+		String cashierId = params[3];
+		if (!Cashier.isValidId(cashierId)) {
+			System.out.printf("ticket remove: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId);
+			return;
+		}
+		
+        Integer productId = Utils.tryParseInt(params[4]);
+        if (productId == null) {
+            Utils.printInvalidDataType("ticket remove", "integer", params[4]);
+            return;
+        }
+
+        // Execute
+		if (!Ticket.isValidId(ticketId)) {
+			System.out.printf("ticket remove: error: ticket id '%d' is invalid, expected a 5 digit number\n", ticketId);
+			return;
+		}
+			
+		if (!Inventory.isValidId(productId)) {
+			System.out.printf("ticket remove: error: expected id greater or equal than zero\n");
+			return;
+		}
+		
+		Cashier cashier = userManager.findCashier(cashierId);
+		if (cashier == null) {
+			System.out.printf("ticket remove: error: cashier with id '%s' was not found\n", cashierId);
+			return;
+		}
+
+		Ticket ticket = cashier.findTicket(ticketId);
+		if (ticket == null) {
+			System.out.printf("ticket remove: error: ticket with id '%d' not found in cashier with id '%s'\n", ticketId, cashierId);
+			return;
+		}
+
+		Product removedProduct = ticket.removeProduct(productId);
+		if (removedProduct != null) {
+			System.out.println(ticket.summaryString());
+			System.out.println("ticket remove: ok");
+		} else {
+			System.out.printf("ticket remove: error: failed to remove product\n");
+		}
     }
 
     /**
-     * Parses the 'print' subcommand of the 'ticket' command.
-     * This function does not do any parsing besides checking the number of arguments and
-     * creating a proper TicketCommand Print instance.
+     * Parses the 'print' subcommand and prints in standard output the summary of the ticket
+	 * ALSO closes the ticket!
      *
-     * @param params The stream of tokens to parse
-     * @return The result of the parse. If the amount of tokens is 2 then a valid
-     * TicketCommand Print instance OR a failure code with ParseResult.Code.INSUFICIENT_ARGUMENTS will be issued.
-     */
-
-    /**
-     * Prints in standard output the summary of the ticket
-     *
-     * @param ticket ticket to be printed
-     * @return SUCCESS always, since no recognisable error can happen
+     * Format:
+     * ticket print <ticketId> <cashId>
+     * 
+	 * @param params      The stream of tokens to parse
+	 * @param userManager Context
+	 * @param inventory   Context
      */
     private void evalPrint(String[] params, UserManager userManager, Inventory inventory) {
-        // // Parse
-        // if (!Utils.checkArgsCountWithPrint("ticket print", params.length, 2)) return;
+		// Parse
+		if (!Utils.checkArgsCountWithPrint("ticket print", params.length, 4))
+            return;
 
-        // // Execute
-        // System.out.println(ticket.summaryString());
-        // userManager.resetProductInfos();
-        // System.out.println("ticket print: ok");
-		System.out.println("ProductCommand.evalPrint: NOT IMPLEMENTED");
+        Integer ticketId = Utils.tryParseInt(params[2]);
+        if (ticketId == null) {
+            Utils.printInvalidDataType("ticket print", "integer", params[2]);
+            return;
+        }
+
+		String cashierId = params[3];
+		if (!Cashier.isValidId(cashierId)) {
+			System.out.printf("ticket print: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId);
+			return;
+		}
+
+        // Execute
+		if (!Ticket.isValidId(ticketId)) {
+			System.out.printf("ticket print: error: ticket id '%d' is invalid, expected a 5 digit number\n", ticketId);
+			return;
+		}
+		
+		Cashier cashier = userManager.findCashier(cashierId);
+		if (cashier == null) {
+			System.out.printf("ticket print: error: cashier with id '%s' was not found\n", cashierId);
+			return;
+		}
+
+		Ticket ticket = cashier.findTicket(ticketId);
+		if (ticket != null) {
+			System.out.println(ticket.summaryString());
+			ticket.close();
+			System.out.println("ticket print: ok");
+		} else {
+			System.out.printf("ticket print: error: ticket with id '%d' not found in cashier with id '%s'\n", ticketId, cashierId);
+			return;
+		}
     }
 
+    /**
+     * Parses the 'list' subcommand command and
+     * prints the tickets ordered by cashier id
+     *
+     * Format:
+     * ticket list
+     * 
+	 * @param params      The stream of tokens to parse
+	 * @param userManager Context
+	 * @param inventory   Context
+     */
     private void evalList(String[] params, UserManager userManager, Inventory inventory) {
-        System.out.println("TicketCommand.evalList() NOT IMPLEMENTED");
+		Cashier[] cashiers = userManager.listCashiers();
+		Arrays.sort(cashiers, (c1, c2) -> c1.getId().compareTo(c2.getId()));
+		for (Cashier cashier : cashiers) {
+			System.out.println(cashier.getTicketsString());
+		}
+		System.out.println("ticket list: ok");
     }
 
     private boolean isValidAmount(int amount) {
