@@ -29,7 +29,7 @@ public class CashCommand implements Command {
     /**
      * Parses the 'add' variation of the 'Cash' command.
      * The function parses each field sequentially and short circuits if any fail.
-     * Id is mandatory
+     * Depending of params.length it calls different constructors
      * FORMAT: cash add [<id>] "<nombre>"<email>
      *
      * @param parser The stream of tokens to parse
@@ -65,6 +65,12 @@ public class CashCommand implements Command {
         if (params.length == 4) userManager.addCashier(cashierName, cashierEmail);
     }
 
+    /**
+     * List all the cashiers of the shop
+     * @param params
+     * @param userManager
+     * @param inventory
+     */
     private void evalList(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
         if (!Utils.checkArgsCountWithPrint("cash list", params.length, 2)) return;
@@ -81,6 +87,12 @@ public class CashCommand implements Command {
 
     }
 
+    /**
+     * Remove the cashier with de id provided
+     * @param params
+     * @param userManager
+     * @param inventory
+     */
     private void evalRemove(String[] params, UserManager userManager, Inventory inventory) {
         if (!Utils.checkArgsCountWithPrint("cash remove", params.length, 3)) return;
         String cashierId = params[2];
@@ -91,6 +103,12 @@ public class CashCommand implements Command {
         }
     }
 
+    /**
+     * List all the tickets of a cashier
+     * @param params
+     * @param userManager
+     * @param inventory
+     */
     private void evalTickets(String[] params, UserManager userManager, Inventory inventory) {
         if (!Utils.checkArgsCountWithPrint("cash tickets", params.length, 2)) return;
         String cashierId = params[2];
