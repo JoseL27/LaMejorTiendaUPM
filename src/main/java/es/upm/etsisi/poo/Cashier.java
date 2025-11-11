@@ -73,6 +73,26 @@ public class Cashier extends User {
     }
 
     /**
+     * Returns array of Tickets created by this instance of Cashier
+     * @return Array of tickets, zero length array if there are none
+     */
+    public Ticket[] getTickets() {
+        if (!this.createdTickets.isEmpty()) {
+            Ticket[] tickets = new Ticket[this.createdTickets.size()];
+            for (int i = 0; i < this.createdTickets.size(); i++) {
+                tickets[i] = this.createdTickets.get(i);
+            }
+            return tickets;
+        } else {
+            return new Ticket[0];
+        }
+    }
+
+    public int getCreatedTicketAmount() {
+        return this.createdTickets.size();
+    }
+
+    /**
      * Checks if email is a company email
      * @return true if email contains a single @ and COMPANY_DOMAIN after it
      */
