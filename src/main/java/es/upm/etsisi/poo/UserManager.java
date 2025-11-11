@@ -42,7 +42,7 @@ public class UserManager {
 	 */
 	public boolean addClient(String clientId, String name, String email, Cashier cashierResponsible) {
 		// Check null in any field
-		if (clientId == null || name == null || email == null || cashierResponsible == null)
+		if (clientId == null || !Client.isValidId(clientId) || name == null || email == null || cashierResponsible == null)
 			return false;
 
 		// Make sure cashierResponsible exists within the Cashier set
