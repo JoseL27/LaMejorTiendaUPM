@@ -1,6 +1,7 @@
 package es.upm.etsisi.poo;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Cashier extends User implements Comparable<Cashier> {
@@ -28,13 +29,26 @@ public class Cashier extends User implements Comparable<Cashier> {
      * Creates a new ticket the id given in the parameter.
      */
     public boolean createTicket(int id){
-		System.out.println("Cashier.createTicket: NOT IMPLEMENTED");
-		return false;
+        boolean result = false;
+        if (Ticket.isValidId(id)){
+            createdTickets.add(new Ticket(id));
+            result = true;
+        }
+		return result;
     }
 
 	public Ticket findTicket(int ticketId) {
-		System.out.println("Cashier.findTicket: NOT IMPLEMENTED");
-		return null;
+        Iterator<Ticket> iterator = createdTickets.iterator();
+        Ticket result = null;
+        Ticket currentTicket;
+
+        while (iterator.hasNext() && result == null){
+            currentTicket = iterator.next();
+            if (currentTicket.getId() == ticketId){
+                result = currentTicket;
+            }
+        }
+		return result;
 	}
 
     /**
@@ -43,9 +57,17 @@ public class Cashier extends User implements Comparable<Cashier> {
      */
     public String getTicketsString(){
         StringBuilder result = new StringBuilder();
-        //sort array
+        createdTickets.sort(null);
         for(Ticket ticket: createdTickets){
-            //append id and state
+            result.append(ticket.getComposedId()).append(" ");
+            if (ticket.isEmpty()){
+                result.append("Empty");
+            }else if (ticket.getIsOpen()){
+                result.append("Open");
+            }else{
+                result.append("Closed");
+            }
+            result.append("\n");
         }
         return result.toString();
     }
@@ -55,10 +77,15 @@ public class Cashier extends User implements Comparable<Cashier> {
      * @return Array of tickets, zero length array if there are none
      */
     public Ticket[] getTickets() {
-        if (!this.createdTickets.isEmpty())
-            return this.createdTickets.toArray(new Ticket[0]);
-        else
+        if (!this.createdTickets.isEmpty()) {
+            Ticket[] tickets = new Ticket[this.createdTickets.size()];
+            for (int i = 0; i < this.createdTickets.size(); i++) {
+                tickets[i] = this.createdTickets.get(i);
+            }
+            return tickets;
+        } else {
             return new Ticket[0];
+        }
     }
 
     public int getCreatedTicketAmount() {
