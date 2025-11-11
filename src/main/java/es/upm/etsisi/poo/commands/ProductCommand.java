@@ -2,6 +2,8 @@ package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.*;
 
+import java.sql.Time;
+
 /**
  *  ProductCommand class that parses a stream of tokens into a specific ProductCommand,
  *  being one of the following formats:
@@ -101,7 +103,34 @@ public class ProductCommand implements Command {
 	}
 
 	public void evalAddTimed(String[] params, UserManager userManager, Inventory inventory) {
-		System.out.println("ProductCommand.evalAddTimed: NOT IMPLEMENTED");
+		if (params.length < 4){
+			System.out.println("prod " + params[1] + ": invalid number of parameters, got " + params.length + ", expected 4 or 5");
+			return;
+		}
+
+		int id;
+		String name;
+		double price;
+
+		int parseIndex = 2;
+
+		Integer idOrName = Utils.tryParseInt(params[parseIndex]); // TODO: Change when we remove utils
+		if (idOrName == null){
+			id = inventory.generateUniqueProductId();
+			name = params[parseIndex];
+		}else{
+			id = idOrName;
+			name = params[++parseIndex];
+		}
+
+		try {
+
+			price = Double.parseDouble(params[++parseIndex]);
+
+
+		}catch (NumberFormatException e){
+			System.out.println("Invalid price: "  + params[parseIndex]);
+		}
 	}
 	
 	
