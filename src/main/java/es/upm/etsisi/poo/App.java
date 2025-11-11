@@ -41,7 +41,7 @@ public class App {
 				System.out.println("Closing application.");
 				System.out.println("Goodbye!");
 			}
-        } while (!input.equals("exit"));
+        } while (sc.hasNext() && !input.equals("exit"));
     }
 
     /**
