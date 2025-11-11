@@ -41,9 +41,9 @@ public class CashCommand implements Command {
         // Parse
         if (!Utils.checkArgsCountWithPrint("cash add", params.length, 4, 5)) return;
 
-        String cashierId ="";
-        String cashierName ;
-        String cashierEmail ;
+        String cashierId = "";
+        String cashierName;
+        String cashierEmail;
         if (params.length == 5) {
             cashierId = params[2];
             cashierName = params[3];
@@ -70,12 +70,12 @@ public class CashCommand implements Command {
         if (!Utils.checkArgsCountWithPrint("cash list", params.length, 2)) return;
 
         Cashier[] workers = userManager.listCashiers();
-        if (workers != null) {
+        if (workers.length > 0) {
             for (Cashier cashier : workers) {
                 System.out.println(" " + cashier.toString());
             }
             System.out.println("cashiers list: ok");
-        }else{
+        } else {
             System.out.println("cashiers list: Not cashiers added yet");
         }
 
@@ -94,10 +94,8 @@ public class CashCommand implements Command {
     private void evalTickets(String[] params, UserManager userManager, Inventory inventory) {
         if (!Utils.checkArgsCountWithPrint("cash tickets", params.length, 2)) return;
         String cashierId = params[2];
-        Ticket[] cashierTickets=userManager.listCashierTicketsArray(cashierId);
-        if (cashierTickets != null) {
-            // Hay que ordenar y ver como lo queremos sacar por pantalla, deberiamos mantener
-            // List de tickets en cashier en vez cambiarlo a array
-        }
+        String cashierTickets = userManager.findCashier(cashierId).getTicketsString();
+        System.out.println(cashierTickets);
     }
+}
 }
