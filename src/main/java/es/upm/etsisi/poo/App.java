@@ -1,5 +1,4 @@
 package es.upm.etsisi.poo;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
