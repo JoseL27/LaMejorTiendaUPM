@@ -9,8 +9,25 @@ import es.upm.etsisi.poo.Inventory;
 import es.upm.etsisi.poo.UserManager;
 import es.upm.etsisi.poo.Utils;
 
+/**
+ * Command to manage clients (add, remove, list)
+ */
 public class ClientCommand implements Command {
 
+	/**
+	 * Evaluates client-related commands based on the provided parameters.
+	 * Supported subcommands:
+	 *
+	 *add<: Adds a new client using the specified parameters.</li>
+	 * remove: Removes an existing client as specified.</li>
+	 * list: Lists all registered clients.</li>
+	 *
+	 * If the subcommand is not recognized, an error message is printed.
+	 *
+	 * @param params      The command-line parameters, where the first element is the command and the second is the subcommand.
+	 * @param manager     The {@link UserManager} instance for managing users.
+	 * @param dataManager The {@link Inventory} instance for managing inventory data.
+	 */
 
 	@Override
 	public void eval(String[] params, UserManager manager, Inventory dataManager) {
@@ -24,35 +41,54 @@ public class ClientCommand implements Command {
 		}
 	}
 
-
+	/**
+	 * Evaluates the "add client" command by validating the number of parameters and adding a new client
+	 * to the system using the provided user information and the creator cashier.
+	 *
+	 * @param params   An array of command parameters. Expected to contain at least 6 elements:
+	 *                 [0] - command name,
+	 *                 [1] - subcommand,
+	 *                 [2] - client's DNI,
+	 *                 [3] - client's name,
+	 *                 [4] - client's email,
+	 *                 [5] - creator cashier's identifier.
+	 * @param manager  The UserManager instance used to find the creator cashier and add the new client.
+	 */
 	public void evalAdd(String[] params, UserManager manager) {
 
 		if (!Utils.checkArgsCountWithPrint("client add", params.length, 6)) {
 			return;
 		}
-		else {
-			final Cashier creator = manager.findCashier(params[5]);
-			manager.addClient(params[2], params[3], params[4], creator);
+		final Cashier creator = manager.findCashier(params[5]);
+		if (manager.addClient(params[2], params[3], params[4], creator)) {
+			System.out.println("Client " + params[2] + " added.");
+		} else {
+			System.out.println("Client " + params[2] + " could not be added.");
 		}
 
 	}
-
 
 	public void evalRemove(String[] params, UserManager manager) {
 
 		if (!Utils.checkArgsCountWithPrint("client remove", params.length, 3)) {
 			return;
 		}
-		else {
-			manager.removeClient(params[2]);
+		if (manager.removeClient(params[2])) {
+			System.out.println("Client " + params[2] + " removed.");
+		} else {
+			System.out.println("Client " + params[2] + " not found.");
 		}
-
+		
 	}
 
-	public void evalList(UserManager manager) { 
+	public void evalList(UserManager manager) {
 
 		Client[] clients = manager.listClients();
 		Arrays.sort(clients);
+		if (clients.length == 0) {
+			System.out.println("No clients registered.");
+			return;
+		}
 		for (Client client : clients) {
 			System.out.println(client.toString());
 		}
