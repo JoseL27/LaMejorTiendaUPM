@@ -45,25 +45,30 @@ public class ClientCommand implements Command {
 	 * Evaluates the "add client" command by validating the number of parameters and adding a new client
 	 * to the system using the provided user information and the creator cashier.
 	 *
+	 * Format:
+	 * client add "<nombre>" <DNI> <email> <cashId>
+	 * 
 	 * @param params   An array of command parameters. Expected to contain at least 6 elements:
 	 *                 [0] - command name,
 	 *                 [1] - subcommand,
-	 *                 [2] - client's DNI,
-	 *                 [3] - client's name,
+	 *                 [2] - client's name,
+	 *                 [3] - client's DNI,
 	 *                 [4] - client's email,
 	 *                 [5] - creator cashier's identifier.
 	 * @param manager  The UserManager instance used to find the creator cashier and add the new client.
 	 */
 	public void evalAdd(String[] params, UserManager manager) {
-
 		if (!Utils.checkArgsCountWithPrint("client add", params.length, 6)) {
 			return;
 		}
+		String clientName  = params[2];
+		String clientId    = params[3];
+		String clientEmail = params[4];
 		final Cashier creator = manager.findCashier(params[5]);
-		if (manager.addClient(params[2], params[3], params[4], creator)) {
-			System.out.println("Client " + params[2] + " added.");
+		if (manager.addClient(clientId, clientName, clientEmail, creator)) {
+			System.out.println("client add: ok");
 		} else {
-			System.out.println("Client " + params[2] + " could not be added.");
+			System.out.printf("client add: error: client with id %s could not be added\n", params[2]);
 		}
 
 	}

@@ -14,8 +14,12 @@ public class Client extends User implements Comparable<Client> {
 		this.ticketIds = new ArrayList<>();
 	}
 
-	public void addTicket(int ticketId) {
-		ticketIds.add(ticketId);
+	public boolean addTicket(int ticketId) {
+		if (!ticketIds.contains(ticketId)) {
+			ticketIds.add(ticketId);
+			return true;
+		}
+		return false;
 	}
 
 	public static boolean isValidId(String id) {
