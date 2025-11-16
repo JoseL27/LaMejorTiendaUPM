@@ -1,5 +1,6 @@
 package es.upm.etsisi.poo;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -354,7 +355,7 @@ public class Ticket implements Comparable<Ticket> {
 		ticket.addProduct(book, amount, null);
 
 
-		TimedProduct food = new TimedProduct(1, "food", 10, 30, TimedProduct.TimedType.FOOD);
+		TimedProduct food = new TimedProduct(1, "food", 10, 30, TimedProduct.TimedType.FOOD, LocalDateTime.now().plusDays(3));
 		amount = 20;
 		ticket.addProduct(food, amount, null);
 		ticket.addProduct(food, amount, null);
