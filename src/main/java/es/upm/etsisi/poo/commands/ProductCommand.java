@@ -255,18 +255,11 @@ public class ProductCommand implements Command {
 		 if (productToRemove != null) {
 			 // Retrieves the active ticket from the system (Products should not be removed from closed tickets)
 			 List<Ticket> tickets = userManager.getAllTickets();
-			 Iterator<Ticket> iterator = tickets.iterator();
-			 Ticket activeTicket = null;
 
-			 while (iterator.hasNext() && activeTicket == null){
-				 Ticket ticket = iterator.next();
-				 if (ticket.getIsOpen()){
-					 activeTicket = ticket;
+			 for (Ticket ticket: tickets) {
+				 if (ticket.getIsOpen()) {
+					 ticket.removeProduct(productToRemove.getId());
 				 }
-			 }
-
-			 if (activeTicket != null){
-				 activeTicket.removeProduct(productId);
 			 }
 
 		 	if (inventory.deleteProduct(productId)) {
