@@ -1,5 +1,7 @@
 package es.upm.etsisi.poo;
 
+import java.time.LocalDateTime;
+
 /**
  * Manages Create Read Update Delete operations for Products using Array to store the products. Provides input
  * sanity checks for all operations.
@@ -34,7 +36,7 @@ public class Inventory {
      * @param nameToCheck Name string to check
      * @return true if valid, otherwise return false
      */
-    private boolean isValidName(String nameToCheck) {
+    public static boolean isValidName(String nameToCheck) {
         return nameToCheck.length() < Product.PRODUCT_MAX_NAME_LENGTH;
     }
 
@@ -108,9 +110,26 @@ public class Inventory {
         }
     }
 
-    public Product createTimedProduct(int id, String name, double price, int people, TimedProduct.TimedType type) {
-		System.out.println("Inventory.createTimedProduct: NOT IMPLEMENTED");
-		return null;
+    /**
+     * Tries to create a new timed product with its attributes set to the values of the parameters
+     * @return The product that was created, or null if the creation failed
+     */
+    public Product createTimedProduct(int id, String name, double price, int people, TimedProduct.TimedType type, LocalDateTime expirationDate) {
+        if (!isValidId(id) || !isValidName(name) || !isValidPrice(price)) return null;
+
+        // Check inventory full
+        if (this.productAmount >= MAX_PRODUCTS) return null;
+
+        TimedProduct prodToAdd = null;
+        //Check if already exists
+        Product selectedProduct = this.readProduct(id);
+
+        if (selectedProduct == null) {
+            prodToAdd = new TimedProduct(id, name, price, people, type, expirationDate);
+            this.inventory[this.productAmount] = prodToAdd;
+            this.productAmount++;
+        }
+        return prodToAdd;
     }
 
     /**

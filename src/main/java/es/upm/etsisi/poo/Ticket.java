@@ -1,5 +1,6 @@
 package es.upm.etsisi.poo;
 
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -337,5 +338,27 @@ public class Ticket implements Comparable<Ticket> {
 
 	public int compareTo(Ticket ticket) {
 		return this.getComposedId().compareTo(ticket.getComposedId());
+	}
+	
+	public static void main(String[] args) {
+		Ticket ticket = new Ticket(0);
+
+		BaseProduct book = new BaseProduct(0, "book", 20, BaseProduct.Category.BOOK, 0);
+		int amount = 2;
+		ticket.addProduct(book, amount, null);
+		ticket.addProduct(book, amount, null);
+		ticket.addProduct(book, amount, null);
+		ticket.addProduct(book, amount, null);
+		ticket.addProduct(book, amount, null);
+
+
+		TimedProduct food = new TimedProduct(1, "food", 10, 30, TimedProduct.TimedType.FOOD, LocalDateTime.now().plusDays(3));
+		amount = 20;
+		ticket.addProduct(food, amount, null);
+		ticket.addProduct(food, amount, null);
+		ticket.addProduct(food, amount, null);
+		ticket.addProduct(food, amount, null);
+
+		System.out.println(ticket.summaryString());
 	}
 }

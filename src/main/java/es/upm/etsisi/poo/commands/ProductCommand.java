@@ -2,6 +2,11 @@ package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  *  ProductCommand class that parses a stream of tokens into a specific ProductCommand,
  *  being one of the following formats:
@@ -17,7 +22,7 @@ public class ProductCommand implements Command {
 		if (!Utils.checkArgsCountWithPrint("prod", args.length, 2, 7)) return;
 
 		switch (args[1].toLowerCase()) {
-		case "addFood", "addMeeting" -> evalAddTimed(args, userManager, inventory);
+		case "addfood", "addmeeting" -> evalAddTimed(args, userManager, inventory);
 		case "add"	  -> evalAddBase(args, userManager, inventory);
 		case "list"	  -> evalList(args, userManager, inventory);
 		case "update" -> evalUpdate(args, userManager, inventory);
@@ -100,8 +105,72 @@ public class ProductCommand implements Command {
 		}
 	}
 
+	/**
+	 * Checks if the arguments are valid and tries to create a new timed product (food/meeting) from them
+	 * @param params The arguments (user input) to consider for the command
+	 * @param userManager The manager containing all the info on cliets and cashiers (and by extension on tickets)
+	 * @param inventory The manager containing all the info on products, if the command succeeds, the product will be created here
+	 */
 	public void evalAddTimed(String[] params, UserManager userManager, Inventory inventory) {
-		System.out.println("ProductCommand.evalAddTimed: NOT IMPLEMENTED");
+		if (params.length != 6 && params.length != 7){
+			System.out.println("prod " + params[1] + ": invalid number of parameters, got " + params.length + ", expected 6 or 7");
+			return;
+		}
+
+		int id;
+		String name;
+		double price;
+		LocalDateTime expirationDate;
+		int maxPeople;
+		TimedProduct.TimedType type;
+
+
+		int parseIndex = 1;
+		try {
+			// Parsing
+
+			String typeArgument = params[parseIndex++];
+			type = TimedProduct.TimedType.fromLabel(typeArgument.replaceAll("add", ""));
+			if (params.length == 6){
+				name = params[parseIndex++];
+				id = inventory.generateUniqueProductId();
+			}else{
+				id = Integer.parseInt(params[parseIndex++]);
+				name = params[parseIndex++];
+			}
+			price = Double.parseDouble(params[parseIndex++]);
+			expirationDate = LocalDate.parse(params[parseIndex++]).atStartOfDay();
+			maxPeople = Integer.parseInt(params[parseIndex]);
+
+
+			// Execution
+			if (!Inventory.isValidId(id)){
+				System.out.println("prod add: error:" + id + " is not a valid product id");
+				return;
+			}
+			if (!Inventory.isValidName(name)){
+				System.out.println("prod add: error:" + name + " is not a valid product name");
+				return;
+			}
+			if(price < 0){
+				System.out.println("prod add: error:" + price + " is not a valid product price");
+				return;
+			}
+			if (maxPeople > TimedProduct.TIMED_PRODUCT_MAX_PEOPLE){
+				System.out.println("prod add: error: " + maxPeople + " is not a valid maximum of people (max " + TimedProduct.TIMED_PRODUCT_MAX_PEOPLE + ")");
+				return;
+			}
+
+			Product addedProduct = inventory.createTimedProduct(id, name, price, maxPeople, type, expirationDate);
+			if (addedProduct == null){
+				System.out.println("prod add: error: Error adding product to the inventory");
+				return;
+			}
+			System.out.println(addedProduct);
+			System.out.println("prod " + typeArgument + " : ok");
+		}catch (Exception e){
+			System.out.println("Invalid argument: "  + params[parseIndex] + " for index " + parseIndex);
+		}
 	}
 	
 	
@@ -165,14 +234,6 @@ public class ProductCommand implements Command {
 		}
 	}
 
-	public void evalAddFood(String[] params, UserManager userManager, Inventory inventory) {
-		System.out.println("ProductCommand.evalAddFood: NOT IMPLEMENTED");
-	}
-
-	public void evalAddMeeting(String[] params, UserManager userManager, Inventory inventory) {
-		System.out.println("ProductCommand.evalAddMeeting: NOT IMPLEMENTED");
-	}
-
 	/**
 	 * Parses the 'remove' variation of the 'product' command.
 	 * The function only parses and 'id'.
@@ -182,29 +243,35 @@ public class ProductCommand implements Command {
 	 *               ProductCommand Remove instance or null
 	 */			
 	public void evalRemove(String[] params, UserManager userManager, Inventory inventory) {
-		// if (!Utils.checkArgsCountWithPrint("prod remove", params.length, 3)) return;
+		 if (!Utils.checkArgsCountWithPrint("prod remove", params.length, 3)) return;
 
- 		// Integer productId = Utils.tryParseInt(params[2]);
-		// if (productId == null) {
-		// 	Utils.printInvalidDataType("prod remove", "integer", params[2]);
-		// 	return;
-		// }
+ 		 Integer productId = Utils.tryParseInt(params[2]);
+		 if (productId == null) {
+		 	Utils.printInvalidDataType("prod remove", "integer", params[2]);
+		 	return;
+		 }
 
-		// Product productToRemove = inventory.readProduct(productId);
-		// if (productToRemove != null) {
-		// 	ticket.removeProduct(productId);
+		 Product productToRemove = inventory.readProduct(productId);
+		 if (productToRemove != null) {
+			 // Retrieves the active ticket from the system (Products should not be removed from closed tickets)
+			 List<Ticket> tickets = userManager.getAllTickets();
+
+			 for (Ticket ticket: tickets) {
+				 if (ticket.getIsOpen()) {
+					 ticket.removeProduct(productToRemove.getId());
+				 }
+			 }
+
+		 	if (inventory.deleteProduct(productId)) {
+		 		System.out.println(productToRemove);
+		 		System.out.println("prod remove: ok");
+		 	} else {
+		 		System.out.println("prod remove: error: unexpected error");
+		 	}
 			
-		// 	if (inventory.deleteProduct(productId)) {
-		// 		System.out.println(productToRemove);
-		// 		System.out.printf("prod remove: ok\n");
-		// 	} else {
-		// 		System.out.printf("prod remove: error: unexpected error\n");
-		// 	}
-			
-		// } else {
-		// 	System.out.printf("prod remove: error: product with id %d not found\n", productId);
-		// }
-		System.out.println("ProductCommand.evalRemove: NOT IMPLEMENTED");
+		 } else {
+		 	System.out.printf("prod remove: error: product with id %d not found\n", productId);
+		 }
 	}
 
 	/**

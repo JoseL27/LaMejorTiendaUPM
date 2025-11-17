@@ -1,8 +1,6 @@
 package es.upm.etsisi.poo;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * UserManager creates and stores a set of Clients and Cashiers (both are Users), and provides methods to perform
@@ -193,6 +191,18 @@ public class UserManager {
 		} else {
 			return new Cashier[0];
 		}
+	}
+
+	/**
+	 * Returns a list of all the tickets created by any cashier existing in the manager
+	 * @return ArrayList containing all the tickets in the system, the list will be empty if no tickets exist
+	 */
+	public List<Ticket> getAllTickets(){
+		List<Ticket> tickets = new ArrayList<>();
+		for (Cashier cashier: listCashiers()){
+			tickets.addAll(Arrays.asList(cashier.getTickets()));
+		}
+		return tickets;
 	}
 
 	/**
