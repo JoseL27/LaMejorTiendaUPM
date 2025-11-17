@@ -1,7 +1,9 @@
 package es.upm.etsisi.poo;
 
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
@@ -29,12 +31,12 @@ public class Ticket implements Comparable<Ticket> {
 	 * The current products the ticket holds. static array of products-amount pairs.
 	 * Has a fixed size of 'MAX_PRODUCTS' and holds 'count' product infos.
 	 */
-	private ProductInfo[] productInfos;
+	private ArrayList<ProductInfo> productInfos;
 
 	/**
-	 * The count of product infos in the productInfos array.
+	 * The total summed amount of all productInfo's amount
 	 */
-	private int count;
+	private int totalAmount;
 
 	/**
 	 * The number part of the ticket. 5 digit number (between 0 and 99999)
@@ -80,7 +82,14 @@ public class Ticket implements Comparable<Ticket> {
 	}
 
 	public String getComposedId() {
-		return String.format("%s-%s-%s", ID_DATE_FORMAT.format(dateOpened), id, ID_DATE_FORMAT.format(dateClosed));
+		String dateOpenedString = ID_DATE_FORMAT.format(this.dateOpened);
+		String idString = String.format("%s-%d", dateOpenedString, this.id);
+
+		if (dateClosed != null) {
+			String dateClosedString = ID_DATE_FORMAT.format(this.dateClosed);
+			idString += String.format("-%s", dateClosedString);
+		}
+		return idString;
 	}
 
 	public boolean getIsOpen() {
@@ -88,15 +97,14 @@ public class Ticket implements Comparable<Ticket> {
 	}
 
 	public boolean isEmpty() {
-		return (this.count == 0);
+		return this.productInfos.isEmpty();
 	}
 
 	/**
 	 * Resets the Ticket resources
 	 */
 	public void resetProductInfos() {
-		this.count = 0;
-		this.productInfos = new ProductInfo[MAX_PRODUCTS];
+		this.productInfos = new ArrayList<ProductInfo>();
 	}
 
 	public void close() {
@@ -130,29 +138,14 @@ public class Ticket implements Comparable<Ticket> {
 	 * @see appendProductInfo
 	 */
 	public boolean addProduct(Product product, int amount, String[] personalizations) {
-		ProductInfo newProductInfo = new ProductInfo(product, personalizations);
-
+		ProductInfo newProductInfo = new ProductInfo(product, amount, personalizations);
 		boolean result = false;
-		if (product instanceof BaseProduct) {
-			int amountIndex = 0;
-			result = true;
-			while (result && amountIndex < amount) {
-				result = appendProductInfo(newProductInfo);
-				amountIndex++;
-			}
-			
-		} else if (product instanceof TimedProduct) {
+		
+		ProductInfo duplicate = findDuplicateProductInfo(newProductInfo);
+		if (duplicate == null) {
 
-			boolean found = false;
-			int productIndex = 0;
-			while (!found && productIndex < count) {
-				found = (product.getId() == productInfos[productIndex].getProduct().getId());
-				productIndex++;				
-			}
-			
-			if (!found) {
+			if (product instanceof TimedProduct) {
 				TimedProduct timedProduct = (TimedProduct)product;
-
 				if (amount <= timedProduct.getMaxParticipants()) {
 					result = appendProductInfo(newProductInfo);
 					if (result) { 
@@ -160,6 +153,7 @@ public class Ticket implements Comparable<Ticket> {
 					}
 				}
 			}
+			result = appendProductInfo(newProductInfo);
 		}
 		
 		return result;
@@ -175,22 +169,24 @@ public class Ticket implements Comparable<Ticket> {
 	 * @return    the removed product if it was found or null if it wasn't
 	 */
 	public Product removeProduct(int id) {
-		int foundIndex = -1;
-		int index = 0;
-		while (foundIndex == -1 && index < count) {
-			if (productInfos[index].getProduct().getId() == id) {
-				foundIndex = index;
+		if (!Ticket.isValidId(id)) return null;
+		
+		ProductInfo foundProductInfo = null;
+		ProductInfo currentProductInfo = null;		
+		Iterator<ProductInfo> iterator = productInfos.iterator();
+		
+		while (foundProductInfo == null && iterator.hasNext()) {
+			currentProductInfo = iterator.next();
+			if (id == currentProductInfo.getProduct().getId()) {
+				foundProductInfo = currentProductInfo;
 			}
 		}
-			
-		if (foundIndex != -1) {
-			// NOTE(enrique): Unoredered Remove.
-			// Swap with the last element and remove the last element avoids moving elements.
-			Product removed = productInfos[foundIndex].getProduct();
-			productInfos[foundIndex] = productInfos[count - 1];
-			productInfos[count - 1]	= null;
-			count--;
-			return removed;
+		
+		if (foundProductInfo != null) {
+			Product removed = foundProductInfo.getProduct();
+			if (productInfos.remove(foundProductInfo)) {
+				return removed;
+			}
 		}
 		
 		return null;
@@ -206,8 +202,7 @@ public class Ticket implements Comparable<Ticket> {
 		int categoriesCount = BaseProduct.Category.values().length;
 		int[] categoriesProductCount = new int[categoriesCount];
 
-		for (int productInfoIndex = 0; productInfoIndex < count; productInfoIndex++) {
-			ProductInfo info = productInfos[productInfoIndex];
+		for (ProductInfo info : productInfos) {
 			Product prod = info.getProduct();
 			// NOTE(enrique): Think of a more OOP way to do this.
 			if (prod instanceof BaseProduct) {
@@ -241,52 +236,54 @@ public class Ticket implements Comparable<Ticket> {
 		double totalPrice = 0;
 		double totalDiscount = 0;
 		double totalPersExtra = 0;
-		
-		if (count > 0) {
-			Arrays.sort(productInfos, 0, count);
-		}
+
+		productInfos.sort(null);
 
 		int[] categoriesCount = categoriesProductCount();
 
-		for (int productInfoIndex = 0; productInfoIndex < count; productInfoIndex++) {
-
-			ProductInfo productInfo = productInfos[productInfoIndex];
+		for (ProductInfo productInfo : productInfos) {
 			Product product = productInfo.getProduct();
 
 			double multipliedPrice = 0;
 
 			sb.append(product.toString());
 
-			int personalizationCount = productInfo.getPersonalizations() != null 
-				? productInfo.getPersonalizations().length : 0;
-			double persExtra = multipliedPrice * PERSONALIZATION_EXTRA_PERCENT * personalizationCount;
 
 			if (product instanceof BaseProduct) {
 				BaseProduct baseProduct = (BaseProduct)product;
 
+				int personalizationCount = productInfo.getPersonalizations() != null 
+					? productInfo.getPersonalizations().length : 0;
+				double persExtra = multipliedPrice * PERSONALIZATION_EXTRA_PERCENT * personalizationCount;
+				boolean hasPersExtra = (int)persExtra != 0;
+				totalPersExtra += persExtra;
+
 				multipliedPrice = baseProduct.getPrice();
 				int categoryIndex = (int)baseProduct.getCategory().ordinal();
 				boolean hasDiscount = (categoriesCount[categoryIndex]) > 1;
+				double discountPercent = baseProduct.getCategory().getDiscountPercent(); 
+				double discount = discountPercent * multipliedPrice;
+				totalDiscount += discount;
 
-				if (hasDiscount) {
-					double discountPercent = baseProduct.getCategory().getDiscountPercent(); 
-					double discount = discountPercent * multipliedPrice;
-					totalDiscount += discount;
-					sb.append(String.format(" **discount -%.1f", (float)discount));
+				for (int i = 0; i < productInfo.getAmount(); i++) {
+					sb.append(baseProduct);
+					if (hasDiscount) {
+						sb.append(String.format(" **discount -%.1f", (float)discount));
+					}
+					if (hasPersExtra) { 
+						sb.append(String.format(" **pers extra -%.1f", (float)persExtra));
+					}
+					sb.append('\n');
 				}
 				
 			} else if (product instanceof TimedProduct) {
 				TimedProduct timedProduct = (TimedProduct)product;
 				multipliedPrice = timedProduct.getPrice() * timedProduct.getAmount();
+				sb.append(timedProduct);
+				sb.append('\n');
 			}
-
-			if ((int)persExtra != 0) { 
-				sb.append(String.format(" **pers extra -%.1f", (float)persExtra));
-			}
-			sb.append("\n");
 
 			totalPrice += multipliedPrice;
-			totalPersExtra += persExtra;
 		}
 
 		double finalPrice = (totalPrice - totalDiscount + totalPersExtra);
@@ -310,15 +307,15 @@ public class Ticket implements Comparable<Ticket> {
 	 */
 	private ProductInfo findDuplicateProductInfo(ProductInfo productInfo) {
 		ProductInfo result = null;
-		int productInfoIndex = 0;
-		
-		while (result == null && productInfoIndex < count) {
-			if (productInfo.duplicateOf(productInfos[productInfoIndex])) {
-				result = productInfos[productInfoIndex];
+		ProductInfo currentProductInfo = null;		
+		Iterator<ProductInfo> iterator = productInfos.iterator();
+
+		while (result == null && iterator.hasNext()) {
+			currentProductInfo = iterator.next();
+			if (productInfo.getProduct().getId() == currentProductInfo.getProduct().getId()) {
+				result = currentProductInfo;
 			}
-			productInfoIndex++;
 		}
-		
 		return result;
 	}
 
@@ -331,9 +328,9 @@ public class Ticket implements Comparable<Ticket> {
 	 */
 	private boolean appendProductInfo(ProductInfo productInfo) {
 		boolean result = false;
-		if (count + 1 <= MAX_PRODUCTS) {
-			productInfos[count] = productInfo;
-			count++;
+		if (totalAmount <= MAX_PRODUCTS) {
+			productInfos.add(productInfo);
+			totalAmount += productInfo.getAmount();
 			result = true;
 		}
 		return result;
@@ -342,7 +339,7 @@ public class Ticket implements Comparable<Ticket> {
 	public int compareTo(Ticket ticket) {
 		return this.getComposedId().compareTo(ticket.getComposedId());
 	}
-
+	
 	public static void main(String[] args) {
 		Ticket ticket = new Ticket(0);
 

@@ -9,15 +9,21 @@ public class ProductInfo implements Comparable<ProductInfo> {
 	 */
 
 	private Product product;
+	private int amount;
 	private String[] personalizations;
 		
-	public ProductInfo(Product product, String[] personalizations) {
+	public ProductInfo(Product product, int amount, String[] personalizations) {
 		this.product = product;
+		this.amount = amount;
 		this.personalizations = personalizations;
 	}
 
 	public Product getProduct() { 
 		return this.product;
+	}
+	
+	public int getAmount() { 
+		return this.amount;
 	}
 	
 	public String[] getPersonalizations() { 
