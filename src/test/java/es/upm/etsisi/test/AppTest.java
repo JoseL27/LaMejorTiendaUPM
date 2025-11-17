@@ -32,7 +32,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll; 
 
 public class AppTest {
-	/*
 	// DICTATOR LOCALE 
 	@BeforeAll
 	static void setEnUSLocale() {
@@ -113,31 +112,26 @@ public class AppTest {
 		}
 	}
 
-	void runAppWithInput(Scanner inputScanner) {
-		App app = new App();
-		app.run(inputScanner);
-	}
-
-	void runAppWithInput(File inputFile) throws FileNotFoundException {
-		runAppWithInput(new Scanner(inputFile));
-	}
-	
-	void runAppWithInput(String inputString) {
-		runAppWithInput(new Scanner(inputString));
-	}
-
 	// ======================================================================
 	// TESTS
 	// ======================================================================
+	@Test
+	void fullAppTestByLines() throws IOException {
+		Scanner testInScanner = new Scanner(new File("full-app-in.txt"));
+		App app = new App();
+		app.run(testInScanner, true);
+		assertEqualOutputsByLine(Paths.get("full-app-expected-out.txt"));
+	}
 
 	@Test
 	void fullAppTest() throws IOException {
 		Scanner testInScanner = new Scanner(new File("full-app-in.txt"));
 		App app = new App();
-		app.run(testInScanner);
-		assertEqualOutputsByLine(Paths.get("full-app-expected-out.txt"));
+		app.run(testInScanner, true);
+		assertEqualOutputs(Paths.get("full-app-expected-out.txt"));
 	}
-
+	
+	/*
 	@Test
 	void auxCommandsTest() throws IOException {
 		String inputString =

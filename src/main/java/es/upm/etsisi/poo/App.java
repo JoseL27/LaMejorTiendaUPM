@@ -29,6 +29,10 @@ public class App {
      * Then the Command is executed. If any error is detected, a message error is sent indicating the error.
      */
     public void run(Scanner sc) {
+		run(sc, false);
+	}
+	
+    public void run(Scanner sc, boolean echoCmd) {
         Locale.setDefault(new Locale("en", "US"));
 
         System.out.println("Welcome to the ticket module App.");
@@ -38,12 +42,16 @@ public class App {
         do {
             System.out.print("tUPM> ");
             input = sc.nextLine();
+			if (echoCmd) {
+				System.out.println(input);
+			}
             if (!input.equals("exit")) {
 				firstParse(input);
 			} else {
 				System.out.println("Closing application.");
 				System.out.println("Goodbye!");
 			}
+			System.out.println();
         } while (sc.hasNext() && !input.equals("exit"));
     }
 
@@ -117,35 +125,36 @@ public class App {
 
     private static void echo(String[] params) {
         if (!Utils.checkArgsCountWithPrint("echo", params.length, 2)) return;
-        System.out.printf("echo \"%s\"\n", params[1]);
+        System.out.printf("\"%s\"\n", params[1]);
     }
 
     private static void help() {
         System.out.println("Commands:");
-        System.out.println(" prod add [<id>] \"<name>\" <category> <price> [<maxPers>]");
-        System.out.println(" prod list");
+        System.out.println("  client add \"<nombre>\" <DNI> <email> <cashId>");
+        System.out.println("  client remove <DNI>");
+        System.out.println("  client list");
+							  
+        System.out.println("  cash add [<id>] \"<nombre>\" <email>");
+        System.out.println("  cash remove <id>");
+        System.out.println("  cash list");
+        System.out.println("  cash tickets <id>");
 
-        System.out.println(" prod update <id> NAME|CATEGORY|PRICE <value>");
-
-        System.out.println(" prod addFood [<id>] \"<name>\" <price> <expiration: yyyy-MM-dd> <max_people>");
-        System.out.println(" prod addMeeting [<id>] \"<name>\" <price> <expiration: yyyy-MM-dd> <max_people>");
-        System.out.println(" prod remove <id>");
-
-        System.out.println(" ticket new [<id>] <cashId> <userId>");
-        System.out.println(" ticket add <ticketId> <cashId> <prodId> <amount> [--p<txt> --p<txt> ...]");
-        System.out.println(" ticket remove <ticketId> <cashId> <prodId>");
-        System.out.println(" ticket print <ticketId> <cashId>");
-        System.out.println(" ticket list");
-
-        System.out.println(" client add \"<nombre>\" <DNI> <email> <cashId>");
-        System.out.println(" client remove <DNI>");
-        System.out.println(" client list");
-        System.out.println(" cash add [<id>] \"<nombre>\" <email>");
-        System.out.println(" cash remove <id>");
-        System.out.println(" cash tickets <id>");
-        System.out.println(" echo \"<texto>\"");
-        System.out.println(" help");
-        System.out.println(" exit");
+        System.out.println("  ticket new [<id>] <cashId> <userId>");
+        System.out.println("  ticket add <ticketId> <cashId> <prodId> <amount> [--p<txt> --p<txt> ...]");
+        System.out.println("  ticket remove <ticketId> <cashId> <prodId>");
+        System.out.println("  ticket print <ticketId> <cashId>");
+        System.out.println("  ticket list");
+		
+        System.out.println("  prod add [<id>] \"<name>\" <category> <price> [<maxPers>]");
+        System.out.println("  prod update <id> NAME|CATEGORY|PRICE <value>");
+        System.out.println("  prod addFood [<id>] \"<name>\" <price> <expiration: yyyy-MM-dd> <max_people>");
+        System.out.println("  prod addMeeting [<id>] \"<name>\" <price> <expiration: yyyy-MM-dd> <max_people>");
+        System.out.println("  prod list");
+        System.out.println("  prod remove <id>");
+							  
+        System.out.println("  help");
+        System.out.println("  echo \"<text>\"");
+        System.out.println("  exit");
         System.out.println();
 
         BaseProduct.Category[] categoryValues = BaseProduct.Category.values();
