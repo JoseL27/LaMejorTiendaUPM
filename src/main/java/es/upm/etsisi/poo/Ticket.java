@@ -2,7 +2,6 @@ package es.upm.etsisi.poo;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -92,7 +91,7 @@ public class Ticket implements Comparable<Ticket> {
 		return idString;
 	}
 
-	public boolean getIsOpen() {
+	public boolean isOpen() {
 		return this.isOpen;
 	}
 

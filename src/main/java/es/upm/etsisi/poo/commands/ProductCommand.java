@@ -4,7 +4,6 @@ import es.upm.etsisi.poo.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -161,7 +160,7 @@ public class ProductCommand implements Command {
 				return;
 			}
 
-			Product addedProduct = inventory.createTimedProduct(id, name, price, maxPeople, type, expirationDate);
+			TimedProduct addedProduct = inventory.createTimedProduct(id, name, price, maxPeople, type, expirationDate);
 			if (addedProduct == null){
 				System.out.println("prod add: error: Error adding product to the inventory");
 				return;
@@ -257,7 +256,7 @@ public class ProductCommand implements Command {
 			 List<Ticket> tickets = userManager.getAllTickets();
 
 			 for (Ticket ticket: tickets) {
-				 if (ticket.getIsOpen()) {
+				 if (ticket.isOpen()) {
 					 ticket.removeProduct(productToRemove.getId());
 				 }
 			 }
@@ -296,5 +295,4 @@ public class ProductCommand implements Command {
 		}
 		System.out.println("prod list: ok");
 	}
-	
 }

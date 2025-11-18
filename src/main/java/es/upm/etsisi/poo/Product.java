@@ -25,9 +25,5 @@ public abstract class Product {
 
     public void setPrice(double price) {this.price = price;}
 
-	public double getMultipliedPrice(int amount) {
-		return amount * price;
-	}
-	
 	public abstract boolean duplicateOf(Product product);
 }

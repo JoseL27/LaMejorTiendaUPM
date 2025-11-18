@@ -50,10 +50,6 @@ public class BaseProduct extends Product {
         this.maxPersonalizations = maxPersonalizations;
     }
 
-	public int getMaxPersonalizations() {
-		return this.maxPersonalizations;
-	}
-
     public Category getCategory() {
         return category;
     }

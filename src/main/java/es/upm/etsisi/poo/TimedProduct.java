@@ -30,7 +30,7 @@ public class TimedProduct extends Product {
         public int getHoursForPreparing(){
             return hoursForPreparing;
         }
-    }
+        }
 
     public static final int TIMED_PRODUCT_MAX_PEOPLE = 100;
 	
