@@ -1,7 +1,7 @@
 # La Mejor Tienda UPM 
 
 ## Tareas
- - [ ] ⁠(Enrique)  Escribir test con fichero entrada ejemplo (el de moodle)
+ - [x] ⁠(Enrique)  Escribir test con fichero entrada ejemplo (el de moodle)
  - [ ] ⁠(Andres)   Escribir tests generales
  - [ ] ⁠⁠(TODOS)    Probar (y talvez escribir tests) para casos casitos y casetes
  - [ ] (⁠TODOS)    Garantizar que todo este funcionando
