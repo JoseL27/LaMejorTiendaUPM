@@ -17,9 +17,9 @@ cash add "pepecurro2" pepe0@upm.es
 echo "Creo tres cliente listo borro uno y listo"
 client add "Pepe3" 55630667S pepe1@upm.es UW1234567
 client add "Pepe2" 98948334B pepe2@upm.es UW1234567
-client add "Pepe1" Y8682724P pepe3@upm.es UW1234567
+client add "Pepe1" 18682724P pepe3@upm.es UW1234567
 client list
-client remove Y8682724P
+client remove 18682724P
 client list
 echo "creo un cajero nuevo listo, lo booro y listo de nuevo"
 cash add UW1234569 "pepecurro1" pepe0@upm.es

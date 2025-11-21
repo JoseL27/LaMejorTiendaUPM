@@ -51,17 +51,15 @@ Catalog:
 prod list: ok
 
 tUPM> echo "Actualizo Nombre y Precio del Libro"
-"Actualizo Nombre y Precio del Libro" 
+"Actualizo Nombre y Precio del Libro"
 
 tUPM> prod update 1 NAME "Libro POO V2"
 {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:25.0}
 prod update: ok
 
-
 tUPM> prod update 1 PRICE 30
 {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}
 prod update: ok
-
 
 tUPM> echo "inserto libro repetido y lo borro"
 "inserto libro repetido y lo borro"
@@ -82,7 +80,7 @@ Cash{identifier='UW1234567', name='pepecurro3', email='pepe0@upm.es'}
 cash add: ok
 
 tUPM> cash add "pepecurro2" pepe0@upm.es
-Cash{identifier='UW8961116', name='pepecurro2', email='pepe0@upm.es'}
+Cash{identifier='UW1234568', name='pepecurro2', email='pepe0@upm.es'}
 cash add: ok
 
 tUPM> echo "Creo tres cliente listo borro uno y listo"
@@ -96,18 +94,18 @@ tUPM> client add "Pepe2" 98948334B pepe2@upm.es UW1234567
 Client{identifier='98948334B', name='Pepe2', email='pepe2@upm.es', cash=UW1234567}
 client add: ok
 
-tUPM> client add "Pepe1" Y8682724P pepe3@upm.es UW1234567
-Client{identifier='Y8682724P', name='Pepe1', email='pepe3@upm.es', cash=UW1234567}
+tUPM> client add "Pepe1" 18682724P pepe3@upm.es UW1234567
+Client{identifier='18682724P', name='Pepe1', email='pepe3@upm.es', cash=UW1234567}
 client add: ok
 
 tUPM> client list
 Client:
-  Client{identifier='Y8682724P', name='Pepe1', email='pepe3@upm.es', cash=UW1234567}
+  Client{identifier='18682724P', name='Pepe1', email='pepe3@upm.es', cash=UW1234567}
   Client{identifier='98948334B', name='Pepe2', email='pepe2@upm.es', cash=UW1234567}
   Client{identifier='55630667S', name='Pepe3', email='pepe1@upm.es', cash=UW1234567}
 client list: ok
 
-tUPM> client remove Y8682724P
+tUPM> client remove 18682724P
 client remove: ok
 
 tUPM> client list
@@ -126,7 +124,7 @@ cash add: ok
 tUPM> cash list
 Cash:
   Cash{identifier='UW1234569', name='pepecurro1', email='pepe0@upm.es'}
-  Cash{identifier='UW8961116', name='pepecurro2', email='pepe0@upm.es'}
+  Cash{identifier='UW1234568', name='pepecurro2', email='pepe0@upm.es'}
   Cash{identifier='UW1234567', name='pepecurro3', email='pepe0@upm.es'}
 cash list: ok
 
@@ -135,7 +133,7 @@ cash remove: ok
 
 tUPM> cash list
 Cash:
-  Cash{identifier='UW8961116', name='pepecurro2', email='pepe0@upm.es'}
+  Cash{identifier='UW1234568', name='pepecurro2', email='pepe0@upm.es'}
   Cash{identifier='UW1234567', name='pepecurro3', email='pepe0@upm.es'}
 cash list: ok
 
@@ -143,7 +141,7 @@ tUPM> echo "miro los tickets de UW1234567 creo un ticket y vuelvo a printar"
 "miro los tickets de UW1234567 creo un ticket y vuelvo a printar"
 
 tUPM> cash tickets UW1234567
-Tickets: 
+Tickets:
 cash tickets: ok
 
 tUPM> ticket new UW1234567 55630667S
