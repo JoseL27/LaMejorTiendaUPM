@@ -35,6 +35,7 @@ public class Client extends User implements Comparable<Client> {
 
 	@Override
 	public String toString() {
-		return "{Client:" + this.getId() + ", name:'" + this.getName() + "', email:'" + this.getEmail() + "', created by:" + this.managedBy.getId() + "}";
+		return String.format("Client{identifier='%s', name='%s', email='%s', cash=%s}",
+							 this.getId(), this.getName(), this.getEmail(), this.managedBy.getId());
 	}
 }

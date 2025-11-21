@@ -28,13 +28,13 @@ public class Cashier extends User implements Comparable<Cashier> {
     /**
      * Creates a new ticket the id given in the parameter.
      */
-    public boolean createTicket(int id){
-        boolean result = false;
+    public Ticket createTicket(int id){
+        Ticket created = null;
         if (Ticket.isValidId(id)){
-            createdTickets.add(new Ticket(id));
-            result = true;
+			created = new Ticket(id);
+            createdTickets.add(created);
         }
-		return result;
+		return created;
     }
 
 	public Ticket findTicket(int ticketId) {
@@ -120,7 +120,8 @@ public class Cashier extends User implements Comparable<Cashier> {
 
     @Override
     public String toString() {
-		return "{Cashier:" + this.getId() + ", name:'" + this.getName() + "', email:'" + this.getEmail() + "'}";
+		return String.format("Cash{identifier='%s', name='%s', email='%s'}",
+							 this.getId(), this.getName(), this.getEmail());
 	}
 
 }

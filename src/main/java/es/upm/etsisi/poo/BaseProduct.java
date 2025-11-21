@@ -64,7 +64,7 @@ public class BaseProduct extends Product {
 	
     @Override
     public String toString() {
-        return String.format("{id:%d, name:'%s', category:%s, price:%.1f}",
+        return String.format("{class:Product, id:%d, name:'%s', category:%s, price:%.1f}",
                 this.id, super.getName(), this.category, super.getPrice());
     }
 

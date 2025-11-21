@@ -266,6 +266,7 @@ public class Ticket implements Comparable<Ticket> {
 				totalDiscount += discount;
 
 				for (int i = 0; i < productInfo.getAmount(); i++) {
+					sb.append("  ");
 					sb.append(baseProduct);
 					if (hasDiscount) {
 						sb.append(String.format(" **discount -%.1f", (float)discount));
@@ -279,6 +280,7 @@ public class Ticket implements Comparable<Ticket> {
 			} else if (product instanceof TimedProduct) {
 				TimedProduct timedProduct = (TimedProduct)product;
 				multipliedPrice = timedProduct.getPrice() * timedProduct.getAmount();
+				sb.append("  ");
 				sb.append(timedProduct);
 				sb.append('\n');
 			}
@@ -288,10 +290,9 @@ public class Ticket implements Comparable<Ticket> {
 
 		double finalPrice = (totalPrice - totalDiscount + totalPersExtra);
 		
-		sb.append(String.format("Total price: %.1f\n", totalPrice));
-		sb.append(String.format("Total discount: %.1f\n", totalDiscount));
-		sb.append(String.format("Personalization extra: %.1f\n", totalPersExtra));
-		sb.append(String.format("Final Price: %.1f", finalPrice));
+		sb.append(String.format("  Total price: %.1f\n", totalPrice));
+		sb.append(String.format("  Total discount: %.1f\n", totalDiscount));
+		sb.append(String.format("  Final Price: %.1f", finalPrice));
 		return sb.toString();
 	}
 
