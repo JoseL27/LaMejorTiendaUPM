@@ -38,24 +38,24 @@ public class UserManager {
 	 * @param cashierResponsible Cashier who is linked with the creation of this Client
 	 * @return True if successful, false if otherwise
 	 */
-	public boolean addClient(String clientId, String name, String email, Cashier cashierResponsible) {
+	public Client addClient(String clientId, String name, String email, Cashier cashierResponsible) {
 		// Check null in any field
 		if (clientId == null || !Client.isValidId(clientId) || name == null || email == null || cashierResponsible == null)
-			return false;
+			return null;
 
 		// Make sure cashierResponsible exists within the Cashier set
 		Cashier findCashier = this.findCashier(cashierResponsible.getId());
 		if (findCashier == null || !findCashier.equals(cashierResponsible)) // Shortcircuit is fun
-			return false;
+			return null;
 
 		// Attempt to find the client with the same ID in the cashier set
-		if (this.clients.containsKey(clientId))
-			return false;
-		else {
+		if (!this.clients.containsKey(clientId)) {
 			Client newClient = new Client(clientId, name, email, cashierResponsible);
 			this.clients.put(clientId, newClient);
-			return true;
+			return newClient;
 		}
+
+		return null;
 	}
 
 	/**
@@ -112,22 +112,22 @@ public class UserManager {
 	 * @param email Cashier's corporate email, must end in specific domain (See Cashier class)
 	 * @return True if successful, false if the worker with the same id already exists, or the ID space for cashier is exhausted, or email format is not correct
 	 */
-	public boolean addCashier(String workerId, String name, String email) {
+	public Cashier addCashier(String workerId, String name, String email) {
 		// Sanity check for email and workedId
 		if (workerId == null || name == null || email == null)
-			return false;
+			return null;
 		boolean isEmailValid = Cashier.isCompanyEmail(email);
 		boolean isWorkerIdValid = Cashier.isValidId(workerId);
 
 		// If ID space is exhausted, do not add any more Cashiers
 		int maximumCashierAmountLimitedById = UserManager.MAX_CASHIER_ID - UserManager.MIN_CASHIER_ID + 1;
 		if (this.cashiers.size() >= maximumCashierAmountLimitedById)
-			return false;
+			return null;
 
 		if (isEmailValid && isWorkerIdValid) {
 			// Attempt to find the cashier with the same ID in the cashier set
 			if (this.cashiers.containsKey(workerId))
-				return false;
+				return null;
 
 			// Update nextCashierId if needed for auto-increment
 			String number = Utils.removeLeadingZeros(workerId.substring(2)); // Remove 'UW', remove leading 0
@@ -138,9 +138,9 @@ public class UserManager {
 			// Add the cashier to the set
 			Cashier newCashier = new Cashier(workerId, name, email);
 			this.cashiers.put(workerId, newCashier);
-			return true;
+			return newCashier;
 		} else {
-			return false;
+			return null;
 		}
 	}
 
@@ -150,7 +150,7 @@ public class UserManager {
 	 * @param email Cashier's corporate email, must end in specific domain (See Cashier class)
 	 * @return True if successful, false if the worker with the same id already exists, or the ID space for cashier is exhausted
 	 */
-	public boolean addCashier(String name, String email) {
+	public Cashier addCashier(String name, String email) {
 		String newCashierId = this.generateUniqueCashierId();
 		return this.addCashier(newCashierId, name, email);
 	}
@@ -179,18 +179,14 @@ public class UserManager {
 	 * @return Array of Cashier, array of zero length if there are none
 	 */
 	public Cashier[] listCashiers() {
-		if (!this.cashiers.isEmpty()) {
-			Iterator<Cashier> cashierIterator = this.cashiers.values().iterator();
-			Cashier[] arrayCashier = new Cashier[this.cashiers.size()];
-			int i = 0;
-			while (cashierIterator.hasNext()) {
-				arrayCashier[i] = cashierIterator.next();
-				i++;
-			}
-			return arrayCashier;
-		} else {
-			return new Cashier[0];
+		Iterator<Cashier> cashierIterator = this.cashiers.values().iterator();
+		Cashier[] arrayCashier = new Cashier[this.cashiers.size()];
+		int i = 0;
+		while (cashierIterator.hasNext()) {
+			arrayCashier[i] = cashierIterator.next();
+			i++;
 		}
+		return arrayCashier;
 	}
 
 	/**
