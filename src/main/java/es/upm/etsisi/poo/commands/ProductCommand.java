@@ -291,7 +291,7 @@ public class ProductCommand implements Command {
 		System.out.println("Catalog:");
 		if (products != null) {
 			for (Product p : products) {
-				System.out.println(" "+p.toString());
+				System.out.println("  "+p.toString());
 			}
 		}
 		System.out.println("prod list: ok");

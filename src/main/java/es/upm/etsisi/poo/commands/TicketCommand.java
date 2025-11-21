@@ -99,10 +99,17 @@ public class TicketCommand implements Command {
 		}
 
 		if (client.addTicket(ticketId)) {
-			cashier.createTicket(ticketId);
-			System.out.println("ticket new: ok");
+			Ticket created = cashier.createTicket(ticketId);
+
+			if (created != null) { 
+				System.out.printf("Ticket : %s\n", created.getComposedId());
+				System.out.println(created.summaryString());
+				System.out.println("ticket new: ok");
+			} else {
+				System.out.println("ticket new: error: failed to add ticket to cashier.");
+			}
 		} else {
-			System.out.println("ticket new: failed to add the ticket to the client");
+			System.out.println("ticket new: error: failed to add the ticket to the client");
 		}
     }
 
@@ -333,7 +340,23 @@ public class TicketCommand implements Command {
     }
 
 	private String[] parsePersonalizations(int beginIndex, String[] params) {
-		System.out.println("TicketCommand.parsePersonalizations: UNIMPLEMENTED");
-		return null;
+		int size = params.length-beginIndex;
+		String[] pers = new String[size];
+
+		boolean result = true;
+		int i = 0; 
+		while (i < size && result) {
+			String str = params[i + beginIndex];
+			result = str.length() >= 3 && str.substring(0, 2).equals("--p");
+			if (result) {
+				pers[i] = str.substring(3);
+			}
+			i++;
+		}
+
+		if (!result) {
+			return null;
+		}
+		return pers;
 	}
 }
