@@ -130,7 +130,12 @@ public class UserManager {
 				return null;
 
 			// Update nextCashierId if needed for auto-increment
-			String number = Utils.removeLeadingZeros(workerId.substring(2)); // Remove 'UW', remove leading 0
+			String number = workerId.substring(2); // Remove 'UW'
+            // If the id is all 0 the number=0
+            if(number.matches("^0+$")) number="0";
+            // All the leading 0 are eliminated
+            else number.replaceAll("^0+", "");
+
 			int cashierIdValue = Integer.parseInt(number);
 			if (cashierIdValue >= this.nextCashierId)
 				this.nextCashierId = cashierIdValue + 1;
