@@ -64,8 +64,8 @@ public class ProductCommand implements Command {
 		String productCategoryString = params[parseIndex++];
 		BaseProduct.Category productCategory = BaseProduct.Category.fromLabel(productCategoryString);
 		if (productCategory == null) {
-			Utils.printInvalidEnum("prod add", "category", productCategoryString, BaseProduct.Category.values());
-			return;
+            System.out.printf("%s: error: invalid %s '%s', expected one of: %s\n","prod add", "category", productCategoryString, BaseProduct.Category.values());
+            return;
 		}
 
 		String productPriceString = params[parseIndex++];
@@ -207,8 +207,9 @@ public class ProductCommand implements Command {
 		case "category" -> {
 			BaseProduct.Category productCategory = BaseProduct.Category.fromLabel(params[4]);
 			if (productCategory == null) {
-				Utils.printInvalidEnum("prod update", "category", params[4], BaseProduct.Category.values());
-			} else { 
+                System.out.printf("%s: error: invalid %s '%s', expected one of: %s\n",
+                        "prod update", "category", params[4], BaseProduct.Category.values());
+            } else {
 				updatedProduct = inventory.updateProductCategory(productId, productCategory);
 			}
 		}
