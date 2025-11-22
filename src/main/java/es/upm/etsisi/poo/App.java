@@ -23,6 +23,7 @@ public class App {
         userManager = new UserManager();
     }
 
+
     /**
      * This is the main function which runs the program.
      * It has and scanner for read the different commands, then that string is parsed, and checked if it is correct (ParseResult=Success).
@@ -124,7 +125,7 @@ public class App {
     }
 
     private static void echo(String[] params) {
-        if (!Utils.checkArgsCountWithPrint("echo", params.length, 2)) return;
+        if (!checkArgsCountWithPrint("echo", params.length, 2)) return;
         System.out.printf("\"%s\"\n", params[1]);
     }
 
@@ -174,7 +175,7 @@ public class App {
 
     private void firstParse(String input) {
         String[] params = parser(input);
-        if (!Utils.checkMinArgsCountWithPrint("all", params.length, 1)) return;
+        if (!checkMinArgsCountWithPrint("all", params.length, 1)) return;
 
         Command command = null;
         switch (params[0].toLowerCase()) {
@@ -190,5 +191,44 @@ public class App {
         if (command != null) {
             command.eval(params, userManager, inventory);
         }
+    }
+
+
+    /**
+     * Parses an integer from a string, basically supresses the InvalidArgumentException.
+     * @return An integer with the underlying int value or NULL if the parse failed.
+     */
+    public static Integer tryParseInt(String s) {
+        Integer value = null;
+        try {
+            value = Integer.parseInt(s);
+        } catch (Exception e) {
+        } finally {
+            return value;
+        }
+    }
+
+    public static boolean checkMaxArgsCountWithPrint(String prefix, int amount, int maxAmount) {
+        if (amount > maxAmount) {
+            System.out.printf("%s: too many arguments, expected maximum %d and got %d\n", prefix, maxAmount, amount);
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean checkMinArgsCountWithPrint(String prefix, int amount, int minAmount) {
+        if (amount < minAmount) {
+            System.out.printf("%s: too few arguments, expected at least %d arguments and got %d\n", prefix, minAmount, amount);
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean checkArgsCountWithPrint(String prefix, int amount, int minAmount, int maxAmount) {
+        return checkMinArgsCountWithPrint(prefix, amount, minAmount) && checkMaxArgsCountWithPrint(prefix, amount, maxAmount);
+    }
+
+    public static boolean checkArgsCountWithPrint(String prefix, int amount, int expectedAmount) {
+        return checkArgsCountWithPrint(prefix, amount, expectedAmount, expectedAmount);
     }
 }

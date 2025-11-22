@@ -4,7 +4,6 @@ import es.upm.etsisi.poo.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -19,7 +18,7 @@ import java.util.List;
 public class ProductCommand implements Command {
 	@Override
 	public void eval(String[] args, UserManager userManager, Inventory inventory) {
-		if (!Utils.checkArgsCountWithPrint("prod", args.length, 2, 7)) return;
+		if (!App.checkArgsCountWithPrint("prod", args.length, 2, 7)) return;
 
 		switch (args[1].toLowerCase()) {
 		case "addfood", "addmeeting" -> evalAddTimed(args, userManager, inventory);
@@ -43,14 +42,14 @@ public class ProductCommand implements Command {
 	 */	
 	public void evalAddBase(String[] params, UserManager userManager, Inventory inventory) {
 		// Parse
-		if (!Utils.checkArgsCountWithPrint("prod add", params.length, 5, 7)) return;
+		if (!App.checkArgsCountWithPrint("prod add", params.length, 5, 7)) return;
 		
 		// NOTE(enrique): Index to consume while parsing
 		int parseIndex = 2; 
 
 		String productIdOrName = params[parseIndex++];
 		String productName = null;
- 		Integer productId = Utils.tryParseInt(productIdOrName);
+ 		Integer productId = App.tryParseInt(productIdOrName);
 		
 		// NOTE(enrique): Check the 3rd argument:
 		//  - If parsing the int succeeds then we assume its the ID and the next token is the name string (advance parsing)
@@ -69,7 +68,7 @@ public class ProductCommand implements Command {
 		}
 
 		String productPriceString = params[parseIndex++];
- 		Integer productPrice = Utils.tryParseInt(productPriceString);
+ 		Integer productPrice = App.tryParseInt(productPriceString);
 		if (productPrice == null){
 			Utils.printInvalidDataType("prod add", "integer", productPriceString);
 			return;
@@ -78,7 +77,7 @@ public class ProductCommand implements Command {
 		Integer productMaxPers = productCategory.getMaxPersonalizations();
 		if (parseIndex < params.length) {
 			String productMaxPersString = params[parseIndex++];
-			productMaxPers = Utils.tryParseInt(productMaxPersString);
+			productMaxPers = App.tryParseInt(productMaxPersString);
 			if (productMaxPers == null){
 				Utils.printInvalidDataType("prod add", "integer", productMaxPersString);
 				return;
@@ -187,9 +186,9 @@ public class ProductCommand implements Command {
 	 * @see Product.Field
 	 */		
 	public void evalUpdate(String[] params, UserManager userManager, Inventory inventory) {
-		if (!Utils.checkArgsCountWithPrint("prod update", params.length, 5)) return;
+		if (!App.checkArgsCountWithPrint("prod update", params.length, 5)) return;
 		
- 		Integer productId = Utils.tryParseInt(params[2]);
+ 		Integer productId = App.tryParseInt(params[2]);
 		if (productId == null){
 			Utils.printInvalidDataType("prod update", "integer", params[2]);
 			return;
@@ -214,7 +213,7 @@ public class ProductCommand implements Command {
 			}
 		}
 		case "price" -> {
-			Integer productPrice = Utils.tryParseInt(params[4]);
+			Integer productPrice = App.tryParseInt(params[4]);
 			if (productPrice == null){
 				Utils.printInvalidDataType("prod update", "integer", params[4]);
 			} else { 
@@ -244,9 +243,9 @@ public class ProductCommand implements Command {
 	 *               ProductCommand Remove instance or null
 	 */			
 	public void evalRemove(String[] params, UserManager userManager, Inventory inventory) {
-		 if (!Utils.checkArgsCountWithPrint("prod remove", params.length, 3)) return;
+		 if (!App.checkArgsCountWithPrint("prod remove", params.length, 3)) return;
 
- 		 Integer productId = Utils.tryParseInt(params[2]);
+ 		 Integer productId = App.tryParseInt(params[2]);
 		 if (productId == null) {
 		 	Utils.printInvalidDataType("prod remove", "integer", params[2]);
 		 	return;
@@ -285,7 +284,7 @@ public class ProductCommand implements Command {
 	 *               ProductCommand List instance or null
 	 */
 	public void evalList(String[] params, UserManager userManager, Inventory inventory) {
-		if (!Utils.checkArgsCountWithPrint("prod list", params.length, 2)) return;
+		if (!App.checkArgsCountWithPrint("prod list", params.length, 2)) return;
 
 		Product[] products = inventory.listProducts();
 

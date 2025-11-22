@@ -25,7 +25,7 @@ public class Client extends User implements Comparable<Client> {
 	public static boolean isValidId(String id) {
 		return id.length() == 9 
 			&& Character.isLetter(id.charAt(8))
-			&& (Utils.tryParseInt(id.substring(0, 7)) != null);
+			&& (App.tryParseInt(id.substring(0, 7)) != null);
 	}
 
 	@Override

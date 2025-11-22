@@ -2,12 +2,7 @@ package es.upm.etsisi.poo.commands;
 
 import java.util.Arrays;
 
-import es.upm.etsisi.poo.Cashier;
-import es.upm.etsisi.poo.Client;
-import es.upm.etsisi.poo.Command;
-import es.upm.etsisi.poo.Inventory;
-import es.upm.etsisi.poo.UserManager;
-import es.upm.etsisi.poo.Utils;
+import es.upm.etsisi.poo.*;
 
 /**
  * Command to manage clients (add, remove, list)
@@ -31,7 +26,7 @@ public class ClientCommand implements Command {
 
 	@Override
 	public void eval(String[] params, UserManager manager, Inventory dataManager) {
-		if(!Utils.checkArgsCountWithPrint("client", params.length, 2, 6)) { return; }
+		if(!App.checkArgsCountWithPrint("client", params.length, 2, 6)) { return; }
 		final String subcommand = params[1].toLowerCase();
 		switch (subcommand) {
 			case "add" -> evalAdd(params, manager);
@@ -58,7 +53,7 @@ public class ClientCommand implements Command {
 	 * @param manager  The UserManager instance used to find the creator cashier and add the new client.
 	 */
 	public void evalAdd(String[] params, UserManager manager) {
-		if (!Utils.checkArgsCountWithPrint("client add", params.length, 6)) {
+		if (!App.checkArgsCountWithPrint("client add", params.length, 6)) {
 			return;
 		}
 		
@@ -85,7 +80,7 @@ public class ClientCommand implements Command {
 
 	public void evalRemove(String[] params, UserManager manager) {
 
-		if (!Utils.checkArgsCountWithPrint("client remove", params.length, 3)) {
+		if (!App.checkArgsCountWithPrint("client remove", params.length, 3)) {
 			return;
 		}
 		if (manager.removeClient(params[2])) {
