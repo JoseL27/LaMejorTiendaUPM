@@ -23,7 +23,6 @@ public class App {
         userManager = new UserManager();
     }
 
-
     /**
      * This is the main function which runs the program.
      * It has and scanner for read the different commands, then that string is parsed, and checked if it is correct (ParseResult=Success).
@@ -193,6 +192,9 @@ public class App {
         }
     }
 
+    public static void printInvalidDataType(String failedCommand, String expectedDataType, String receivedValue){
+        System.out.printf("%s: error: expected %s, got '%s'\n", failedCommand, expectedDataType, receivedValue);
+    }
 
     /**
      * Parses an integer from a string, basically supresses the InvalidArgumentException.

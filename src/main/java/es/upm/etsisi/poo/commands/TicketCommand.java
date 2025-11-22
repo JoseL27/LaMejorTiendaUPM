@@ -81,7 +81,7 @@ public class TicketCommand implements Command {
 		if (params.length == 5) {
 			ticketId = App.tryParseInt(params[2]);
 			if (ticketId == null) {
-				Utils.printInvalidDataType("ticket new", "integer", params[2]);
+				App.printInvalidDataType("ticket new", "integer", params[2]);
 				return;
 			}
 			
@@ -134,7 +134,7 @@ public class TicketCommand implements Command {
 
         Integer ticketId = App.tryParseInt(params[2]);
         if (ticketId == null) {
-            Utils.printInvalidDataType("ticket add", "integer", params[2]);
+            App.printInvalidDataType("ticket add", "integer", params[2]);
             return;
         }
 
@@ -146,13 +146,13 @@ public class TicketCommand implements Command {
 		
         Integer productId = App.tryParseInt(params[4]);
         if (productId == null) {
-            Utils.printInvalidDataType("ticket add", "integer", params[4]);
+            App.printInvalidDataType("ticket add", "integer", params[4]);
             return;
         }
 
         Integer amount = App.tryParseInt(params[5]);
         if (amount == null) {
-            Utils.printInvalidDataType("ticket add", "integer", params[5]);
+            App.printInvalidDataType("ticket add", "integer", params[5]);
             return;
         }
 
@@ -216,7 +216,7 @@ public class TicketCommand implements Command {
 
         Integer ticketId = App.tryParseInt(params[2]);
         if (ticketId == null) {
-            Utils.printInvalidDataType("ticket remove", "integer", params[2]);
+            App.printInvalidDataType("ticket remove", "integer", params[2]);
             return;
         }
 
@@ -228,7 +228,7 @@ public class TicketCommand implements Command {
 		
         Integer productId = App.tryParseInt(params[4]);
         if (productId == null) {
-            Utils.printInvalidDataType("ticket remove", "integer", params[4]);
+            App.printInvalidDataType("ticket remove", "integer", params[4]);
             return;
         }
 
@@ -282,7 +282,7 @@ public class TicketCommand implements Command {
 
         Integer ticketId = App.tryParseInt(params[2]);
         if (ticketId == null) {
-            Utils.printInvalidDataType("ticket print", "integer", params[2]);
+            App.printInvalidDataType("ticket print", "integer", params[2]);
             return;
         }
 

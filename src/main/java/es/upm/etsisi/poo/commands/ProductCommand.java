@@ -70,7 +70,7 @@ public class ProductCommand implements Command {
 		String productPriceString = params[parseIndex++];
  		Integer productPrice = App.tryParseInt(productPriceString);
 		if (productPrice == null){
-			Utils.printInvalidDataType("prod add", "integer", productPriceString);
+			App.printInvalidDataType("prod add", "integer", productPriceString);
 			return;
 		}
 
@@ -79,7 +79,7 @@ public class ProductCommand implements Command {
 			String productMaxPersString = params[parseIndex++];
 			productMaxPers = App.tryParseInt(productMaxPersString);
 			if (productMaxPers == null){
-				Utils.printInvalidDataType("prod add", "integer", productMaxPersString);
+				App.printInvalidDataType("prod add", "integer", productMaxPersString);
 				return;
 			}
 		}
@@ -190,7 +190,7 @@ public class ProductCommand implements Command {
 		
  		Integer productId = App.tryParseInt(params[2]);
 		if (productId == null){
-			Utils.printInvalidDataType("prod update", "integer", params[2]);
+			App.printInvalidDataType("prod update", "integer", params[2]);
 			return;
 		}
 
@@ -215,7 +215,7 @@ public class ProductCommand implements Command {
 		case "price" -> {
 			Integer productPrice = App.tryParseInt(params[4]);
 			if (productPrice == null){
-				Utils.printInvalidDataType("prod update", "integer", params[4]);
+				App.printInvalidDataType("prod update", "integer", params[4]);
 			} else { 
 				updatedProduct = inventory.updateProductPrice(productId, productPrice);
 			}
@@ -247,7 +247,7 @@ public class ProductCommand implements Command {
 
  		 Integer productId = App.tryParseInt(params[2]);
 		 if (productId == null) {
-		 	Utils.printInvalidDataType("prod remove", "integer", params[2]);
+		 	App.printInvalidDataType("prod remove", "integer", params[2]);
 		 	return;
 		 }
 
