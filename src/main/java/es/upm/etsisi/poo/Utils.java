@@ -6,20 +6,6 @@ import java.lang.StringBuilder;
  */
 public class Utils {
 
-	/** true if both objects are equal under this criteria, false in other
-	 * Creats a string of an array. Calls .toString on every element
-	 * with a format '<elem0><delim><elem1><delim><elem2>...'
-	 */
-	public static <T> String arrayToString(T[] array, String delim) {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < array.length; i++) {
-			sb.append(array[i].toString());
-			if (i != array.length - 1)
-				sb.append(delim);
-		}
-		return sb.toString();
-	}
-
 	/**
 	 * Parses an integer from a string, basically supresses the InvalidArgumentException.
 	 * @return An integer with the underlying int value or NULL if the parse failed.
