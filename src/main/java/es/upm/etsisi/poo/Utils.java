@@ -58,46 +58,8 @@ public class Utils {
         return checkArgsCountWithPrint(prefix, amount, expectedAmount, expectedAmount);
     }
 
-    public static void printInvalidEnum(String failedCommand, String enumName, String receivedValue, Enum[] possibleValues) {
-        System.out.printf("%s: error: invalid %s '%s', expected one of: %s\n",
-                          failedCommand, enumName, receivedValue, arrayToString(possibleValues, "|"));
-    }
-
     public static void printInvalidDataType(String failedCommand, String expectedDataType, String receivedValue){
         System.out.printf("%s: error: expected %s, got '%s'\n", failedCommand, expectedDataType, receivedValue);
     }
 
-    /**
-     * public static Product.Category tryParseCategoryWithPrint(String prefix, String categoryString) {
-     *         Product.Category category = Product.Category.fromLabel(categoryString);
-     *         if (category == null) {
-     *             printInvalidEnum(prefix, "category", categoryString, Product.Category.values());
-     *         }
-     *         return category;
-     *     }
-     */
-
-
-    public static Integer tryParseIntWithPrint(String prefix, String intString) {
-        Integer number = tryParseInt(intString);
-        if (number == null) {
-            System.out.printf("%s: error: expected an integer string, got '%s'\n", prefix, intString);
-        }
-        return number;
-    }
-
-	public static String removeLeadingZeros(String str) {
-		int pos = 0;
-		// Find the index of the first non-zero character
-		while (pos < str.length() && str.charAt(pos) == '0') {
-			pos++;
-		}
-
-		// Directly store the result
-		String result = str.substring(pos);
-		if (result.isEmpty())
-			return "0";
-		else
-			return result;
-	}
 }
