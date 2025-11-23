@@ -22,7 +22,7 @@ public class TicketCommand implements Command {
      */
     public void eval(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
-        if (!Utils.checkMinArgsCountWithPrint("ticket", params.length, 2)) return;
+        if (!App.checkMinArgsCountWithPrint("ticket", params.length, 2)) return;
 
         // Execute
         switch (params[1].toLowerCase()) {
@@ -48,7 +48,7 @@ public class TicketCommand implements Command {
      */
     private void evalNew(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
-        if (!Utils.checkArgsCountWithPrint("ticket new", params.length, 4, 5))
+        if (!App.checkArgsCountWithPrint("ticket new", params.length, 4, 5))
             return;
 
 		String cashierId = params[params.length - 2];
@@ -79,9 +79,9 @@ public class TicketCommand implements Command {
 		Integer ticketId = null;
 
 		if (params.length == 5) {
-			ticketId = Utils.tryParseInt(params[2]);
+			ticketId = App.tryParseInt(params[2]);
 			if (ticketId == null) {
-				Utils.printInvalidDataType("ticket new", "integer", params[2]);
+				App.printInvalidDataType("ticket new", "integer", params[2]);
 				return;
 			}
 			
@@ -129,12 +129,12 @@ public class TicketCommand implements Command {
      */
     private void evalAdd(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
-        if (!Utils.checkMinArgsCountWithPrint("ticket add", params.length, 4))
+        if (!App.checkMinArgsCountWithPrint("ticket add", params.length, 4))
             return;
 
-        Integer ticketId = Utils.tryParseInt(params[2]);
+        Integer ticketId = App.tryParseInt(params[2]);
         if (ticketId == null) {
-            Utils.printInvalidDataType("ticket add", "integer", params[2]);
+            App.printInvalidDataType("ticket add", "integer", params[2]);
             return;
         }
 
@@ -144,15 +144,15 @@ public class TicketCommand implements Command {
 			return;
 		}
 		
-        Integer productId = Utils.tryParseInt(params[4]);
+        Integer productId = App.tryParseInt(params[4]);
         if (productId == null) {
-            Utils.printInvalidDataType("ticket add", "integer", params[4]);
+            App.printInvalidDataType("ticket add", "integer", params[4]);
             return;
         }
 
-        Integer amount = Utils.tryParseInt(params[5]);
+        Integer amount = App.tryParseInt(params[5]);
         if (amount == null) {
-            Utils.printInvalidDataType("ticket add", "integer", params[5]);
+            App.printInvalidDataType("ticket add", "integer", params[5]);
             return;
         }
 
@@ -211,12 +211,12 @@ public class TicketCommand implements Command {
      */
     private void evalRemove(String[] params, UserManager userManager, Inventory inventory) {
 		// Parse
-		if (!Utils.checkArgsCountWithPrint("ticket remove", params.length, 5))
+		if (!App.checkArgsCountWithPrint("ticket remove", params.length, 5))
             return;
 
-        Integer ticketId = Utils.tryParseInt(params[2]);
+        Integer ticketId = App.tryParseInt(params[2]);
         if (ticketId == null) {
-            Utils.printInvalidDataType("ticket remove", "integer", params[2]);
+            App.printInvalidDataType("ticket remove", "integer", params[2]);
             return;
         }
 
@@ -226,9 +226,9 @@ public class TicketCommand implements Command {
 			return;
 		}
 		
-        Integer productId = Utils.tryParseInt(params[4]);
+        Integer productId = App.tryParseInt(params[4]);
         if (productId == null) {
-            Utils.printInvalidDataType("ticket remove", "integer", params[4]);
+            App.printInvalidDataType("ticket remove", "integer", params[4]);
             return;
         }
 
@@ -277,12 +277,12 @@ public class TicketCommand implements Command {
      */
     private void evalPrint(String[] params, UserManager userManager, Inventory inventory) {
 		// Parse
-		if (!Utils.checkArgsCountWithPrint("ticket print", params.length, 4))
+		if (!App.checkArgsCountWithPrint("ticket print", params.length, 4))
             return;
 
-        Integer ticketId = Utils.tryParseInt(params[2]);
+        Integer ticketId = App.tryParseInt(params[2]);
         if (ticketId == null) {
-            Utils.printInvalidDataType("ticket print", "integer", params[2]);
+            App.printInvalidDataType("ticket print", "integer", params[2]);
             return;
         }
 

@@ -17,7 +17,7 @@ import java.util.Arrays;
 public class CashCommand implements Command {
     @Override
     public void eval(String[] args, UserManager userManager, Inventory inventory) {
-        if (!Utils.checkArgsCountWithPrint("cash", args.length, 2, 5)) return;
+        if (!App.checkArgsCountWithPrint("cash", args.length, 2, 5)) return;
         switch (args[1].toLowerCase()) {
             case "add" -> evalAddCash(args, userManager, inventory);
             case "list" -> evalList(args, userManager, inventory);
@@ -40,7 +40,7 @@ public class CashCommand implements Command {
      */
     private void evalAddCash(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
-        if (!Utils.checkArgsCountWithPrint("cash add", params.length, 4, 5)) return;
+        if (!App.checkArgsCountWithPrint("cash add", params.length, 4, 5)) return;
 
         String cashierName = params[params.length-2];
         String cashierEmail = params[params.length-1];
@@ -81,7 +81,7 @@ public class CashCommand implements Command {
      */
     private void evalList(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
-        if (!Utils.checkArgsCountWithPrint("cash list", params.length, 2)) return;
+        if (!App.checkArgsCountWithPrint("cash list", params.length, 2)) return;
 
         Cashier[] workers = userManager.listCashiers();
 		Arrays.sort(workers);
@@ -105,7 +105,7 @@ public class CashCommand implements Command {
      * @param inventory
      */
     private void evalRemove(String[] params, UserManager userManager, Inventory inventory) {
-        if (!Utils.checkArgsCountWithPrint("cash remove", params.length, 3)) return;
+        if (!App.checkArgsCountWithPrint("cash remove", params.length, 3)) return;
         String cashierId = params[2];
         if (userManager.removeCashier(cashierId)) {
             System.out.println("cash remove: ok");
@@ -121,7 +121,7 @@ public class CashCommand implements Command {
      * @param inventory
      */
     private void evalTickets(String[] params, UserManager userManager, Inventory inventory) {
-        if (!Utils.checkArgsCountWithPrint("cash tickets", params.length, 3)) return;
+        if (!App.checkArgsCountWithPrint("cash tickets", params.length, 3)) return;
         String cashierId = params[2];
 		System.out.println("Tickets:");
 		String ticketsStr = userManager.findCashier(cashierId).getTicketsString();

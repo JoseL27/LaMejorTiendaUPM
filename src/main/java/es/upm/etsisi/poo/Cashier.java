@@ -110,7 +110,7 @@ public class Cashier extends User implements Comparable<Cashier> {
 		return id.length() == 9 
 			&& Character.toUpperCase(id.charAt(0)) == 'U'
 			&& Character.toUpperCase(id.charAt(1)) == 'W'
-			&& (Utils.tryParseInt(id.substring(2)) != null);
+			&& (App.tryParseInt(id.substring(2)) != null);
 	}
 
 	@Override
