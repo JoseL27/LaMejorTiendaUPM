@@ -92,7 +92,7 @@ public class Inventory {
      * @param price Product price (must be greater than 0)
      * @return true if the product is created correctly, false in other case
      */
-    public BaseProduct createBaseProduct(int id, String name, BaseProduct.Category category, double price, int maxPers) {
+    public BaseProduct createBaseProduct(int id, String name, BaseProduct.Category category, double price, int maxPers, boolean personalized) {
         if (!isValidId(id) || !isValidName(name) || !isValidPrice(price)) return null;
 
         // Check inventory full
@@ -101,7 +101,7 @@ public class Inventory {
         Product selectedProduct = this.readProduct(id);
 
         if (selectedProduct == null) {
-            BaseProduct prodToAdd = new BaseProduct(id, name, price, category, maxPers);
+            BaseProduct prodToAdd = new BaseProduct(id, name, price, category, maxPers, personalized);
             this.inventory[this.productAmount] = prodToAdd;
             this.productAmount++;
             return prodToAdd;

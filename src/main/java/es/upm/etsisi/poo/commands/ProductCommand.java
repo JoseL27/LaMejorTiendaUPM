@@ -74,14 +74,16 @@ public class ProductCommand implements Command {
 			return;
 		}
 
+		boolean specifiedMaxPers = false;
 		Integer productMaxPers = productCategory.getMaxPersonalizations();
 		if (parseIndex < params.length) {
 			String productMaxPersString = params[parseIndex++];
 			productMaxPers = App.tryParseInt(productMaxPersString);
-			if (productMaxPers == null){
+			if (productMaxPers == null) {
 				App.printInvalidDataType("prod add", "integer", productMaxPersString);
 				return;
 			}
+			specifiedMaxPers = true;
 		}
 		
 		// Execute
@@ -95,7 +97,8 @@ public class ProductCommand implements Command {
 			productId = inventory.generateUniqueProductId();
 		}
 		
-		BaseProduct createdProduct = inventory.createBaseProduct(productId, productName, productCategory, productPrice, productMaxPers);
+		BaseProduct createdProduct = inventory.createBaseProduct(productId, productName, productCategory, 
+																 productPrice, productMaxPers, specifiedMaxPers);
 		if (createdProduct != null) {
 			System.out.println(createdProduct);
 			System.out.println("prod add: ok");
@@ -166,7 +169,7 @@ public class ProductCommand implements Command {
 				return;
 			}
 			System.out.println(addedProduct);
-			System.out.println("prod " + typeArgument + " : ok");
+			System.out.printf("prod %s: ok\n", typeArgument);
 		}catch (Exception e){
 			System.out.println("Invalid argument: "  + params[parseIndex] + " for index " + parseIndex);
 		}

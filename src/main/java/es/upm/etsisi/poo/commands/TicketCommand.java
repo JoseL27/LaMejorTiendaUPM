@@ -155,9 +155,9 @@ public class TicketCommand implements Command {
             return;
         }
 
-		String[] personalizations = parsePersonalizations(6, params);
-        if (params.length > 6 && personalizations == null) {
-            return;
+		String[] personalizations = null;
+        if (params.length > 6) {
+			personalizations = parsePersonalizations(6, params);
 		}
 
         // Execute
@@ -347,7 +347,7 @@ public class TicketCommand implements Command {
 		int i = 0; 
 		while (i < size && result) {
 			String str = params[i + beginIndex];
-			result = str.length() >= 3 && str.substring(0, 2).equals("--p");
+			result = str.length() >= 3 && str.substring(0, 3).equals("--p");
 			if (result) {
 				pers[i] = str.substring(3);
 			}
