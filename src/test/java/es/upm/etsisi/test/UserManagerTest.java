@@ -54,15 +54,15 @@ public class UserManagerTest {
         Cashier result = this.testUserManager.addCashier("UW0000000", "Cajero1", "cajero1@upm.es");
         assertNotNull(result);
         result = this.testUserManager.addCashier("UW0000000", "Cajero2", "cajero2@upm.es");
-        assertNotNull(result);
+        assertNull(result);
     }
 
     @Test
     void addCashierWithInvalidId() {
         Cashier result = this.testUserManager.addCashier("UX0000000", "Cajero0", "cajero0@upm.es");
-        assertNotNull(result);
-        result = this.testUserManager.addCashier("UW00000010", "Cajero0", "cajero0@upm.es");
-        assertNotNull(result);
+        assertNull(result);
+        result = this.testUserManager.addCashier("UW000000100", "Cajero0", "cajero0@upm.es");
+        assertNull(result);
     }
 
     @Test
@@ -210,7 +210,7 @@ public class UserManagerTest {
     void addOneClient() {
         this.testUserManager.addCashier("Cashier 0", "cashier0@upm.es");
         Cashier cashier = this.testUserManager.findCashier("UW0000000");
-        Client result = this.testUserManager.addClient("X0000000Y", "Client 0", "client1@example.com", cashier);
+        Client result = this.testUserManager.addClient("00000000Y", "Client 0", "client1@example.com", cashier);
         assertNotNull(result);
     }
 
@@ -218,16 +218,16 @@ public class UserManagerTest {
     void addClientSameId() {
         this.testUserManager.addCashier("Cashier 0", "cashier0@upm.es");
         Cashier cashier = this.testUserManager.findCashier("UW0000000");
-        Client result = this.testUserManager.addClient("X0000000Y", "Client 0", "client1@example.com", cashier);
+        Client result = this.testUserManager.addClient("00000000Y", "Client 1", "client1@example.com", cashier);
         assertNotNull(result);
-        result = this.testUserManager.addClient("X0000000Y", "Client 0", "client1@example.com", cashier);
+        result = this.testUserManager.addClient("00000000Y", "Client 2", "client2@example.com", cashier);
         assertNull(result);
     }
 
     @Test
     void removeClient() {
         addOneClient();
-        boolean result = this.testUserManager.removeClient("X0000000Y");
+        boolean result = this.testUserManager.removeClient("00000000Y");
         assertTrue(result);
     }
 
@@ -241,16 +241,16 @@ public class UserManagerTest {
     @Test
     void findNonExistentClient() {
         addOneClient();
-        Client client = this.testUserManager.findClient("X0000000X");
+        Client client = this.testUserManager.findClient("00000000X");
         assertNull(client);
     }
 
     @Test
     void findClient() {
         addOneClient();
-        Client client = this.testUserManager.findClient("X0000000Y");
+        Client client = this.testUserManager.findClient("00000000Y");
         assertNotNull(client);
-        assertEquals("X0000000Y", client.getId());
+        assertEquals("00000000Y", client.getId());
     }
 
     @Test
