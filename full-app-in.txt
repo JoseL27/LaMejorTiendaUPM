@@ -52,17 +52,17 @@ prod addMeeting 23457 "Graduacion ETSISI" 40 2025-11-21 30
 prod addFood 23458 "Cafeteria ETSISI" 5 2025-11-21 300
 prod addFood 23459 "Restaurante Asador" 50 2025-11-21 40
 prod list
-ticket new 212127 UW1234567 98948334B
-ticket add 212127 UW1234567 23456 20
-ticket add 212127 UW1234567 2 3
-ticket print 212127 UW1234567
+ticket new 21217 UW1234567 98948334B
+ticket add 21217 UW1234567 23456 20
+ticket add 21217 UW1234567 2 3
+ticket print 21217 UW1234567
 ticket list
 echo "Trabajamos con productos personalizados"
 prod add 5 "Camiseta talla:M UPM" CLOTHES 15 3
 prod add 6 "Camiseta talla:L UPM" CLOTHES 20 4
-ticket new 212128 UW1234567 98948334B
-ticket add 212128 UW1234567 5 1
-ticket add 212128 UW1234567 5 3 --pred --pblue --pgreen
-ticket add 212128 UW1234567 6 3 --pred --pblue
-ticket print 212128 UW1234567
+ticket new 21218 UW1234567 98948334B
+ticket add 21218 UW1234567 5 1
+ticket add 21218 UW1234567 5 3 --pred --pblue --pgreen
+ticket add 21218 UW1234567 6 3 --pred --pblue
+ticket print 21218 UW1234567
 exit
