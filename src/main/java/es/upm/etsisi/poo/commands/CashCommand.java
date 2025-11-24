@@ -126,7 +126,7 @@ public class CashCommand implements Command {
 		System.out.println("Tickets:");
 		String ticketsStr = userManager.findCashier(cashierId).getTicketsString();
 		if (ticketsStr != null && ticketsStr.length() > 0) { 
-			System.out.println(ticketsStr);
+			System.out.print(ticketsStr);
 		}
 		System.out.println("cash tickets: ok");
     }

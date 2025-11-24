@@ -58,14 +58,19 @@ public class Cashier extends User implements Comparable<Cashier> {
     public String getTicketsString(){
         StringBuilder result = new StringBuilder();
         createdTickets.sort(null);
-        for(Ticket ticket: createdTickets){
-            result.append(ticket.getComposedId()).append(" ");
+        for(Ticket ticket : createdTickets) {
+			
+			result
+				.append("  ")
+				.append(ticket.getComposedId())
+				.append(" - ");
+			
             if (ticket.isEmpty()){
-                result.append("Empty");
+                result.append("EMPTY");
             }else if (ticket.getIsOpen()){
-                result.append("Open");
+                result.append("OPEN");
             }else{
-                result.append("Closed");
+                result.append("CLOSED");
             }
             result.append("\n");
         }

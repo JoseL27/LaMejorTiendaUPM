@@ -1,8 +1,11 @@
 package es.upm.etsisi.poo;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class TimedProduct extends Product {
+
+	public static final DateTimeFormatter EXPIRATION_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     // The times for preparing should be compared by using
     // LocalDateTime.now().plusHours(productYouAreChecking.getType().getHoursForPreparing()).compareTo(productYouAreChecking.getExpirationDate())
@@ -73,7 +76,9 @@ public class TimedProduct extends Product {
 
 	@Override
 	public String toString() {
-        return String.format("{id:%d, name:'%s', type:%s, price per attendant:%.1f, maximum of people:%d}",
-							 super.getId(), super.getName(), this.type, super.getPrice(), this.getMaxParticipants());
+		String typeWord = this.type.toString().charAt(0) + this.type.toString().substring(1).toLowerCase();
+        return String.format("{class: %s, id:%d, name:'%s', price:%.1f, date of Event:%s, max people allowed:%d}",
+							 typeWord, super.getId(), super.getName(), super.getPrice(), 
+							 this.expirationDate.format(EXPIRATION_DATE_FORMAT), this.getMaxParticipants());
 	}
 }

@@ -102,8 +102,7 @@ public class TicketCommand implements Command {
 			Ticket created = cashier.createTicket(ticketId);
 
 			if (created != null) { 
-				System.out.printf("Ticket : %s\n", created.getComposedId());
-				System.out.println(created.summaryString());
+				System.out.print(created.summaryString());
 				System.out.println("ticket new: ok");
 			} else {
 				System.out.println("ticket new: error: failed to add ticket to cashier.");
@@ -191,7 +190,7 @@ public class TicketCommand implements Command {
 		}
 
 		if (ticket.addProduct(productToAdd, amount, personalizations)) {
-			System.out.println(ticket.summaryString());
+			System.out.print(ticket.summaryString());
 			System.out.println("ticket add: ok");
 		} else {
 			System.out.printf("ticket add: error: failed to add product\n");
@@ -257,7 +256,7 @@ public class TicketCommand implements Command {
 
 		Product removedProduct = ticket.removeProduct(productId);
 		if (removedProduct != null) {
-			System.out.println(ticket.summaryString());
+			System.out.print(ticket.summaryString());
 			System.out.println("ticket remove: ok");
 		} else {
 			System.out.printf("ticket remove: error: failed to remove product\n");
@@ -306,8 +305,8 @@ public class TicketCommand implements Command {
 
 		Ticket ticket = cashier.findTicket(ticketId);
 		if (ticket != null) {
-			System.out.println(ticket.summaryString());
 			ticket.close();
+			System.out.print(ticket.summaryString());
 			System.out.println("ticket print: ok");
 		} else {
 			System.out.printf("ticket print: error: ticket with id '%d' not found in cashier with id '%s'\n", ticketId, cashierId);
@@ -329,8 +328,9 @@ public class TicketCommand implements Command {
     private void evalList(String[] params, UserManager userManager, Inventory inventory) {
 		Cashier[] cashiers = userManager.listCashiers();
 		Arrays.sort(cashiers, (c1, c2) -> c1.getId().compareTo(c2.getId()));
+		System.out.println("Ticket List:");
 		for (Cashier cashier : cashiers) {
-			System.out.println(cashier.getTicketsString());
+			System.out.print(cashier.getTicketsString());
 		}
 		System.out.println("ticket list: ok");
     }
