@@ -161,9 +161,11 @@ public class Ticket implements Comparable<Ticket> {
 				TimedProduct timedProduct = (TimedProduct)product;
 				if (amount <= timedProduct.getMaxParticipants()) {
 					result = appendProductInfo(newProductInfo);
+					this.totalAmount++;
 				}
 			} else { 
 				result = appendProductInfo(newProductInfo);
+				this.totalAmount += newProductInfo.getAmount();
 			}
 		}
 		
@@ -195,6 +197,13 @@ public class Ticket implements Comparable<Ticket> {
 		
 		if (foundProductInfo != null) {
 			Product removed = foundProductInfo.getProduct();
+			
+			if (removed instanceof TimedProduct) {
+				this.totalAmount--;
+			} else {
+				this.totalAmount -= foundProductInfo.getAmount();
+			}
+			
 			if (productInfos.remove(foundProductInfo)) {
 				return removed;
 			}
@@ -342,7 +351,6 @@ public class Ticket implements Comparable<Ticket> {
 		boolean result = false;
 		if (totalAmount <= MAX_PRODUCTS) {
 			productInfos.add(productInfo);
-			totalAmount += productInfo.getAmount();
 			result = true;
 		}
 		return result;
