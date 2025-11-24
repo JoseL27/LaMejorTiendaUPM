@@ -46,4 +46,14 @@ public class ProductInfo implements Comparable<ProductInfo> {
 	public int compareTo(ProductInfo other) {
 		return this.product.getName().compareTo(other.product.getName());
 	}
+
+	public boolean equalProductInfo(ProductInfo other) {
+		if (other == null) {
+			return false;
+		}
+
+		boolean result = this.product.getId() == other.product.getId()
+			&& Arrays.equals(this.personalizations, other.personalizations);
+		return result;
+	}
 }

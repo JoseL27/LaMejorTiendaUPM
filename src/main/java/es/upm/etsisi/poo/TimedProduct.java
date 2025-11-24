@@ -38,7 +38,6 @@ public class TimedProduct extends Product {
     public static final int TIMED_PRODUCT_MAX_PEOPLE = 100;
 	
     private TimedType type;
-    private int amount;
     private int maxParticipants;
     private LocalDateTime expirationDate;
 
@@ -46,7 +45,6 @@ public class TimedProduct extends Product {
     public TimedProduct(int id, String name, double individualPrice, int maxParticipants, TimedType type, LocalDateTime expirationDate) {
         super(id, name, individualPrice);
         this.type = type;
-		this.amount = maxParticipants;
         this.maxParticipants = maxParticipants;
         this.expirationDate = expirationDate;
     }
@@ -54,14 +52,6 @@ public class TimedProduct extends Product {
     public TimedType getType() {
         return this.type;
     }
-
-	public int getAmount() {
-		return this.amount;
-	}
-	
-	public void setAmount(int amount) {
-		this.amount = amount;
-	}
 
     public int getMaxParticipants() {
         return this.maxParticipants;
@@ -76,9 +66,26 @@ public class TimedProduct extends Product {
 
 	@Override
 	public String toString() {
-		String typeWord = this.type.toString().charAt(0) + this.type.toString().substring(1).toLowerCase();
-        return String.format("{class: %s, id:%d, name:'%s', price:%.1f, date of Event:%s, max people allowed:%d}",
-							 typeWord, super.getId(), super.getName(), super.getPrice(), 
-							 this.expirationDate.format(EXPIRATION_DATE_FORMAT), this.getMaxParticipants());
+		return toString(0);
 	}
+
+	public String toString(int amount) {
+		String typeWord = this.type.toString().charAt(0) + this.type.toString().substring(1).toLowerCase();
+
+		// NOTE(enrique): expected output indicates that this should the price being payed.
+		// So for example, when printing it as a product listing, it should be 0;
+		double effectivePrice = super.getPrice() * amount;
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(String.format("{class:%s, id:%d, name:'%s', price:%.1f, date of Event:%s, max people allowed:%d",
+								typeWord, super.getId(), super.getName(), effectivePrice, 
+								this.expirationDate.format(EXPIRATION_DATE_FORMAT), this.getMaxParticipants()));
+		if (amount > 0) {
+			sb.append(String.format(", actual people in event:%d", amount));
+		}
+		
+		sb.append("}");
+        return sb.toString();
+	}
+			
 }

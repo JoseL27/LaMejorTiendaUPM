@@ -21,11 +21,6 @@ public class Ticket implements Comparable<Ticket> {
 	public static final int MAX_PRODUCTS = 100;
 
 	/**
-	 * The percent cost added to the price of an item per personalization’
-	 */
-	public static final float PERSONALIZATION_EXTRA_PERCENT = 0.1f;
-
-	/**
 	 * Date format in which the start and ending dates appear in the string representation of the id
 	 */
 	private static final DateTimeFormatter ID_DATE_FORMAT = DateTimeFormatter.ofPattern("YY-MM-dd-HH:mm");
@@ -166,12 +161,10 @@ public class Ticket implements Comparable<Ticket> {
 				TimedProduct timedProduct = (TimedProduct)product;
 				if (amount <= timedProduct.getMaxParticipants()) {
 					result = appendProductInfo(newProductInfo);
-					if (result) { 
-						timedProduct.setAmount(amount);
-					}
 				}
+			} else { 
+				result = appendProductInfo(newProductInfo);
 			}
-			result = appendProductInfo(newProductInfo);
 		}
 		
 		return result;
@@ -257,7 +250,6 @@ public class Ticket implements Comparable<Ticket> {
 
 		double totalPrice = 0;
 		double totalDiscount = 0;
-		double totalPersExtra = 0;
 
 		productInfos.sort(null);
 
@@ -266,34 +258,29 @@ public class Ticket implements Comparable<Ticket> {
 		for (ProductInfo productInfo : productInfos) {
 			Product product = productInfo.getProduct();
 
-			double multipliedPrice = 0;
+			double effectivePrice = product.getPrice();
 
 			if (product instanceof BaseProduct) {
 				BaseProduct baseProduct = (BaseProduct)product;
 
-				int personalizationCount = productInfo.getPersonalizations() != null 
-					? productInfo.getPersonalizations().length : 0;
-				double persExtra = multipliedPrice * PERSONALIZATION_EXTRA_PERCENT * personalizationCount;
-				boolean hasPersExtra = (int)persExtra != 0;
+				String[] pers = productInfo.getPersonalizations();
+				if (pers != null && pers.length > 0) {
+					double persExtra = product.getPrice() * BaseProduct.PERSONALIZATION_EXTRA_PERCENT * pers.length;
+					effectivePrice += persExtra;
+				}
 
 				int categoryIndex = (int)baseProduct.getCategory().ordinal();
 				boolean hasDiscount = (categoriesCount[categoryIndex]) > 1;
-				double discountPercent = 0.0;
 				double discount = 0.0;
 				
 				if (hasDiscount) {
-					discountPercent = baseProduct.getCategory().getDiscountPercent(); 
-					discount = discountPercent * baseProduct.getPrice();
+					discount = baseProduct.getCategory().getDiscountPercent() * effectivePrice;
 				}
 
 				for (int i = 0; i < productInfo.getAmount(); i++) {
-					sb.append("  ");
-					sb.append(baseProduct);
+					sb.append("  ").append(baseProduct.toString(productInfo.getPersonalizations()));
 					if (hasDiscount) {
 						sb.append(" **discount -").append(DECIMAL_FORMAT.format(discount));
-					}
-					if (hasPersExtra) { 
-						sb.append(" **pers extra -").append(DECIMAL_FORMAT.format(persExtra));
 					}
 					sb.append('\n');
 				}
@@ -301,23 +288,18 @@ public class Ticket implements Comparable<Ticket> {
 				if (hasDiscount) { 
 					totalDiscount += discount * productInfo.getAmount();
 				}
-				if (hasPersExtra) { 
-					totalPersExtra += persExtra * productInfo.getAmount();
-				}
-				multipliedPrice = baseProduct.getPrice() * productInfo.getAmount();
 				
 			} else if (product instanceof TimedProduct) {
 				TimedProduct timedProduct = (TimedProduct)product;
-				sb.append("  ");
-				sb.append(timedProduct);
-				sb.append('\n');
-				multipliedPrice = timedProduct.getPrice() * timedProduct.getAmount();
+				sb.append("  ")
+					.append(timedProduct.toString(productInfo.getAmount()))
+					.append('\n');
 			}
 
-			totalPrice += multipliedPrice;
+			totalPrice += effectivePrice * productInfo.getAmount();
 		}
 
-		double finalPrice = (totalPrice - totalDiscount + totalPersExtra);
+		double finalPrice = (totalPrice - totalDiscount);
 		
 		sb.append("  Total price: ")   .append(DECIMAL_FORMAT.format(totalPrice))   .append("\n");
 		sb.append("  Total discount: ").append(DECIMAL_FORMAT.format(totalDiscount)).append("\n");
@@ -342,7 +324,7 @@ public class Ticket implements Comparable<Ticket> {
 
 		while (result == null && iterator.hasNext()) {
 			currentProductInfo = iterator.next();
-			if (productInfo.getProduct().getId() == currentProductInfo.getProduct().getId()) {
+			if (productInfo.equalProductInfo(currentProductInfo)) {
 				result = currentProductInfo;
 			}
 		}
