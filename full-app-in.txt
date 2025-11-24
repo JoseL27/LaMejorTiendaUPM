@@ -47,10 +47,10 @@ ticket list
 ticket print 21213 UW1234567
 ticket list
 echo "Trabajamos con productos de personas"
-prod addMeeting 23456 "Reunion Rotonda" 12 2025-11-21 100
-prod addMeeting 23457 "Graduacion ETSISI" 40 2025-11-21 30
-prod addFood 23458 "Cafeteria ETSISI" 5 2025-11-21 300
-prod addFood 23459 "Restaurante Asador" 50 2025-11-21 40
+prod addMeeting 23456 "Reunion Rotonda" 12 2025-12-01 100
+prod addMeeting 23457 "Graduacion ETSISI" 40 2025-12-01 30
+prod addFood 23458 "Cafeteria ETSISI" 5 2025-12-01 300
+prod addFood 23459 "Restaurante Asador" 50 2025-12-01 40
 prod list
 ticket new 21217 UW1234567 98948334B
 ticket add 21217 UW1234567 23456 20

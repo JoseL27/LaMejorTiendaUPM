@@ -144,7 +144,6 @@ public class ProductCommand implements Command {
 			expirationDate = LocalDate.parse(params[parseIndex++]).atStartOfDay();
 			maxPeople = Integer.parseInt(params[parseIndex]);
 
-
 			// Execution
 			if (!Inventory.isValidId(id)){
 				System.out.println("prod add: error:" + id + " is not a valid product id");
@@ -158,8 +157,16 @@ public class ProductCommand implements Command {
 				System.out.println("prod add: error:" + price + " is not a valid product price");
 				return;
 			}
+			
 			if (maxPeople > TimedProduct.TIMED_PRODUCT_MAX_PEOPLE){
 				System.out.println("prod add: error: " + maxPeople + " is not a valid maximum of people (max " + TimedProduct.TIMED_PRODUCT_MAX_PEOPLE + ")");
+				return;
+			}
+
+			LocalDateTime prepDoneTime = LocalDateTime.now().plusHours(type.getHoursForPreparing());
+			if (prepDoneTime.isAfter(expirationDate)) {
+				System.out.printf("prod add: error: you need at least %d hours to prepare for this %s\n",
+								   type.getHoursForPreparing(), type.toString().toLowerCase());
 				return;
 			}
 
