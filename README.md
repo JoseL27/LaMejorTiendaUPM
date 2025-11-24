@@ -4,9 +4,9 @@
  - [x] ⁠(Enrique)  Escribir test con fichero entrada ejemplo (el de moodle)
  - [ ] ⁠(Andres)   Escribir tests generales
  - [ ] ⁠⁠(TODOS)    Probar (y talvez escribir tests) para casos casitos y casetes
- - [ ] (⁠TODOS)    Garantizar que todo este funcionando
+ - [x] (⁠TODOS)    Garantizar que todo este funcionando
  - [ ] ⁠⁠(Jin Xian) Simplificar/limpiar codigo 
- - [ ] ⁠⁠(Julio)    Cargarse utils
+ - [x] ⁠⁠(Julio)    Cargarse utils
  - [ ] ⁠⁠(Jose)     Hacer UML final
  - [ ] ⁠⁠(TODOS)    Reunion para prepararse a la defensa
 
