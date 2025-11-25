@@ -12,6 +12,12 @@ class App {
   -{static}parser(String): String[]
   -{static}auxParser(String, String[])
   -{static}cutter(String[]): String[]
+  -{static}printInvalidDataType(String, String, String)
+  -{static}tryParseInt(String): Integer
+  -{static}checkMaxArgsCountWithPrint(String, int, int): boolean
+  -{static}checkMinArgsCountWithPrint(String, int, int): boolean
+  -{static}checkArgsCountWithPrint(String, int, int, int): boolean
+  -{static}checkArgsCountWithPrint(String, int, int): boolean
 }
 
 abstract class Product {
@@ -36,8 +42,8 @@ enum Category {
   + BOOK	   	0.10, false
   + ELECTRONICS	0.03, false
   
-  - discountPercent: float
-  - boolean: isCustom
+  - getDiscountPercent(): float
+  - getMaxPersonalizations(): int
 }
 
 class BaseProduct extends Product {
@@ -48,8 +54,6 @@ class BaseProduct extends Product {
   + getCategory(): Category
   + setCategory(Category)
   + toString(): String
-  /' Pregunta si la implementacion
-     de metodos abstractos se pone (para duplicateOf)'/
 }
 
 enum TimedType {
@@ -75,8 +79,6 @@ class TimedProduct extends Product {
   + setAmount(int)
   + getMaxParticipants(): int
   + toString(): String
-  /' Pregunta si la implementacion
-     de metodos abstractos se pone (para duplicateOf)'/
 }
 
 class ProductInfo {
@@ -246,30 +248,14 @@ class ProductCommand implements Command {
   - evalList(String[], UserManager, Inventory)
 }
 
-
-class Utils {
-  + checkArgsCountWithPrint(String, Parser, int, int): boolean
-  + tryParseFieldWithPrint(String, String): Field
-  + tryParseIntWithPrint(String, String): Integer
-  + tryParseCategoryWithPrint(String, String): Category
-  + printInvalidEnum(String, String, String, Enum[]): void
-  + tryParseInt(String): Integer
-  + nullOrEquals(Object, Object): boolean
-  + arrayToString(T[], String): String
-  + printInvalidDataType(String, String, String): void
-  + checkArgsCountWithPrint(String, Parser, int): boolean
-}
-
-' Pregunta si esto se deberia incluir en el uml
-BaseProduct --> Category
-TimedProduct --> TimedType
 Inventory *--> Product
 
 App --> Inventory
-ProductInfo --> Product /' Pregunta si esto podria ser una agregacion'/
+ProductInfo o--> Product
 Ticket *--> ProductInfo
 
-UserManager *--> User
+UserManager *--> Cashier
+UserManager *--> Client
 
 Cashier *--> Ticket
 Client o--> Ticket
@@ -277,7 +263,5 @@ Client --> Cashier
 
 App --> UserManager
 App --> Command
-
-' Relaciones de uso de los comandos con otras?
 
 @enduml
