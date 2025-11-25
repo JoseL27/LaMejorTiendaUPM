@@ -52,7 +52,7 @@ public class App {
                 System.out.println("Goodbye!");
             }
             System.out.println();
-        } while (sc.hasNext() && !input.equals("exit"));
+        } while (!input.equals("exit"));
     }
 
     /**
