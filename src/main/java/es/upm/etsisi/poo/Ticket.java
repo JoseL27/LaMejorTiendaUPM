@@ -135,6 +135,14 @@ public class Ticket implements Comparable<Ticket> {
 		return id >= 0 && id <= 99999;
 	}
 
+	public static int parseId(String strId) throws Exception{
+		int id = Integer.parseInt(strId);
+		if (id < 0 || id > 99999) {
+			throw new Exception(String.format("ticket new: error: ticket id '%s' is invalid, expected a 5 digit number\n", strId));
+		}
+		return id;
+	}
+	
 	/**
 	 * Adds a product asociated to an amount to the ticket. Too things may happen:
 	 *  - If the product does not exist it will be added (as long as there is room)
@@ -181,7 +189,7 @@ public class Ticket implements Comparable<Ticket> {
 	 * @param id  the id of the product to attempt to remove
 	 * @return    the removed product if it was found or null if it wasn't
 	 */
-	public Product removeProduct(int id) {
+	private Product removeProduct(int id) {
 		if (!Ticket.isValidId(id)) return null;
 		
 		ProductInfo foundProductInfo = null;
@@ -211,6 +219,15 @@ public class Ticket implements Comparable<Ticket> {
 		
 		return null;
 	}
+
+	public Product deleteProduct(int id) throws Exception {
+		Product removed = this.removeProduct(id);
+		if (removed == null) {
+			throw new Exception(String.format("failed to remove product with id '%s'", id));
+		}
+		return removed;
+	}
+	
 
 	/**
 	 * @return array table of the amount of products in each.

@@ -25,14 +25,20 @@ public class ClientCommand implements Command {
 	 */
 
 	@Override
-	public void eval(String[] params) {
-		if(!App.checkArgsCountWithPrint("client", params.length, 2, 6)) { return; }
-		final String subcommand = params[1].toLowerCase();
-		switch (subcommand) {
+	public void eval(String[] params) throws Exception {
+		try { 
+			App.checkArgsCountWithPrint(params.length, 2, 6);
+		
+			final String subcommand = params[1].toLowerCase();
+			switch (subcommand) {
 			case "add"    -> evalAdd(params);
 			case "remove" -> evalRemove(params);
 			case "list"   -> evalList();
-			default -> System.err.println("Subcommand not recognised");
+			default -> throw new Exception("subcommand not recognized");
+			}
+			
+		} catch (Exception e) {
+			throw new Exception("client "+e.getMessage());
 		}
 	}
 
@@ -52,45 +58,44 @@ public class ClientCommand implements Command {
 	 *                 [5] - creator cashier's identifier.
 	 * @param manager  The UserManager instance used to find the creator cashier and add the new client.
 	 */
-	public void evalAdd(String[] params) {
-		if (!App.checkArgsCountWithPrint("client add", params.length, 6)) {
-			return;
-		}
+	public void evalAdd(String[] params) throws Exception {
+		try {
+			App.checkArgsCountWithPrint(params.length, 6);
 		
-		String clientName  = params[2];
-		String clientId    = params[3];
-		String clientEmail = params[4];
+			String clientName  = params[2];
+			String clientId    = params[3];
+			String clientEmail = params[4];
 		
-		if (!Client.isValidId(clientId))  {
-			System.out.printf("ticket new: error: invalid client id '%s' expected 8 digits followed by a letter\n", clientId);
-			return;
-		}
+			if (!Client.isValidId(clientId))  {
+				System.out.printf("ticket new: error: invalid client id '%s' expected 8 digits followed by a letter\n", clientId);
+				return;
+			}
 
-		UserManager userManager = UserManager.getInstance();
+			UserManager userManager = UserManager.getInstance();
 
-		Cashier creator = userManager.findCashier(params[5]);
-		
-		Client addedClient = userManager.addClient(clientId, clientName, clientEmail, creator);
-		if (addedClient != null) {
+			Client addedClient = userManager.addClient(clientId, clientName, clientEmail, params[5]);
+			if (addedClient == null) {
+				throw new Exception(String.format("client with id %s could not be added\n", params[2]));
+			}
+
 			System.out.println(addedClient);
 			System.out.println("client add: ok");
-		} else {
-			System.out.printf("client add: error: client with id %s could not be added\n", params[2]);
+			
+		} catch (Exception e) {
+			throw new Exception(" add:"+e.getMessage());
 		}
-
 	}
 
-	public void evalRemove(String[] params) {
-
-		if (!App.checkArgsCountWithPrint("client remove", params.length, 3)) {
-			return;
-		}
-		if (UserManager.getInstance().removeClient(params[2])) {
-			System.out.println("client remove: ok");
-		} else {
-			System.out.printf("client remove: client with id '%s' not found\n", params[2]);
-		}
+	public void evalRemove(String[] params) throws Exception {
+		try { 
+			App.checkArgsCountWithPrint(params.length, 3);
 		
+			UserManager.getInstance().removeClient(params[2]);
+			System.out.println("client remove: ok");
+		
+		} catch (Exception e) {
+			throw new Exception("remove: "+e.getMessage());
+		}
 	}
 
 	public void evalList() {

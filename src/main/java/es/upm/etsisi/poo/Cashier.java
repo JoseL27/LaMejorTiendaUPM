@@ -28,16 +28,16 @@ public class Cashier extends User implements Comparable<Cashier> {
     /**
      * Creates a new ticket the id given in the parameter.
      */
-    public Ticket createTicket(int id){
-        Ticket created = null;
-        if (Ticket.isValidId(id)){
-			created = new Ticket(id);
-            createdTickets.add(created);
-        }
+    public Ticket createTicket(int id) throws Exception {
+		assert Ticket.isValidId(id);
+		Ticket created = new Ticket(id);
+		if (!createdTickets.add(created)) {
+			throw new Exception("failed to add ticket to the cashier");
+		}
 		return created;
     }
 
-	public Ticket findTicket(int ticketId) {
+	private Ticket findTicket(int ticketId) {
         Iterator<Ticket> iterator = createdTickets.iterator();
         Ticket result = null;
         Ticket currentTicket;
@@ -50,6 +50,15 @@ public class Cashier extends User implements Comparable<Cashier> {
         }
 		return result;
 	}
+
+	public Ticket getTicket(int ticketId) throws Exception {
+		Ticket ticket = findTicket(ticketId);
+		if (ticket == null) {
+			throw new Exception(String.format("ticket with id '%d' found", ticketId));
+		}
+		return ticket;
+	}
+	
 
     /**
      * Returns a string representing the tickets created by this cashier
@@ -115,7 +124,15 @@ public class Cashier extends User implements Comparable<Cashier> {
 		return id.length() == 9 
 			&& Character.toUpperCase(id.charAt(0)) == 'U'
 			&& Character.toUpperCase(id.charAt(1)) == 'W'
-			&& (App.tryParseInt(id.substring(2)) != null);
+			&& (Integer.parseInt(id.substring(2)) >= 0);
+	}
+
+	public static String validId(String id) throws Exception {
+		if (!isValidId(id)) {
+			throw new Exception(String.format("invalid cashier id '%s' expected 'UW' followed by 7 digits\n", id));			
+		}
+
+		return id;
 	}
 
 	@Override

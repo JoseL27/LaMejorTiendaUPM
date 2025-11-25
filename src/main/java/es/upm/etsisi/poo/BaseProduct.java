@@ -30,21 +30,6 @@ public class BaseProduct extends Product {
         public int getMaxPersonalizations() {
 			return this.maxPersonalizations;
 		}
-
-        /**
-         * Function use in Parse.
-         * @param label String receive from the parse
-         * @return Category if is aceptable or null if the category does not exit
-         */
-        public static Category fromLabel(String label) {
-            Category category = null;
-            try {
-                category = Category.valueOf(label.toUpperCase());
-            } catch (Exception e) {
-            } finally {
-                return category;
-            }
-        }
     }
 
     private Category category;

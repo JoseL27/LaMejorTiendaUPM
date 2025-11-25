@@ -14,6 +14,7 @@ public class Inventory {
 
     private Product[] inventory; // List
     private int productAmount;
+	private int nextId;
 
 	public static Inventory getInstance() {
 		if (Inventory.instance == null) {
@@ -28,51 +29,7 @@ public class Inventory {
     private Inventory() {
         this.inventory = new Product[MAX_PRODUCTS];
         this.productAmount = 0;
-    }
-
-    /**
-     * Checks if given ID is valid (idToCheck >= 0)
-     * @param idToCheck numeric id to check
-     * @return true if valid, otherwise return false
-     */
-    public static boolean isValidId(int idToCheck) {
-        // Change if 0 is not an allowed ID
-        return idToCheck >= 0;
-    }
-
-    /**
-     * Check if given name is valid (nameToCheck.length < 100)
-     * @param nameToCheck Name string to check
-     * @return true if valid, otherwise return false
-     */
-    public static boolean isValidName(String nameToCheck) {
-        return nameToCheck.length() < Product.PRODUCT_MAX_NAME_LENGTH;
-    }
-
-    /**
-     * Check if given price is valid (priceToCheck > 0)
-     * @param priceToCheck Price double to check
-     * @return true if valid, otherwise return false
-     */
-    private boolean isValidPrice(double priceToCheck) {
-        return priceToCheck > 0;
-    }
-
-    /**
-     * Attempts to find the product with the same ID, returning its position in the array
-     * @param id Product ID
-     * @return Product object's index in the array, -1 if not found or ID is invalid (ID < 0)
-     */
-    public int readProductIndex(int id) {
-        if (!isValidId(id)) return -1;
-        int result = -1;
-        int i = 0;
-        while (result == -1 && i < this.productAmount) {
-            if (this.inventory[i].getId() == id)
-                result = i;
-            i++;
-        }
-        return result;
+		this.nextId = 0;
     }
 
     /**
@@ -80,18 +37,18 @@ public class Inventory {
      * @param id Product ID
      * @return Product with the specified id, null if not found or ID is invalid (ID < 0)
      */
-    public Product readProduct(int id) {
-        if (!isValidId(id)) return null;
-        // Linear search for products with the same ID
-        Product result = null;
-        int i = 0;
-        while (result == null && i < this.productAmount) {
-            if (this.inventory[i].getId() == id)
-                result = this.inventory[i];
-            i++;
-        }
-        return result;
-    }
+    public Product getProduct(int id) throws Exception {
+        assert Product.isValidId(id);
+
+		int index = this.readProductIndex(id);
+
+		if (index == -1) {
+			throw new Exception(String.format("could not find product with id '%d'", id));
+		}
+
+		Product product = this.inventory[index];
+		return product;
+	}
 
     /**
      * Creates a product and adds it to the array
@@ -101,45 +58,45 @@ public class Inventory {
      * @param price Product price (must be greater than 0)
      * @return true if the product is created correctly, false in other case
      */
-    public BaseProduct createBaseProduct(int id, String name, BaseProduct.Category category, double price, int maxPers, boolean personalized) {
-        if (!isValidId(id) || !isValidName(name) || !isValidPrice(price)) return null;
+    public BaseProduct createBaseProduct(int id, String name, BaseProduct.Category category, 
+										 double price, int maxPers, boolean personalized) throws Exception {
+        assert Product.isValidId(id) && Product.isValidName(name) && Product.isValidPrice(price);
 
-        // Check inventory full
-        if (this.productAmount >= MAX_PRODUCTS) return null;
-
-        Product selectedProduct = this.readProduct(id);
-
-        if (selectedProduct == null) {
-            BaseProduct prodToAdd = new BaseProduct(id, name, price, category, maxPers, personalized);
-            this.inventory[this.productAmount] = prodToAdd;
-            this.productAmount++;
-            return prodToAdd;
-        } else {
-            return null;
-        }
+		BaseProduct prodToAdd = new BaseProduct(id, name, price, category, maxPers, personalized);
+		appendProduct(prodToAdd);
+		return prodToAdd;
     }
 
     /**
      * Tries to create a new timed product with its attributes set to the values of the parameters
      * @return The product that was created, or null if the creation failed
      */
-    public Product createTimedProduct(int id, String name, double price, int people, TimedProduct.TimedType type, LocalDateTime expirationDate) {
-        if (!isValidId(id) || !isValidName(name) || !isValidPrice(price)) return null;
+    public Product createTimedProduct(int id, String name, double price, int people, 
+									  TimedProduct.TimedType type, LocalDateTime expirationDate) throws Exception {
+        assert Product.isValidId(id) && Product.isValidName(name) && Product.isValidPrice(price);
 
-        // Check inventory full
-        if (this.productAmount >= MAX_PRODUCTS) return null;
-
-        TimedProduct prodToAdd = null;
-        //Check if already exists
-        Product selectedProduct = this.readProduct(id);
-
-        if (selectedProduct == null) {
-            prodToAdd = new TimedProduct(id, name, price, people, type, expirationDate);
-            this.inventory[this.productAmount] = prodToAdd;
-            this.productAmount++;
-        }
-        return prodToAdd;
+        TimedProduct prodToAdd = new TimedProduct(id, name, price, people, type, expirationDate);
+		appendProduct(prodToAdd);
+		return prodToAdd;
     }
+
+	public Product appendProduct(Product product) throws Exception {
+        if (this.containsProduct(product.getId())) {
+			throw new Exception(String.format("unable to add, product with id '%d' allready exists", product.getId()));
+        }
+
+        if (this.productAmount >= MAX_PRODUCTS) {
+			throw new Exception("unable to add, too many products");
+		}
+
+		if (product.getId() > this.nextId) {
+			this.nextId = product.getId() + 1;
+		}
+		
+		this.inventory[this.productAmount] = product;
+		this.productAmount++;
+        return product;
+	}
 
     /**
      * Updates a product's name specifying its product ID
@@ -147,15 +104,11 @@ public class Inventory {
      * @param name Product name (length must be less than 100)
      * @return true if the product's name is updated correctly, false in other case
      */
-    public Product updateProductName(int id, String name) {
-        // Sanity checks: ID >= 0, name.length < 100
-        if (!isValidId(id) || !isValidName(name)) return null;
+    public Product updateProductName(int id, String name) throws Exception {
+        assert Product.isValidId(id) && Product.isValidName(name);
 
-        Product selectedProduct = this.readProduct(id);
-
-        if (selectedProduct != null) {
-            selectedProduct.setName(name);
-        }
+        Product selectedProduct = this.getProduct(id);
+		selectedProduct.setName(name);
 		return selectedProduct;
     }
 
@@ -165,15 +118,12 @@ public class Inventory {
      * @param price Product price (must be greater than 0)
      * @return true if the product's price is updated correctly, false in other case
      */
-    public Product updateProductPrice(int id, double price) {
-        // Sanity checks: ID >= 0, price > 0
-        if (!isValidId(id) || !isValidPrice(price)) return null;
+    public Product updateProductPrice(int id, double price) throws Exception {
+        assert Product.isValidId(id) && Product.isValidPrice(price);
 
-        Product selectedProduct = this.readProduct(id);
+        Product selectedProduct = this.getProduct(id);
 
-        if (selectedProduct != null) {
-            selectedProduct.setPrice(price);
-        }
+		selectedProduct.setPrice(price);
 		return selectedProduct;
     }
 
@@ -183,17 +133,12 @@ public class Inventory {
      * @param category Product Category
      * @return true if the product's category is updated correctly, false in other case
      */
-    public BaseProduct updateProductCategory(int id, BaseProduct.Category category) {
-        // Sanity checks: ID >= 0, category != null
-        if (!isValidId(id)) return null;
-        // if (category == null) return DataResult.INVALID_CATEGORY;
-
-        BaseProduct selectedProduct = (BaseProduct) this.readProduct(id);
-
-        if (selectedProduct != null) {
-            // Update product's category
-             selectedProduct.setCategory(category);
-        }
+    public BaseProduct updateProductCategory(int id, BaseProduct.Category category) throws Exception {
+        assert Product.isValidId(id);
+		
+        BaseProduct selectedProduct = (BaseProduct)this.getProduct(id);
+		
+		selectedProduct.setCategory(category);
 		return selectedProduct;
     }
 
@@ -202,22 +147,23 @@ public class Inventory {
      * @param id Product ID (must be a positive integer)
      * @return true if the product is deleted correctly, false in other case
      */
-    public boolean deleteProduct(int id) {
-        // Sanity checks: ID >= 0
-        if (!isValidId(id)) return false;
+    public Product deleteProduct(int id) throws Exception {
+        assert Product.isValidId(id);
+		
+        int index = this.readProductIndex(id);
 
-        int selectedProductIndex = this.readProductIndex(id);
+        if (index == -1) {
+			throw new Exception(String.format("product with id '%d' not found", id));
+		}
 
-        if (selectedProductIndex != -1) {
-            // Remove product from array
-            this.productAmount--;
-            for (int i = selectedProductIndex; i < this.productAmount; i++) {
-                this.inventory[i] = this.inventory[i + 1];
-            }
-            return true;
-        } else {
-            return false;
-        }
+		Product deleted = this.inventory[index];
+		
+		this.productAmount--;
+		for (int i = index; i < this.productAmount; i++) {
+			this.inventory[i] = this.inventory[i + 1];
+		}
+
+		return deleted;
     }
 
     /**
@@ -233,11 +179,30 @@ public class Inventory {
         return arrayProducts;
     }
 
-	// NOTE(enrique): Implementation Sugestion: loop through all products
-	// and find the greatest id value and add 1 to it (maybe even keep a 'greatest id value')
-	public int generateUniqueProductId() {
-		System.out.println("UserManager.generateUniqueTicketId: NOT IMPLEMENTED");
-		return -1;
+
+    /**
+     * Attempts to find the product with the same ID, returning its position in the array
+     * @param id Product ID
+     * @return Product object's index in the array, -1 if not found or ID is invalid (ID < 0)
+     */
+    private int readProductIndex(int id) {
+        assert Product.isValidId(id);
+		
+        int result = -1;
+        int i = 0;
+        while (result == -1 && i < this.productAmount) {
+            if (this.inventory[i].getId() == id)
+                result = i;
+            i++;
+        }
+        return result;
+    }
+
+	private boolean containsProduct(int id) {
+		return this.readProductIndex(id) != -1;
 	}
 
+	public int generateUniqueProductId() {
+		return this.nextId++;
+	}
 }

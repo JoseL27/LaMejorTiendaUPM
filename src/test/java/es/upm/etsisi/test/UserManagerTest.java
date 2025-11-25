@@ -41,43 +41,54 @@ public class UserManagerTest {
 
     @Test
     void normalAddCashier() {
-        Cashier result = UserManager.getInstance().addCashier("Cajero1", "cajero1@upm.es");
-        assertNotNull(result);
+		assertDoesNotThrow(() -> { 
+				UserManager.getInstance().addCashier("Cajero1", "cajero1@upm.es");
+			});
     }
 
     @Test
     void addCashierTwice() {
-        Cashier result = UserManager.getInstance().addCashier("Cajero1", "cajero1@upm.es");
-        assertNotNull(result);
-        result = UserManager.getInstance().addCashier("Cajero2", "cajero2@upm.es");
-        assertNotNull(result);
+		assertDoesNotThrow(() -> {
+				UserManager.getInstance().addCashier("Cajero1", "cajero1@upm.es");
+				UserManager.getInstance().addCashier("Cajero2", "cajero2@upm.es");
+			});
     }
 
     @Test
     void addCashierWithId() {
-        Cashier result = UserManager.getInstance().addCashier("UW0000000", "Cajero1", "cajero1@upm.es");
-        assertNotNull(result);
+		assertDoesNotThrow(() -> {
+				UserManager.getInstance().addCashier("UW0000000", "Cajero1", "cajero1@upm.es");
+			});
     }
 
     @Test
     void addCashierWithExistingId() {
-        Cashier result = UserManager.getInstance().addCashier("UW0000000", "Cajero1", "cajero1@upm.es");
-        assertNotNull(result);
-        result = UserManager.getInstance().addCashier("UW0000000", "Cajero2", "cajero2@upm.es");
-        assertNull(result);
+		assertDoesNotThrow(() -> {
+				UserManager.getInstance().addCashier("UW0000000", "Cajero1", "cajero1@upm.es");				
+			});
+		assertThrows(Exception.class, () -> { 
+				UserManager.getInstance().addCashier("UW0000000", "Cajero2", "cajero2@upm.es");
+			});
     }
 
     @Test
     void addCashierWithInvalidId() {
-        Cashier result = UserManager.getInstance().addCashier("UX0000000", "Cajero0", "cajero0@upm.es");
-        assertNull(result);
-        result = UserManager.getInstance().addCashier("UW000000100", "Cajero0", "cajero0@upm.es");
-        assertNull(result);
+		assertThrows(AssertionError.class, () -> {
+				UserManager.getInstance().addCashier("UX00000", "Cajero0", "cajero0@upm.es");
+			});
     }
 
     @Test
+    void addCashierWithInvalidIdOther() {
+		assertThrows(AssertionError.class, () -> { 
+				UserManager.getInstance().addCashier("UW000000100", "Cajero0", "cajero0@upm.es");
+			});
+	}
+			
+
+    @Test
     @Disabled("This test will take a LOOOOOOOONG LOOOOOOONG TIIIIIIMEEEE (Cue the Sakeru Gumi's Ad music)")
-    void FillCashiersNoId() {
+    void FillCashiersNoId() throws Exception {
         // Filling
         String cashierName;
         String cashierEmail;
@@ -95,7 +106,7 @@ public class UserManagerTest {
 
     @Test
     @Disabled("This test will take a LOOOOOOOONG LOOOOOOONG TIIIIIIMEEEE (Cue the Sakeru Gumi's Ad music)")
-    void FillCashiersWithId() {
+    void FillCashiersWithId() throws Exception {
         // Filling
         String cashierId;
         String cashierName;
@@ -117,7 +128,7 @@ public class UserManagerTest {
 
     @Test
     @Disabled("This test will take a LOOOOOOOONG LOOOOOOONG TIIIIIIMEEEE (Cue the Sakeru Gumi's Ad music)")
-    void fillCashierWithExistingMaxIdEdgeCaseTest() {
+    void fillCashierWithExistingMaxIdEdgeCaseTest() throws Exception {
         // Filling
         String cashierId = String.format("UW%07d", UserManager.MAX_CASHIER_ID);
         String cashierName = String.format("Cashier #%d", UserManager.MAX_CASHIER_ID);;
@@ -141,7 +152,7 @@ public class UserManagerTest {
     // If for what reason the nextCashierId broke and is unavailable, make sure that generation by iteration works
     @Test
     @Disabled("This test will take a LOOOOOOOONG LOOOOOOONG TIIIIIIMEEEE (Cue the Sakeru Gumi's Ad music)")
-    void fillCashierWithExistingMaxIdEdgeCaseTest2() {
+    void fillCashierWithExistingMaxIdEdgeCaseTest2() throws Exception {
         // Render auto-increment useless
         for (int i = UserManager.MIN_CASHIER_ID; i <= UserManager.MAX_CASHIER_ID; i++) {
             String generatedId = UserManager.getInstance().generateUniqueCashierId();
@@ -172,95 +183,102 @@ public class UserManagerTest {
     @Test
     void removeNonExistentCashier() {
         normalAddCashier();
-        boolean result = UserManager.getInstance().removeCashier("UW0000001");
-        assertNotNull(result);
-    }
-
-    @Test
-    void removeInvalidIdCashier() {
-        normalAddCashier();
-        boolean result = UserManager.getInstance().removeCashier("UX0000000");
-        assertNotNull(result);
-        result = UserManager.getInstance().removeCashier("UW00000000");
-        assertNotNull(result);
+		String id = "UW0000001";
+		Exception e = assertThrows(Exception.class, () -> { 
+				UserManager.getInstance().removeCashier(id); 
+			});
+		assertEquals(String.format("failed to remove cashier with id '%s'", id), e.getMessage());		
     }
 
     @Test
     void removeCashier() {
         normalAddCashier();
-        boolean result = UserManager.getInstance().removeCashier("UW0000000");
-        assertTrue(result);
+		assertDoesNotThrow(() -> { 
+				UserManager.getInstance().removeCashier("UW0000000"); 
+			});		
     }
 
-    @Test
+	@Test		
     void findNonExistentCashier() {
         normalAddCashier();
-        Cashier cashier = UserManager.getInstance().findCashier("UW0000001");
-        assertNull(cashier);
+		String id = "UW0000001";
+		Exception e = assertThrows(Exception.class, () -> { 
+				UserManager.getInstance().getCashier(id); 
+			});
+		assertEquals(e.getMessage(), String.format("cashier with id '%s' not found", id));
     }
 
-    @Test
+	@Test		
     void findInvalidIdCashier() {
         normalAddCashier();
-        Cashier cashier = UserManager.getInstance().findCashier("UX0000000");
-        assertNull(cashier);
-        cashier = UserManager.getInstance().findCashier("UW00000000");
-        assertNull(cashier);
+		assertThrows(AssertionError.class, () -> {
+				UserManager.getInstance().getCashier("UX0000000");
+			});
     }
 
     @Test
     void findCashier() {
         normalAddCashier();
-        Cashier cashier = UserManager.getInstance().findCashier("UW0000000");
-        assertNotNull(cashier);
-        assertEquals("UW0000000", cashier.getId());
+		assertDoesNotThrow(() -> {
+				Cashier cashier = UserManager.getInstance().getCashier("UW0000000");
+				assertEquals("UW0000000", cashier.getId());
+			});
     }
 
     @Test
     void addOneClient() {
-        UserManager.getInstance().addCashier("Cashier 0", "cashier0@upm.es");
-        Cashier cashier = UserManager.getInstance().findCashier("UW0000000");
-        Client result = UserManager.getInstance().addClient("00000000Y", "Client 0", "client1@example.com", cashier);
-        assertNotNull(result);
+		assertDoesNotThrow(() -> {
+				UserManager.getInstance().addCashier("Cashier 0", "cashier0@upm.es");
+				Cashier cashier = UserManager.getInstance().getCashier("UW0000000");
+				UserManager.getInstance().addClient("00000000Y", "Client 0", "client1@example.com", cashier.getId());
+			});
     }
 
-    @Test
-    void addClientSameId() {
-        UserManager.getInstance().addCashier("Cashier 0", "cashier0@upm.es");
-        Cashier cashier = UserManager.getInstance().findCashier("UW0000000");
-        Client result = UserManager.getInstance().addClient("00000000Y", "Client 1", "client1@example.com", cashier);
-        assertNotNull(result);
-        result = UserManager.getInstance().addClient("00000000Y", "Client 2", "client2@example.com", cashier);
-        assertNull(result);
+	@Test		
+    void addClientSameId() throws Exception {
+		Cashier cashier = assertDoesNotThrow(() -> {
+				UserManager.getInstance().addCashier("Cashier 0", "cashier0@upm.es");
+				Cashier result = UserManager.getInstance().getCashier("UW0000000");
+				UserManager.getInstance().addClient("00000000Y", "Client 1", "client1@example.com", result.getId());
+				return result;
+		});
+		
+		assertThrows(Exception.class, () -> {
+				UserManager.getInstance().addClient("00000000Y", "Client 2", "client2@example.com", cashier.getId());
+			});		
     }
 
     @Test
     void removeClient() {
         addOneClient();
-        boolean result = UserManager.getInstance().removeClient("00000000Y");
-        assertTrue(result);
+		assertDoesNotThrow(() -> { 
+				UserManager.getInstance().removeClient("00000000Y");
+			});
     }
 
-    @Test
+	@Test		
     void removeClientNonExistent() {
         addOneClient();
-        boolean result = UserManager.getInstance().removeClient("X0000000X");
-        assertFalse(result);
+		assertThrows(Exception.class, () -> { 
+				UserManager.getInstance().removeClient("X0000000X");
+			});
     }
 
-    @Test
+	@Test		
     void findNonExistentClient() {
         addOneClient();
-        Client client = UserManager.getInstance().findClient("00000000X");
-        assertNull(client);
+		assertThrows(Exception.class, () -> { 
+				UserManager.getInstance().getClient("00000000X");
+			});
     }
 
     @Test
     void findClient() {
         addOneClient();
-        Client client = UserManager.getInstance().findClient("00000000Y");
-        assertNotNull(client);
-        assertEquals("00000000Y", client.getId());
+		assertDoesNotThrow(() -> { 
+				Client client = UserManager.getInstance().getClient("00000000Y");
+				assertEquals("00000000Y", client.getId());
+			});
     }
 
     @Test
@@ -278,10 +296,10 @@ public class UserManagerTest {
 
     @Test
     @Disabled("This test will take a LOOOOOOOONG LOOOOOOONG TIIIIIIMEEEE (Cue the Sakeru Gumi's Ad music)")
-    void fillCashierTicket() {
+    void fillCashierTicket() throws Exception {
         normalAddCashier();
         Ticket result = null;
-        Cashier cashier = UserManager.getInstance().findCashier("UW0000000");
+        Cashier cashier = UserManager.getInstance().getCashier("UW0000000");
         for (int i = UserManager.MIN_TICKET_ID; i <= UserManager.MAX_TICKET_ID; i++) {
             result = cashier.createTicket(UserManager.getInstance().generateUniqueTicketId());
             assertNotNull(result);
@@ -291,11 +309,11 @@ public class UserManagerTest {
 
     @Test
     @Disabled("This test will take a LOOOOOOOONG LOOOOOOONG TIIIIIIMEEEE (Cue the Sakeru Gumi's Ad music)")
-    void fillCashierTicketLastTicketWithIterationOnly() {
+    void fillCashierTicketLastTicketWithIterationOnly() throws Exception {
         normalAddCashier();
         // Render auto-increment useless, and create the rest of the ticket wicked fast
         Ticket result = null;
-        Cashier cashier = UserManager.getInstance().findCashier("UW0000000");
+        Cashier cashier = UserManager.getInstance().getCashier("UW0000000");
         for (int i = UserManager.MIN_TICKET_ID; i < UserManager.MAX_TICKET_ID; i++) {
             int generatedId = UserManager.getInstance().generateUniqueTicketId();
             result = cashier.createTicket(generatedId);

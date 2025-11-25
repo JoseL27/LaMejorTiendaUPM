@@ -37,7 +37,13 @@ public class App {
                 System.out.println(input);
             }
             if (!input.equals("exit")) {
-                firstParse(input);
+
+				try { 
+					firstParse(input);
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
+				
             } else {
                 System.out.println("Closing application.");
                 System.out.println("Goodbye!");
@@ -114,8 +120,8 @@ public class App {
         return aux;
     }
 
-    private static void echo(String[] params) {
-        if (!checkArgsCountWithPrint("echo", params.length, 2)) return;
+    private static void echo(String[] params) throws Exception {
+        checkArgsCountWithPrint(params.length, 2);
         System.out.printf("\"%s\"\n", params[1]);
     }
 
@@ -163,65 +169,65 @@ public class App {
         System.out.println(".");
     }
 
-    private void firstParse(String input) {
-        String[] params = parser(input);
-        if (!checkMinArgsCountWithPrint("all", params.length, 1)) return;
+    private void firstParse(String input) throws Exception {
+		try {
+			String[] params = parser(input);
+			checkMinArgsCountWithPrint(params.length, 1);
 
-        Command command = null;
-        switch (params[0].toLowerCase()) {
-            case "prod" -> command = new ProductCommand();
+			Command command = null;
+			switch (params[0].toLowerCase()) {
+            case "prod"   -> command = new ProductCommand();
             case "ticket" -> command = new TicketCommand();
-            case "echo" -> echo(params);
-            case "help" -> help();
-            case "cash" -> command = new CashCommand();
             case "client" -> command = new ClientCommand();
-            default -> System.out.println("all: error: command not recognized. type help to see all commands.");
-        }
+            case "cash"   -> command = new CashCommand();
+            case "echo"   -> echo(params);
+            case "help"   -> help();
+            default -> throw new Exception("command not recognized. type help to see all commands.");
+			}
 
-        if (command != null) {
-            command.eval(params);
-        }
+			if (command != null) {
+				command.eval(params);
+			}
+
+		} catch (Exception e) {
+			throw new Exception("error: "+e.getMessage());
+		}
     }
 
-    public static void printInvalidDataType(String failedCommand, String expectedDataType, String receivedValue){
-        System.out.printf("%s: error: expected %s, got '%s'\n", failedCommand, expectedDataType, receivedValue);
-    }
-
-    /**
-     * Parses an integer from a string, basically supresses the InvalidArgumentException.
-     * @return An integer with the underlying int value or NULL if the parse failed.
-     */
-    public static Integer tryParseInt(String s) {
-        Integer value = null;
-        try {
-            value = Integer.parseInt(s);
-        } catch (Exception e) {
-        } finally {
-            return value;
-        }
-    }
-
-    public static boolean checkMaxArgsCountWithPrint(String prefix, int amount, int maxAmount) {
+    public static void checkMaxArgsCountWithPrint(int amount, int maxAmount) throws Exception {
         if (amount > maxAmount) {
-            System.out.printf("%s: too many arguments, expected maximum %d and got %d\n", prefix, maxAmount, amount);
-            return false;
+			throw new Exception(String.format("too many arguments, expected maximum %d and got %d\n", maxAmount, amount));
         }
-        return true;
     }
 
-    public static boolean checkMinArgsCountWithPrint(String prefix, int amount, int minAmount) {
+    public static void checkMinArgsCountWithPrint(int amount, int minAmount) throws Exception {
         if (amount < minAmount) {
-            System.out.printf("%s: too few arguments, expected at least %d arguments and got %d\n", prefix, minAmount, amount);
-            return false;
+			throw new Exception(String.format("too few arguments, expected at least %d arguments and got %d\n", minAmount, amount));
         }
-        return true;
     }
 
-    public static boolean checkArgsCountWithPrint(String prefix, int amount, int minAmount, int maxAmount) {
-        return checkMinArgsCountWithPrint(prefix, amount, minAmount) && checkMaxArgsCountWithPrint(prefix, amount, maxAmount);
+    public static void checkArgsCountWithPrint(int amount, int minAmount, int maxAmount) throws Exception {
+        checkMinArgsCountWithPrint(amount, minAmount);
+		checkMaxArgsCountWithPrint(amount, maxAmount);
     }
 
-    public static boolean checkArgsCountWithPrint(String prefix, int amount, int expectedAmount) {
-        return checkArgsCountWithPrint(prefix, amount, expectedAmount, expectedAmount);
+    public static void checkArgsCountWithPrint(int amount, int expectedAmount) throws Exception {
+        checkArgsCountWithPrint(amount, expectedAmount, expectedAmount);
     }
+
+	public static int parsePositiveInt(String str) throws Exception {
+		int value = Integer.parseInt(str);
+		if (value < 0) {
+			throw new Exception(String.format("expected positive number, got '%d'", value));
+		}
+		return value;
+	}
+
+	public static double parsePositiveDouble(String str) throws Exception {
+		double value = Double.parseDouble(str);
+		if (value < 0) {
+			throw new Exception(String.format("expected positive number, got '%d'", value));
+		}
+		return value;
+	}
 }

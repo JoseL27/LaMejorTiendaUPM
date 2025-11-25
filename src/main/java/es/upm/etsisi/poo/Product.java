@@ -25,9 +25,47 @@ public abstract class Product {
 
     public void setPrice(double price) {this.price = price;}
 
-	public double getMultipliedPrice(int amount) {
-		return amount * price;
-	}
-	
 	public abstract boolean duplicateOf(Product product);
+
+    /**
+     * Checks if given ID is valid (idToCheck >= 0)
+     * @param idToCheck numeric id to check
+     * @return true if valid, otherwise return false
+     */
+    public static boolean isValidId(int idToCheck) {
+        return idToCheck >= 0;
+    }
+	
+    /**
+     * Check if given name is valid (nameToCheck.length < 100)
+     * @param nameToCheck Name string to check
+     * @return true if valid, otherwise return false
+     */
+    public  static boolean isValidName(String nameToCheck) {
+        return nameToCheck.length() < Product.PRODUCT_MAX_NAME_LENGTH;
+    }
+	
+    /**
+     * Check if given price is valid (priceToCheck > 0)
+     * @param priceToCheck Price double to check
+     * @return true if valid, otherwise return false
+     */
+    public static boolean isValidPrice(double priceToCheck) {
+        return priceToCheck > 0;
+    }
+
+	public static String validName(String name) throws Exception {
+		if (!isValidName(name)) {
+			throw new Exception("%s is not a valid name, too long");
+		}
+		return name;
+	}
+
+	public static int parseId(String strId) throws Exception {
+		Integer productId = Integer.parseInt(strId);
+		if (!isValidId(productId)) {
+			throw new Exception("expected id greater or equal than zero");
+		}
+		return productId;
+	}
 }

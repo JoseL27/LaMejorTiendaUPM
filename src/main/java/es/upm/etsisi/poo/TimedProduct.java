@@ -20,16 +20,6 @@ public class TimedProduct extends Product {
             this.hoursForPreparing = hoursForPreparing;
         }
 
-        public static TimedType fromLabel(String label){
-            TimedType result = null;
-            try{
-                result = TimedType.valueOf(label.toUpperCase());
-            }catch (Exception e){
-            }finally{
-                return result;
-            }
-        }
-
         public int getHoursForPreparing(){
             return hoursForPreparing;
         }
@@ -87,5 +77,4 @@ public class TimedProduct extends Product {
 		sb.append("}");
         return sb.toString();
 	}
-			
 }

@@ -14,18 +14,24 @@ public class Client extends User implements Comparable<Client> {
 		this.ticketIds = new ArrayList<>();
 	}
 
-	public boolean addTicket(int ticketId) {
-		if (!ticketIds.contains(ticketId)) {
-			ticketIds.add(ticketId);
-			return true;
+	public void addTicket(int ticketId) throws Exception {
+		if (ticketIds.contains(ticketId)) {
+			throw new Exception("failed to add ticket to client");
 		}
-		return false;
+		ticketIds.add(ticketId);
 	}
 
 	public static boolean isValidId(String id) {
 		return id.length() == 9 
 			&& Character.isLetter(id.charAt(8))
-			&& (App.tryParseInt(id.substring(0, 7)) != null);
+			&& (Integer.parseInt(id.substring(0, 7)) >= 0);
+	}
+
+	public static String validId(String id) throws Exception {
+		if (!isValidId(id)) {
+			 throw new Exception(String.format("invalid client id '%s' expected 8 digits followed by a letter\n", id));
+		}
+		return id;
 	}
 
 	@Override
