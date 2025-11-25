@@ -87,7 +87,7 @@ public class ProductCommand implements Command {
 		}
 		
 		// Execute
-		if (productMaxPers != null && productMaxPers > productCategory.getMaxPersonalizations()) {
+		if (productMaxPers != null && (productMaxPers < 0 || productMaxPers > productCategory.getMaxPersonalizations())) {
 			System.out.printf("prod add: error: category %s only allows a max of %d personalizations, got %d\n",
 							  productCategory, productCategory.getMaxPersonalizations(), productMaxPers);
 			return;
