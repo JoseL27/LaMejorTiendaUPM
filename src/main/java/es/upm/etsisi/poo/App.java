@@ -11,17 +11,8 @@ import es.upm.etsisi.poo.commands.ProductCommand;
 import es.upm.etsisi.poo.commands.TicketCommand;
 
 public class App {
-    private Inventory inventory;
-    private UserManager userManager;
-
-
-    /**
-     * Basic constructor
-     */
-    public App() {
-        inventory = new Inventory();
-        userManager = new UserManager();
-    }
+	
+    public App() {}
 
     /**
      * This is the main function which runs the program.
@@ -188,7 +179,7 @@ public class App {
         }
 
         if (command != null) {
-            command.eval(params, userManager, inventory);
+            command.eval(params);
         }
     }
 

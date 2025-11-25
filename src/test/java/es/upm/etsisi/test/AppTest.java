@@ -1,9 +1,12 @@
 package es.upm.etsisi.test;
 
+import java.lang.reflect.Field;
+
 import es.upm.etsisi.poo.App;
 import es.upm.etsisi.poo.BaseProduct;
 import es.upm.etsisi.poo.Ticket;
 import es.upm.etsisi.poo.Inventory;
+import es.upm.etsisi.poo.UserManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -37,6 +40,21 @@ public class AppTest {
 	static void setEnUSLocale() {
 		Locale.setDefault(new Locale("en", "US"));
 	}
+
+    @BeforeEach
+    void ResetSingletons() {
+		try { 
+			Field f = UserManager.class.getDeclaredField("instance");
+			f.setAccessible(true);
+			f.set(null, null);
+
+			f = Inventory.class.getDeclaredField("instance");
+			f.setAccessible(true);
+			f.set(null, null);
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+    }	
 	
 	@AfterAll
 	static void unsetEnUSLocale() {

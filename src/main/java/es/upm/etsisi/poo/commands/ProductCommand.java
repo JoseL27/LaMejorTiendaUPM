@@ -17,15 +17,15 @@ import java.util.List;
  */
 public class ProductCommand implements Command {
 	@Override
-	public void eval(String[] args, UserManager userManager, Inventory inventory) {
+	public void eval(String[] args) {
 		if (!App.checkArgsCountWithPrint("prod", args.length, 2, 7)) return;
 
 		switch (args[1].toLowerCase()) {
-		case "addfood", "addmeeting" -> evalAddTimed(args, userManager, inventory);
-		case "add"	  -> evalAddBase(args, userManager, inventory);
-		case "list"	  -> evalList(args, userManager, inventory);
-		case "update" -> evalUpdate(args, userManager, inventory);
-		case "remove" -> evalRemove(args, userManager, inventory);
+		case "addfood", "addmeeting" -> evalAddTimed(args);
+		case "add"	  -> evalAddBase(args);
+		case "list"	  -> evalList(args);
+		case "update" -> evalUpdate(args);
+		case "remove" -> evalRemove(args);
 		default       -> System.out.println("prod: invalid sub command");
 		}
 	}
@@ -40,7 +40,7 @@ public class ProductCommand implements Command {
 	 *               specifiying productId, productName, productCategory and productPrice,
 	 *               or null if it fails
 	 */	
-	public void evalAddBase(String[] params, UserManager userManager, Inventory inventory) {
+	public void evalAddBase(String[] params) {
 		// Parse
 		if (!App.checkArgsCountWithPrint("prod add", params.length, 5, 7)) return;
 		
@@ -93,6 +93,8 @@ public class ProductCommand implements Command {
 			return;
 		}
 
+		Inventory inventory = Inventory.getInstance();
+
 		if (productId == null) {
 			productId = inventory.generateUniqueProductId();
 		}
@@ -103,7 +105,7 @@ public class ProductCommand implements Command {
 			System.out.println(createdProduct);
 			System.out.println("prod add: ok");
 		} else {
-			System.out.println("prod add: error: unexpected error");
+			System.out.println("prod add: error: failed to create product");
 		}
 	}
 
@@ -113,7 +115,7 @@ public class ProductCommand implements Command {
 	 * @param userManager The manager containing all the info on cliets and cashiers (and by extension on tickets)
 	 * @param inventory The manager containing all the info on products, if the command succeeds, the product will be created here
 	 */
-	public void evalAddTimed(String[] params, UserManager userManager, Inventory inventory) {
+	public void evalAddTimed(String[] params) {
 		if (params.length != 6 && params.length != 7){
 			System.out.println("prod " + params[1] + ": invalid number of parameters, got " + params.length + ", expected 6 or 7");
 			return;
@@ -130,6 +132,8 @@ public class ProductCommand implements Command {
 		int parseIndex = 1;
 		try {
 			// Parsing
+
+			Inventory inventory = Inventory.getInstance();
 
 			String typeArgument = params[parseIndex++];
 			type = TimedProduct.TimedType.fromLabel(typeArgument.replaceAll("add", ""));
@@ -177,6 +181,7 @@ public class ProductCommand implements Command {
 			}
 			System.out.println(addedProduct);
 			System.out.printf("prod %s: ok\n", typeArgument);
+			
 		}catch (Exception e){
 			System.out.println("Invalid argument: "  + params[parseIndex] + " for index " + parseIndex);
 		}
@@ -195,7 +200,7 @@ public class ProductCommand implements Command {
 	 *               or null
 	 * @see Product.Field
 	 */		
-	public void evalUpdate(String[] params, UserManager userManager, Inventory inventory) {
+	public void evalUpdate(String[] params) {
 		if (!App.checkArgsCountWithPrint("prod update", params.length, 5)) return;
 		
  		Integer productId = App.tryParseInt(params[2]);
@@ -205,6 +210,8 @@ public class ProductCommand implements Command {
 		}
 
 		String productFieldStr = params[3].toLowerCase();
+
+		Inventory inventory = Inventory.getInstance();
 
 		Product updatedProduct = null;
 		String fieldName = params[3].toLowerCase();
@@ -252,7 +259,7 @@ public class ProductCommand implements Command {
 	 * @return       The result of the parse. If the amount of tokens is 3 and the 'id' parse succedes then a valid
 	 *               ProductCommand Remove instance or null
 	 */			
-	public void evalRemove(String[] params, UserManager userManager, Inventory inventory) {
+	public void evalRemove(String[] params) {
 		 if (!App.checkArgsCountWithPrint("prod remove", params.length, 3)) return;
 
  		 Integer productId = App.tryParseInt(params[2]);
@@ -261,10 +268,12 @@ public class ProductCommand implements Command {
 		 	return;
 		 }
 
+		 Inventory inventory = Inventory.getInstance();
+
 		 Product productToRemove = inventory.readProduct(productId);
 		 if (productToRemove != null) {
 			 // Retrieves the active ticket from the system (Products should not be removed from closed tickets)
-			 List<Ticket> tickets = userManager.getAllTickets();
+			 List<Ticket> tickets = UserManager.getInstance().getAllTickets();
 
 			 for (Ticket ticket: tickets) {
 				 if (ticket.getIsOpen()) {
@@ -276,7 +285,7 @@ public class ProductCommand implements Command {
 		 		System.out.println(productToRemove);
 		 		System.out.println("prod remove: ok");
 		 	} else {
-		 		System.out.println("prod remove: error: unexpected error");
+		 		System.out.println("prod remove: error: failed to remove product");
 		 	}
 			
 		 } else {
@@ -293,10 +302,10 @@ public class ProductCommand implements Command {
 	 * @return       The result of the parse. If the amount of tokens is 2 then a valid
 	 *               ProductCommand List instance or null
 	 */
-	public void evalList(String[] params, UserManager userManager, Inventory inventory) {
+	public void evalList(String[] params) {
 		if (!App.checkArgsCountWithPrint("prod list", params.length, 2)) return;
 
-		Product[] products = inventory.listProducts();
+		Product[] products = Inventory.getInstance().listProducts();
 
 		System.out.println("Catalog:");
 		if (products != null) {

@@ -7,6 +7,9 @@ import java.util.*;
  * Add/Remove/Find operations on the Client/Cashier set.
  */
 public class UserManager {
+
+	private static UserManager instance = new UserManager();
+	
 	// using hashmap here since it will make my life easier, also there is no explicit limit on the amount of users -jy
 	private Map<String, Cashier> cashiers;
 	private Map<String, Client> clients;
@@ -20,10 +23,18 @@ public class UserManager {
 	public static final int MAX_TICKET_ID = 99999;
 	private int nextTicketId = MIN_TICKET_ID;
 
+
+	public static UserManager getInstance() {
+		if (UserManager.instance == null) {
+			UserManager.instance = new UserManager();
+		}
+		return instance;
+	}
+
 	/**
 	 * Creates an empty Cashier/Client set
 	 */
-	public UserManager() {
+	private UserManager() {
 		this.cashiers = new HashMap<>();
 		this.clients = new HashMap<>();
 	}

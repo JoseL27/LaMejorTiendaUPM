@@ -25,13 +25,13 @@ public class ClientCommand implements Command {
 	 */
 
 	@Override
-	public void eval(String[] params, UserManager manager, Inventory dataManager) {
+	public void eval(String[] params) {
 		if(!App.checkArgsCountWithPrint("client", params.length, 2, 6)) { return; }
 		final String subcommand = params[1].toLowerCase();
 		switch (subcommand) {
-			case "add" -> evalAdd(params, manager);
-			case "remove" -> evalRemove(params, manager);
-			case "list" -> evalList(manager);
+			case "add"    -> evalAdd(params);
+			case "remove" -> evalRemove(params);
+			case "list"   -> evalList();
 			default -> System.err.println("Subcommand not recognised");
 		}
 	}
@@ -52,7 +52,7 @@ public class ClientCommand implements Command {
 	 *                 [5] - creator cashier's identifier.
 	 * @param manager  The UserManager instance used to find the creator cashier and add the new client.
 	 */
-	public void evalAdd(String[] params, UserManager manager) {
+	public void evalAdd(String[] params) {
 		if (!App.checkArgsCountWithPrint("client add", params.length, 6)) {
 			return;
 		}
@@ -66,9 +66,11 @@ public class ClientCommand implements Command {
 			return;
 		}
 
-		Cashier creator = manager.findCashier(params[5]);
+		UserManager userManager = UserManager.getInstance();
+
+		Cashier creator = userManager.findCashier(params[5]);
 		
-		Client addedClient = manager.addClient(clientId, clientName, clientEmail, creator);
+		Client addedClient = userManager.addClient(clientId, clientName, clientEmail, creator);
 		if (addedClient != null) {
 			System.out.println(addedClient);
 			System.out.println("client add: ok");
@@ -78,12 +80,12 @@ public class ClientCommand implements Command {
 
 	}
 
-	public void evalRemove(String[] params, UserManager manager) {
+	public void evalRemove(String[] params) {
 
 		if (!App.checkArgsCountWithPrint("client remove", params.length, 3)) {
 			return;
 		}
-		if (manager.removeClient(params[2])) {
+		if (UserManager.getInstance().removeClient(params[2])) {
 			System.out.println("client remove: ok");
 		} else {
 			System.out.printf("client remove: client with id '%s' not found\n", params[2]);
@@ -91,9 +93,9 @@ public class ClientCommand implements Command {
 		
 	}
 
-	public void evalList(UserManager manager) {
+	public void evalList() {
 
-		Client[] clients = manager.listClients();
+		Client[] clients = UserManager.getInstance().listClients();
 		Arrays.sort(clients);
 		if (clients.length == 0) {
 			System.out.println("client list: no clients.");

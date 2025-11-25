@@ -16,13 +16,13 @@ import java.util.Arrays;
 
 public class CashCommand implements Command {
     @Override
-    public void eval(String[] args, UserManager userManager, Inventory inventory) {
+    public void eval(String[] args) {
         if (!App.checkArgsCountWithPrint("cash", args.length, 2, 5)) return;
         switch (args[1].toLowerCase()) {
-            case "add" -> evalAddCash(args, userManager, inventory);
-            case "list" -> evalList(args, userManager, inventory);
-            case "remove" -> evalRemove(args, userManager, inventory);
-            case "tickets" -> evalTickets(args, userManager, inventory);
+            case "add"     -> evalAddCash(args);
+            case "list"    -> evalList(args);
+            case "remove"  -> evalRemove(args);
+            case "tickets" -> evalTickets(args);
             default -> System.out.println("cash: invalid sub command");
         }
     }
@@ -38,7 +38,7 @@ public class CashCommand implements Command {
      * specifiying CashId, CashName, CashCategory and CashPrice,
      * or null if it fails
      */
-    private void evalAddCash(String[] params, UserManager userManager, Inventory inventory) {
+    private void evalAddCash(String[] params) {
         // Parse
         if (!App.checkArgsCountWithPrint("cash add", params.length, 4, 5)) return;
 
@@ -51,7 +51,9 @@ public class CashCommand implements Command {
         }
 
 		Cashier addedCash = null;
-		
+
+		UserManager userManager = UserManager.getInstance();
+
         if (params.length == 5) {
 			String cashierId = params[2];
 
@@ -79,9 +81,11 @@ public class CashCommand implements Command {
      * @param userManager
      * @param inventory
      */
-    private void evalList(String[] params, UserManager userManager, Inventory inventory) {
+    private void evalList(String[] params) {
         // Parse
         if (!App.checkArgsCountWithPrint("cash list", params.length, 2)) return;
+
+		UserManager userManager = UserManager.getInstance();
 
         Cashier[] workers = userManager.listCashiers();
 		Arrays.sort(workers);
@@ -104,10 +108,10 @@ public class CashCommand implements Command {
      * @param userManager
      * @param inventory
      */
-    private void evalRemove(String[] params, UserManager userManager, Inventory inventory) {
+    private void evalRemove(String[] params) {
         if (!App.checkArgsCountWithPrint("cash remove", params.length, 3)) return;
         String cashierId = params[2];
-        if (userManager.removeCashier(cashierId)) {
+        if (UserManager.getInstance().removeCashier(cashierId)) {
             System.out.println("cash remove: ok");
         } else {
             System.out.println("cash: invalid cashier id '" + cashierId + "'");
@@ -120,11 +124,11 @@ public class CashCommand implements Command {
      * @param userManager
      * @param inventory
      */
-    private void evalTickets(String[] params, UserManager userManager, Inventory inventory) {
+    private void evalTickets(String[] params) {
         if (!App.checkArgsCountWithPrint("cash tickets", params.length, 3)) return;
         String cashierId = params[2];
 		System.out.println("Tickets:");
-		String ticketsStr = userManager.findCashier(cashierId).getTicketsString();
+		String ticketsStr = UserManager.getInstance().findCashier(cashierId).getTicketsString();
 		if (ticketsStr != null && ticketsStr.length() > 0) { 
 			System.out.print(ticketsStr);
 		}

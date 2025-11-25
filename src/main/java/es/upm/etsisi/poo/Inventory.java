@@ -10,13 +10,22 @@ public class Inventory {
 
     public static final int MAX_PRODUCTS = 200; // E1: no more than 200 products
 
+	private static Inventory instance = new Inventory();
+
     private Product[] inventory; // List
     private int productAmount;
+
+	public static Inventory getInstance() {
+		if (Inventory.instance == null) {
+			Inventory.instance = new Inventory();
+		}
+		return instance;
+	}
 
     /**
      * Creates a new Inventory with an empty inventory
      */
-    public Inventory() {
+    private Inventory() {
         this.inventory = new Product[MAX_PRODUCTS];
         this.productAmount = 0;
     }
