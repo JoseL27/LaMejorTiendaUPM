@@ -62,7 +62,7 @@ public class UserManager {
 	 * @return True if the Client was successfully deleted, false if the Client was not found
 	 */
 	public boolean removeClient(String clientId) {
-		Client removedClient = (Client)this.users.remove(clientId);
+		User removedClient = this.users.remove(clientId);
 		return (removedClient != null);
 	}
 
@@ -175,7 +175,7 @@ public class UserManager {
 	 * @return True if the Cashier was successfully deleted, false if the Cashier was not found
 	 */
 	public boolean removeCashier(String workerId){
-		Cashier removedCashier = (Cashier)this.users.remove(workerId);
+		User removedCashier = this.users.remove(workerId);
 		return (removedCashier != null);
 	}
 
