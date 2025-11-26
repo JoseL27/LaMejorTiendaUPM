@@ -42,8 +42,8 @@ enum Category {
   + BOOK	   	0.10, false
   + ELECTRONICS	0.03, false
   
-  - getDiscountPercent(): float
-  - getMaxPersonalizations(): int
+  + getDiscountPercent(): float
+  + getMaxPersonalizations(): int
 }
 
 class BaseProduct extends Product {
@@ -254,8 +254,7 @@ App --> Inventory
 ProductInfo o--> Product
 Ticket *--> ProductInfo
 
-UserManager *--> Cashier
-UserManager *--> Client
+UserManager *--> User
 
 Cashier *--> Ticket
 Client o--> Ticket
