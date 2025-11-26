@@ -28,13 +28,13 @@ public class Cashier extends User implements Comparable<Cashier> {
     /**
      * Creates a new ticket the id given in the parameter.
      */
-    public boolean createTicket(int id){
-        boolean result = false;
+    public Ticket createTicket(int id){
+        Ticket created = null;
         if (Ticket.isValidId(id)){
-            createdTickets.add(new Ticket(id));
-            result = true;
+			created = new Ticket(id);
+            createdTickets.add(created);
         }
-		return result;
+		return created;
     }
 
 	public Ticket findTicket(int ticketId) {
@@ -58,14 +58,19 @@ public class Cashier extends User implements Comparable<Cashier> {
     public String getTicketsString(){
         StringBuilder result = new StringBuilder();
         createdTickets.sort(null);
-        for(Ticket ticket: createdTickets){
-            result.append(ticket.getComposedId()).append(" ");
+        for(Ticket ticket : createdTickets) {
+			
+			result
+				.append("  ")
+				.append(ticket.getComposedId())
+				.append(" - ");
+			
             if (ticket.isEmpty()){
-                result.append("Empty");
-            }else if (ticket.isOpen()){
-                result.append("Open");
+                result.append("EMPTY");
+            }else if (ticket.getIsOpen()){
+                result.append("OPEN");
             }else{
-                result.append("Closed");
+                result.append("CLOSED");
             }
             result.append("\n");
         }
@@ -110,7 +115,7 @@ public class Cashier extends User implements Comparable<Cashier> {
 		return id.length() == 9 
 			&& Character.toUpperCase(id.charAt(0)) == 'U'
 			&& Character.toUpperCase(id.charAt(1)) == 'W'
-			&& (Utils.tryParseInt(id.substring(2)) != null);
+			&& (App.tryParseInt(id.substring(2)) != null);
 	}
 
 	@Override
@@ -120,7 +125,8 @@ public class Cashier extends User implements Comparable<Cashier> {
 
     @Override
     public String toString() {
-		return "{Cashier:" + this.getId() + ", name:'" + this.getName() + "', email:'" + this.getEmail() + "'}";
+		return String.format("Cash{identifier='%s', name='%s', email='%s'}",
+							 this.getId(), this.getName(), this.getEmail());
 	}
 
 }

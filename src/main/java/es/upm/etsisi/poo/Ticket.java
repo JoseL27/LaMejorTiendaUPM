@@ -1,30 +1,33 @@
 package es.upm.etsisi.poo;
 
-import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.Date;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.text.DecimalFormat;
+
 
 /**
  * Ticket class to manage an application ticket which consists of a product list with amounts.
  * @see Product
  */
 public class Ticket implements Comparable<Ticket> {
+
+	public static final LocalDateTime TEST_NOW_DATE = LocalDateTime.of(25, 11, 14, 18, 21);
 	/**
 	 * Max amount of products allowed in the Ticket, as the requirement documents specifies.
 	 */
 	public static final int MAX_PRODUCTS = 100;
 
 	/**
-	 * The percent cost added to the price of an item per personalization’
-	 */
-	public static final float PERSONALIZATION_EXTRA_PERCENT = 0.1f;
-
-	/**
 	 * Date format in which the start and ending dates appear in the string representation of the id
 	 */
-	private static final SimpleDateFormat ID_DATE_FORMAT = new SimpleDateFormat("YY-MM-dd-HH:mm");
+	private static final DateTimeFormatter ID_DATE_FORMAT = DateTimeFormatter.ofPattern("YY-MM-dd-HH:mm");
+
+	/**
+	 * Decimal format to use in summaryString()
+	 */
+	private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.0###");
 
 	/**
 	 * The current products the ticket holds. static array of products-amount pairs.
@@ -45,12 +48,12 @@ public class Ticket implements Comparable<Ticket> {
 	/**
 	 * The date in which the Ticket constructor was called.
 	 */
-	private Date dateOpened;
+	private LocalDateTime dateOpened;
 
 	/**
 	 * The date in which the close() function was called.
 	 */
-	private Date dateClosed;
+	private LocalDateTime dateClosed;
 
 	private boolean isOpen;
 
@@ -63,8 +66,11 @@ public class Ticket implements Comparable<Ticket> {
 	public Ticket(int id) {
 		resetProductInfos();
 		this.id = id;
-		this.isOpen = false;
-		this.dateOpened = new Date();
+		this.isOpen = true;
+
+		// TODO(enrique): Change back! Just for testing
+		// this.dateOpened = new Date();
+		this.dateOpened = TEST_NOW_DATE;
 		this.dateClosed = null;
 	}
 
@@ -72,23 +78,28 @@ public class Ticket implements Comparable<Ticket> {
 		return this.id;
 	}
 	
-	public Date getDateOpened() {
+	public LocalDateTime getDateOpened() {
 		return this.dateOpened;
 	}
 	
-	public Date getDateClosed() {
+	public LocalDateTime getDateClosed() {
 		return this.dateClosed;
 	}
 
 	public String getComposedId() {
-		String dateOpenedString = ID_DATE_FORMAT.format(this.dateOpened);
-		String idString = String.format("%s-%d", dateOpenedString, this.id);
+		StringBuilder sb = new StringBuilder();
 
-		if (dateClosed != null) {
-			String dateClosedString = ID_DATE_FORMAT.format(this.dateClosed);
-			idString += String.format("-%s", dateClosedString);
+		if (this.isOpen) {
+			sb.append(this.dateOpened.format(ID_DATE_FORMAT)).append("-");
 		}
-		return idString;
+		
+		sb.append(String.format("%05d", this.id));
+
+		if (!this.isOpen && this.dateClosed != null) {
+			sb.append("-").append(this.dateClosed.format(ID_DATE_FORMAT));
+		}
+		
+		return sb.toString();
 	}
 
 	public boolean isOpen() {
@@ -109,7 +120,9 @@ public class Ticket implements Comparable<Ticket> {
 	public void close() {
 		if (this.isOpen) { 
 			this.isOpen = false;
-			this.dateClosed = new Date();
+
+			// TODO(enrique): Remove later! Just for tests
+			this.dateClosed = TEST_NOW_DATE;
 		}
 	}
 
@@ -147,12 +160,12 @@ public class Ticket implements Comparable<Ticket> {
 				TimedProduct timedProduct = (TimedProduct)product;
 				if (amount <= timedProduct.getMaxParticipants()) {
 					result = appendProductInfo(newProductInfo);
-					if (result) { 
-						timedProduct.setAmount(amount);
-					}
+					this.totalAmount++;
 				}
+			} else { 
+				result = appendProductInfo(newProductInfo);
+				this.totalAmount += newProductInfo.getAmount();
 			}
-			result = appendProductInfo(newProductInfo);
 		}
 		
 		return result;
@@ -183,6 +196,13 @@ public class Ticket implements Comparable<Ticket> {
 		
 		if (foundProductInfo != null) {
 			Product removed = foundProductInfo.getProduct();
+			
+			if (removed instanceof TimedProduct) {
+				this.totalAmount--;
+			} else {
+				this.totalAmount -= foundProductInfo.getAmount();
+			}
+			
 			if (productInfos.remove(foundProductInfo)) {
 				return removed;
 			}
@@ -207,7 +227,7 @@ public class Ticket implements Comparable<Ticket> {
 			if (prod instanceof BaseProduct) {
 				BaseProduct baseProduct = (BaseProduct)prod;
 				int categoryIndex = (int)baseProduct.getCategory().ordinal();
-				categoriesProductCount[categoryIndex]++;
+				categoriesProductCount[categoryIndex] += info.getAmount();
 			}
 		}
 
@@ -232,9 +252,12 @@ public class Ticket implements Comparable<Ticket> {
 	public String summaryString() {
 		StringBuilder sb = new StringBuilder();
 
+		sb.append("Ticket : ")
+			.append(getComposedId())
+			.append("\n");
+
 		double totalPrice = 0;
 		double totalDiscount = 0;
-		double totalPersExtra = 0;
 
 		productInfos.sort(null);
 
@@ -243,54 +266,52 @@ public class Ticket implements Comparable<Ticket> {
 		for (ProductInfo productInfo : productInfos) {
 			Product product = productInfo.getProduct();
 
-			double multipliedPrice = 0;
-
-			sb.append(product.toString());
-
+			double effectivePrice = product.getPrice();
 
 			if (product instanceof BaseProduct) {
 				BaseProduct baseProduct = (BaseProduct)product;
 
-				int personalizationCount = productInfo.getPersonalizations() != null 
-					? productInfo.getPersonalizations().length : 0;
-				double persExtra = multipliedPrice * PERSONALIZATION_EXTRA_PERCENT * personalizationCount;
-				boolean hasPersExtra = (int)persExtra != 0;
-				totalPersExtra += persExtra;
+				String[] pers = productInfo.getPersonalizations();
+				if (pers != null && pers.length > 0) {
+					double persExtra = product.getPrice() * BaseProduct.PERSONALIZATION_EXTRA_PERCENT * pers.length;
+					effectivePrice += persExtra;
+				}
 
-				multipliedPrice = baseProduct.getPrice();
 				int categoryIndex = (int)baseProduct.getCategory().ordinal();
 				boolean hasDiscount = (categoriesCount[categoryIndex]) > 1;
-				double discountPercent = baseProduct.getCategory().getDiscountPercent(); 
-				double discount = discountPercent * multipliedPrice;
-				totalDiscount += discount;
+				double discount = 0.0;
+				
+				if (hasDiscount) {
+					discount = baseProduct.getCategory().getDiscountPercent() * effectivePrice;
+				}
 
 				for (int i = 0; i < productInfo.getAmount(); i++) {
-					sb.append(baseProduct);
+					sb.append("  ").append(baseProduct.toString(productInfo.getPersonalizations()));
 					if (hasDiscount) {
-						sb.append(String.format(" **discount -%.1f", (float)discount));
-					}
-					if (hasPersExtra) { 
-						sb.append(String.format(" **pers extra -%.1f", (float)persExtra));
+						sb.append(" **discount -").append(DECIMAL_FORMAT.format(discount));
 					}
 					sb.append('\n');
+				}
+
+				if (hasDiscount) { 
+					totalDiscount += discount * productInfo.getAmount();
 				}
 				
 			} else if (product instanceof TimedProduct) {
 				TimedProduct timedProduct = (TimedProduct)product;
-				multipliedPrice = timedProduct.getPrice() * timedProduct.getAmount();
-				sb.append(timedProduct);
-				sb.append('\n');
+				sb.append("  ")
+					.append(timedProduct.toString(productInfo.getAmount()))
+					.append('\n');
 			}
 
-			totalPrice += multipliedPrice;
+			totalPrice += effectivePrice * productInfo.getAmount();
 		}
 
-		double finalPrice = (totalPrice - totalDiscount + totalPersExtra);
+		double finalPrice = (totalPrice - totalDiscount);
 		
-		sb.append(String.format("Total price: %.1f\n", totalPrice));
-		sb.append(String.format("Total discount: %.1f\n", totalDiscount));
-		sb.append(String.format("Personalization extra: %.1f\n", totalPersExtra));
-		sb.append(String.format("Final Price: %.1f", finalPrice));
+		sb.append("  Total price: ")   .append(DECIMAL_FORMAT.format(totalPrice))   .append("\n");
+		sb.append("  Total discount: ").append(DECIMAL_FORMAT.format(totalDiscount)).append("\n");
+		sb.append("  Final Price: ")   .append(DECIMAL_FORMAT.format(finalPrice))   .append("\n");
 		return sb.toString();
 	}
 
@@ -311,7 +332,7 @@ public class Ticket implements Comparable<Ticket> {
 
 		while (result == null && iterator.hasNext()) {
 			currentProductInfo = iterator.next();
-			if (productInfo.getProduct().getId() == currentProductInfo.getProduct().getId()) {
+			if (productInfo.equalProductInfo(currentProductInfo)) {
 				result = currentProductInfo;
 			}
 		}
@@ -329,35 +350,12 @@ public class Ticket implements Comparable<Ticket> {
 		boolean result = false;
 		if (totalAmount <= MAX_PRODUCTS) {
 			productInfos.add(productInfo);
-			totalAmount += productInfo.getAmount();
 			result = true;
 		}
 		return result;
 	}
 
 	public int compareTo(Ticket ticket) {
-		return this.getComposedId().compareTo(ticket.getComposedId());
-	}
-	
-	public static void main(String[] args) {
-		Ticket ticket = new Ticket(0);
-
-		BaseProduct book = new BaseProduct(0, "book", 20, BaseProduct.Category.BOOK, 0);
-		int amount = 2;
-		ticket.addProduct(book, amount, null);
-		ticket.addProduct(book, amount, null);
-		ticket.addProduct(book, amount, null);
-		ticket.addProduct(book, amount, null);
-		ticket.addProduct(book, amount, null);
-
-
-		TimedProduct food = new TimedProduct(1, "food", 10, 30, TimedProduct.TimedType.FOOD, LocalDateTime.now().plusDays(3));
-		amount = 20;
-		ticket.addProduct(food, amount, null);
-		ticket.addProduct(food, amount, null);
-		ticket.addProduct(food, amount, null);
-		ticket.addProduct(food, amount, null);
-
-		System.out.println(ticket.summaryString());
+		return this.id - ticket.id;
 	}
 }

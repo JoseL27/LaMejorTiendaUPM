@@ -29,9 +29,9 @@ public class App {
      * Then the Command is executed. If any error is detected, a message error is sent indicating the error.
      */
     public void run(Scanner sc) {
-		run(sc, false);
-	}
-	
+        run(sc, false);
+    }
+
     public void run(Scanner sc, boolean echoCmd) {
         Locale.setDefault(new Locale("en", "US"));
 
@@ -42,17 +42,17 @@ public class App {
         do {
             System.out.print("tUPM> ");
             input = sc.nextLine();
-			if (echoCmd) {
-				System.out.println(input);
-			}
+            if (echoCmd) {
+                System.out.println(input);
+            }
             if (!input.equals("exit")) {
-				firstParse(input);
-			} else {
-				System.out.println("Closing application.");
-				System.out.println("Goodbye!");
-			}
-			System.out.println();
-        } while (sc.hasNext() && !input.equals("exit"));
+                firstParse(input);
+            } else {
+                System.out.println("Closing application.");
+                System.out.println("Goodbye!");
+            }
+            System.out.println();
+        } while (!input.equals("exit"));
     }
 
     /**
@@ -124,7 +124,7 @@ public class App {
     }
 
     private static void echo(String[] params) {
-        if (!Utils.checkArgsCountWithPrint("echo", params.length, 2)) return;
+        if (!checkArgsCountWithPrint("echo", params.length, 2)) return;
         System.out.printf("\"%s\"\n", params[1]);
     }
 
@@ -133,7 +133,7 @@ public class App {
         System.out.println("  client add \"<nombre>\" <DNI> <email> <cashId>");
         System.out.println("  client remove <DNI>");
         System.out.println("  client list");
-							  
+
         System.out.println("  cash add [<id>] \"<nombre>\" <email>");
         System.out.println("  cash remove <id>");
         System.out.println("  cash list");
@@ -144,23 +144,24 @@ public class App {
         System.out.println("  ticket remove <ticketId> <cashId> <prodId>");
         System.out.println("  ticket print <ticketId> <cashId>");
         System.out.println("  ticket list");
-		
+
         System.out.println("  prod add [<id>] \"<name>\" <category> <price> [<maxPers>]");
         System.out.println("  prod update <id> NAME|CATEGORY|PRICE <value>");
         System.out.println("  prod addFood [<id>] \"<name>\" <price> <expiration: yyyy-MM-dd> <max_people>");
         System.out.println("  prod addMeeting [<id>] \"<name>\" <price> <expiration: yyyy-MM-dd> <max_people>");
         System.out.println("  prod list");
         System.out.println("  prod remove <id>");
-							  
+
         System.out.println("  help");
         System.out.println("  echo \"<text>\"");
         System.out.println("  exit");
         System.out.println();
 
-        BaseProduct.Category[] categoryValues = BaseProduct.Category.values();
-        System.out.printf("Categories: %s\n", Utils.arrayToString(categoryValues, ", "));
+      // Categories are static so could be written
+        System.out.println("Categories: MERCH, STATIONERY, CLOTHES, BOOK, ELECTRONICS");
         System.out.print("Discounts if there are ≥2 units in the category: ");
 
+        BaseProduct.Category[] categoryValues = BaseProduct.Category.values();
         for (int i = 0; i < categoryValues.length; i++) {
             System.out.printf("%s %.0f%%", categoryValues[i].name(), categoryValues[i].getDiscountPercent() * 100);
             if (i < categoryValues.length - 1) {
@@ -173,7 +174,7 @@ public class App {
 
     private void firstParse(String input) {
         String[] params = parser(input);
-        if (!Utils.checkMinArgsCountWithPrint("all", params.length, 1)) return;
+        if (!checkMinArgsCountWithPrint("all", params.length, 1)) return;
 
         Command command = null;
         switch (params[0].toLowerCase()) {
@@ -189,5 +190,47 @@ public class App {
         if (command != null) {
             command.eval(params, userManager, inventory);
         }
+    }
+
+    public static void printInvalidDataType(String failedCommand, String expectedDataType, String receivedValue){
+        System.out.printf("%s: error: expected %s, got '%s'\n", failedCommand, expectedDataType, receivedValue);
+    }
+
+    /**
+     * Parses an integer from a string, basically supresses the InvalidArgumentException.
+     * @return An integer with the underlying int value or NULL if the parse failed.
+     */
+    public static Integer tryParseInt(String s) {
+        Integer value = null;
+        try {
+            value = Integer.parseInt(s);
+        } catch (Exception e) {
+        } finally {
+            return value;
+        }
+    }
+
+    public static boolean checkMaxArgsCountWithPrint(String prefix, int amount, int maxAmount) {
+        if (amount > maxAmount) {
+            System.out.printf("%s: too many arguments, expected maximum %d and got %d\n", prefix, maxAmount, amount);
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean checkMinArgsCountWithPrint(String prefix, int amount, int minAmount) {
+        if (amount < minAmount) {
+            System.out.printf("%s: too few arguments, expected at least %d arguments and got %d\n", prefix, minAmount, amount);
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean checkArgsCountWithPrint(String prefix, int amount, int minAmount, int maxAmount) {
+        return checkMinArgsCountWithPrint(prefix, amount, minAmount) && checkMaxArgsCountWithPrint(prefix, amount, maxAmount);
+    }
+
+    public static boolean checkArgsCountWithPrint(String prefix, int amount, int expectedAmount) {
+        return checkArgsCountWithPrint(prefix, amount, expectedAmount, expectedAmount);
     }
 }

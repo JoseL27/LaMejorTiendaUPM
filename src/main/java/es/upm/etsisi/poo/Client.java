@@ -25,7 +25,7 @@ public class Client extends User implements Comparable<Client> {
 	public static boolean isValidId(String id) {
 		return id.length() == 9 
 			&& Character.isLetter(id.charAt(8))
-			&& (Utils.tryParseInt(id.substring(0, 7)) != null);
+			&& (App.tryParseInt(id.substring(0, 7)) != null);
 	}
 
 	@Override
@@ -35,6 +35,7 @@ public class Client extends User implements Comparable<Client> {
 
 	@Override
 	public String toString() {
-		return "{Client:" + this.getId() + ", name:'" + this.getName() + "', email:'" + this.getEmail() + "', created by:" + this.managedBy.getId() + "}";
+		return String.format("Client{identifier='%s', name='%s', email='%s', cash=%s}",
+							 this.getId(), this.getName(), this.getEmail(), this.managedBy.getId());
 	}
 }

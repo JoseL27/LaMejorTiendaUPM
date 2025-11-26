@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import es.upm.etsisi.poo.Cashier;
 import es.upm.etsisi.poo.Client;
 import es.upm.etsisi.poo.UserManager;
+import es.upm.etsisi.poo.Ticket;
 import org.junit.jupiter.api.*;
 
 import java.util.Locale;
@@ -30,38 +31,38 @@ public class UserManagerTest {
 
     @Test
     void normalAddCashier() {
-        boolean result = this.testUserManager.addCashier("Cajero1", "cajero1@upm.es");
-        assertTrue(result);
+        Cashier result = this.testUserManager.addCashier("Cajero1", "cajero1@upm.es");
+        assertNotNull(result);
     }
 
     @Test
     void addCashierTwice() {
-        boolean result = this.testUserManager.addCashier("Cajero1", "cajero1@upm.es");
-        assertTrue(result);
+        Cashier result = this.testUserManager.addCashier("Cajero1", "cajero1@upm.es");
+        assertNotNull(result);
         result = this.testUserManager.addCashier("Cajero2", "cajero2@upm.es");
-        assertTrue(result);
+        assertNotNull(result);
     }
 
     @Test
     void addCashierWithId() {
-        boolean result = this.testUserManager.addCashier("UW0000000", "Cajero1", "cajero1@upm.es");
-        assertTrue(result);
+        Cashier result = this.testUserManager.addCashier("UW0000000", "Cajero1", "cajero1@upm.es");
+        assertNotNull(result);
     }
 
     @Test
     void addCashierWithExistingId() {
-        boolean result = this.testUserManager.addCashier("UW0000000", "Cajero1", "cajero1@upm.es");
-        assertTrue(result);
+        Cashier result = this.testUserManager.addCashier("UW0000000", "Cajero1", "cajero1@upm.es");
+        assertNotNull(result);
         result = this.testUserManager.addCashier("UW0000000", "Cajero2", "cajero2@upm.es");
-        assertFalse(result);
+        assertNull(result);
     }
 
     @Test
     void addCashierWithInvalidId() {
-        boolean result = this.testUserManager.addCashier("UX0000000", "Cajero0", "cajero0@upm.es");
-        assertFalse(result);
-        result = this.testUserManager.addCashier("UW00000010", "Cajero0", "cajero0@upm.es");
-        assertFalse(result);
+        Cashier result = this.testUserManager.addCashier("UX0000000", "Cajero0", "cajero0@upm.es");
+        assertNull(result);
+        result = this.testUserManager.addCashier("UW000000100", "Cajero0", "cajero0@upm.es");
+        assertNull(result);
     }
 
     @Test
@@ -70,16 +71,16 @@ public class UserManagerTest {
         // Filling
         String cashierName;
         String cashierEmail;
-        boolean result;
+        Cashier result = null;
         for (int i = UserManager.MIN_CASHIER_ID; i <= UserManager.MAX_CASHIER_ID; i++) {
             cashierName = String.format("Cashier #%d", i);
             cashierEmail = String.format("cashier%d@upm.es", i);
             result = this.testUserManager.addCashier(cashierName, cashierEmail);
-            assertTrue(result);
+            assertNotNull(result);
         }
         // No more cashiers
         result = this.testUserManager.addCashier("Overfilled", "overfilled@upm.es");
-        assertFalse(result);
+        assertNull(result);
     }
 
     @Test
@@ -89,19 +90,19 @@ public class UserManagerTest {
         String cashierId;
         String cashierName;
         String cashierEmail;
-        boolean result;
+        Cashier result = null;
         for (int i = UserManager.MIN_CASHIER_ID; i <= UserManager.MAX_CASHIER_ID; i++) {
             cashierId = String.format("UW%07d", i);
             cashierName = String.format("Cashier #%d", i);
             cashierEmail = String.format("cashier%d@upm.es", i);
             result = this.testUserManager.addCashier(cashierId, cashierName, cashierEmail);
-            assertTrue(result);
+            assertNotNull(result);
         }
         // No more cashiers
         result = this.testUserManager.addCashier("Overfilled", "overfilled@upm.es");
-        assertFalse(result);
+        assertNotNull(result);
         result = this.testUserManager.addCashier("UW0000000", "Overfilled", "overfilled@upm.es");
-        assertFalse(result);
+        assertNotNull(result);
     }
 
     @Test
@@ -111,20 +112,20 @@ public class UserManagerTest {
         String cashierId = String.format("UW%07d", UserManager.MAX_CASHIER_ID);
         String cashierName = String.format("Cashier #%d", UserManager.MAX_CASHIER_ID);;
         String cashierEmail = String.format("cashier%d@upm.es", UserManager.MAX_CASHIER_ID);;
-        boolean result = this.testUserManager.addCashier(cashierId, cashierName, cashierEmail);
-        assertTrue(result);
+        Cashier result = this.testUserManager.addCashier(cashierId, cashierName, cashierEmail);
+        assertNotNull(result);
         for (int i = UserManager.MIN_CASHIER_ID; i < UserManager.MAX_CASHIER_ID - 1; i++) {
             cashierId = String.format("UW%07d", i);
             cashierName = String.format("Cashier #%d", i);
             cashierEmail = String.format("cashier%d@upm.es", i);
             result = this.testUserManager.addCashier(cashierId, cashierName, cashierEmail);
-            assertTrue(result);
+            assertNotNull(result);
         }
         result = this.testUserManager.addCashier("Cashier #9999998", "cashier9999998@upm.es");
-        assertTrue(result);
+        assertNotNull(result);
         // No more cashiers
         result = this.testUserManager.addCashier("Overfilled", "overfilled@upm.es");
-        assertFalse(result);
+        assertNotNull(result);
     }
 
     // If for what reason the nextCashierId broke and is unavailable, make sure that generation by iteration works
@@ -141,37 +142,37 @@ public class UserManagerTest {
         String cashierId;
         String cashierName;
         String cashierEmail;
-        boolean result;
+        Cashier result = null;
         for (int i = UserManager.MIN_CASHIER_ID; i < UserManager.MAX_CASHIER_ID; i++) {
             cashierId = String.format("UW%07d", i);
             cashierName = String.format("Cashier #%d", i);
             cashierEmail = String.format("cashier%d@upm.es", i);
             result = this.testUserManager.addCashier(cashierId, cashierName, cashierEmail);
-            assertTrue(result);
+            assertNotNull(result);
         }
 
         // Add last cashier
         result = this.testUserManager.addCashier("Cashier #9999999", "cashier9999999@upm.es");
-        assertTrue(result);
+        assertNotNull(result);
         // No more cashiers
         result = this.testUserManager.addCashier("Overfilled", "overfilled@upm.es");
-        assertFalse(result);
+        assertNull(result);
     }
 
     @Test
     void removeNonExistentCashier() {
         normalAddCashier();
         boolean result = this.testUserManager.removeCashier("UW0000001");
-        assertFalse(result);
+        assertNotNull(result);
     }
 
     @Test
     void removeInvalidIdCashier() {
         normalAddCashier();
         boolean result = this.testUserManager.removeCashier("UX0000000");
-        assertFalse(result);
+        assertNotNull(result);
         result = this.testUserManager.removeCashier("UW00000000");
-        assertFalse(result);
+        assertNotNull(result);
     }
 
     @Test
@@ -209,24 +210,24 @@ public class UserManagerTest {
     void addOneClient() {
         this.testUserManager.addCashier("Cashier 0", "cashier0@upm.es");
         Cashier cashier = this.testUserManager.findCashier("UW0000000");
-        boolean result = this.testUserManager.addClient("X0000000Y", "Client 0", "client1@example.com", cashier);
-        assertTrue(result);
+        Client result = this.testUserManager.addClient("00000000Y", "Client 0", "client1@example.com", cashier);
+        assertNotNull(result);
     }
 
     @Test
     void addClientSameId() {
         this.testUserManager.addCashier("Cashier 0", "cashier0@upm.es");
         Cashier cashier = this.testUserManager.findCashier("UW0000000");
-        boolean result = this.testUserManager.addClient("X0000000Y", "Client 0", "client1@example.com", cashier);
-        assertTrue(result);
-        result = this.testUserManager.addClient("X0000000Y", "Client 0", "client1@example.com", cashier);
-        assertFalse(result);
+        Client result = this.testUserManager.addClient("00000000Y", "Client 1", "client1@example.com", cashier);
+        assertNotNull(result);
+        result = this.testUserManager.addClient("00000000Y", "Client 2", "client2@example.com", cashier);
+        assertNull(result);
     }
 
     @Test
     void removeClient() {
         addOneClient();
-        boolean result = this.testUserManager.removeClient("X0000000Y");
+        boolean result = this.testUserManager.removeClient("00000000Y");
         assertTrue(result);
     }
 
@@ -240,16 +241,16 @@ public class UserManagerTest {
     @Test
     void findNonExistentClient() {
         addOneClient();
-        Client client = this.testUserManager.findClient("X0000000X");
+        Client client = this.testUserManager.findClient("00000000X");
         assertNull(client);
     }
 
     @Test
     void findClient() {
         addOneClient();
-        Client client = this.testUserManager.findClient("X0000000Y");
+        Client client = this.testUserManager.findClient("00000000Y");
         assertNotNull(client);
-        assertEquals("X0000000Y", client.getId());
+        assertEquals("00000000Y", client.getId());
     }
 
     @Test
@@ -269,11 +270,11 @@ public class UserManagerTest {
     @Disabled("This test will take a LOOOOOOOONG LOOOOOOONG TIIIIIIMEEEE (Cue the Sakeru Gumi's Ad music)")
     void fillCashierTicket() {
         normalAddCashier();
-        boolean result;
+        Ticket result = null;
         Cashier cashier = this.testUserManager.findCashier("UW0000000");
         for (int i = UserManager.MIN_TICKET_ID; i <= UserManager.MAX_TICKET_ID; i++) {
             result = cashier.createTicket(this.testUserManager.generateUniqueTicketId());
-            assertTrue(result);
+            assertNotNull(result);
         }
         assertNull(this.testUserManager.generateUniqueTicketId());
     }
@@ -283,18 +284,19 @@ public class UserManagerTest {
     void fillCashierTicketLastTicketWithIterationOnly() {
         normalAddCashier();
         // Render auto-increment useless, and create the rest of the ticket wicked fast
-        boolean result;
+        Ticket result = null;
         Cashier cashier = this.testUserManager.findCashier("UW0000000");
         for (int i = UserManager.MIN_TICKET_ID; i < UserManager.MAX_TICKET_ID; i++) {
             int generatedId = this.testUserManager.generateUniqueTicketId();
             result = cashier.createTicket(generatedId);
+			assertNotNull(result);
             assertEquals(i, generatedId);
         }
         this.testUserManager.generateUniqueCashierId();
 
         // This should generate 99999
         result = cashier.createTicket(this.testUserManager.generateUniqueTicketId());
-        assertTrue(result);
+        assertNotNull(result);
         // Overfilled should return null
         Integer overfilled = this.testUserManager.generateUniqueTicketId();
         assertNull(overfilled);

@@ -2,12 +2,7 @@ package es.upm.etsisi.poo.commands;
 
 import java.util.Arrays;
 
-import es.upm.etsisi.poo.Cashier;
-import es.upm.etsisi.poo.Client;
-import es.upm.etsisi.poo.Command;
-import es.upm.etsisi.poo.Inventory;
-import es.upm.etsisi.poo.UserManager;
-import es.upm.etsisi.poo.Utils;
+import es.upm.etsisi.poo.*;
 
 /**
  * Command to manage clients (add, remove, list)
@@ -31,7 +26,7 @@ public class ClientCommand implements Command {
 
 	@Override
 	public void eval(String[] params, UserManager manager, Inventory dataManager) {
-		if(!Utils.checkArgsCountWithPrint("client", params.length, 2, 6)) { return; }
+		if(!App.checkArgsCountWithPrint("client", params.length, 2, 6)) { return; }
 		final String subcommand = params[1].toLowerCase();
 		switch (subcommand) {
 			case "add" -> evalAdd(params, manager);
@@ -58,14 +53,24 @@ public class ClientCommand implements Command {
 	 * @param manager  The UserManager instance used to find the creator cashier and add the new client.
 	 */
 	public void evalAdd(String[] params, UserManager manager) {
-		if (!Utils.checkArgsCountWithPrint("client add", params.length, 6)) {
+		if (!App.checkArgsCountWithPrint("client add", params.length, 6)) {
 			return;
 		}
+		
 		String clientName  = params[2];
 		String clientId    = params[3];
 		String clientEmail = params[4];
-		final Cashier creator = manager.findCashier(params[5]);
-		if (manager.addClient(clientId, clientName, clientEmail, creator)) {
+		
+		if (!Client.isValidId(clientId))  {
+			System.out.printf("ticket new: error: invalid client id '%s' expected 8 digits followed by a letter\n", clientId);
+			return;
+		}
+
+		Cashier creator = manager.findCashier(params[5]);
+		
+		Client addedClient = manager.addClient(clientId, clientName, clientEmail, creator);
+		if (addedClient != null) {
+			System.out.println(addedClient);
 			System.out.println("client add: ok");
 		} else {
 			System.out.printf("client add: error: client with id %s could not be added\n", params[2]);
@@ -75,13 +80,13 @@ public class ClientCommand implements Command {
 
 	public void evalRemove(String[] params, UserManager manager) {
 
-		if (!Utils.checkArgsCountWithPrint("client remove", params.length, 3)) {
+		if (!App.checkArgsCountWithPrint("client remove", params.length, 3)) {
 			return;
 		}
 		if (manager.removeClient(params[2])) {
-			System.out.println("Client " + params[2] + " removed.");
+			System.out.println("client remove: ok");
 		} else {
-			System.out.println("Client " + params[2] + " not found.");
+			System.out.printf("client remove: client with id '%s' not found\n", params[2]);
 		}
 		
 	}
@@ -91,13 +96,15 @@ public class ClientCommand implements Command {
 		Client[] clients = manager.listClients();
 		Arrays.sort(clients);
 		if (clients.length == 0) {
-			System.out.println("No clients registered.");
-			return;
-		}
-		for (Client client : clients) {
-			System.out.println(client.toString());
-		}
+			System.out.println("client list: no clients.");
 
+		} else {
+			System.out.println("Client:");
+			for (Client client : clients) {
+				System.out.println("  "+client.toString());
+			}
+			System.out.println("client list: ok");
+		}
 	}
 
 }

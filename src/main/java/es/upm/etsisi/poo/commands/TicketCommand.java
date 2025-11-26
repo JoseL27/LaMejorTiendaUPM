@@ -22,7 +22,7 @@ public class TicketCommand implements Command {
      */
     public void eval(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
-        if (!Utils.checkMinArgsCountWithPrint("ticket", params.length, 2)) return;
+        if (!App.checkMinArgsCountWithPrint("ticket", params.length, 2)) return;
 
         // Execute
         switch (params[1].toLowerCase()) {
@@ -48,7 +48,7 @@ public class TicketCommand implements Command {
      */
     private void evalNew(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
-        if (!Utils.checkArgsCountWithPrint("ticket new", params.length, 4, 5))
+        if (!App.checkArgsCountWithPrint("ticket new", params.length, 4, 5))
             return;
 
 		String cashierId = params[params.length - 2];
@@ -79,9 +79,9 @@ public class TicketCommand implements Command {
 		Integer ticketId = null;
 
 		if (params.length == 5) {
-			ticketId = Utils.tryParseInt(params[2]);
+			ticketId = App.tryParseInt(params[2]);
 			if (ticketId == null) {
-				Utils.printInvalidDataType("ticket new", "integer", params[2]);
+				App.printInvalidDataType("ticket new", "integer", params[2]);
 				return;
 			}
 			
@@ -99,10 +99,16 @@ public class TicketCommand implements Command {
 		}
 
 		if (client.addTicket(ticketId)) {
-			cashier.createTicket(ticketId);
-			System.out.println("ticket new: ok");
+			Ticket created = cashier.createTicket(ticketId);
+
+			if (created != null) { 
+				System.out.print(created.summaryString());
+				System.out.println("ticket new: ok");
+			} else {
+				System.out.println("ticket new: error: failed to add ticket to cashier.");
+			}
 		} else {
-			System.out.println("ticket new: failed to add the ticket to the client");
+			System.out.println("ticket new: error: failed to add the ticket to the client");
 		}
     }
 
@@ -122,12 +128,12 @@ public class TicketCommand implements Command {
      */
     private void evalAdd(String[] params, UserManager userManager, Inventory inventory) {
         // Parse
-        if (!Utils.checkMinArgsCountWithPrint("ticket add", params.length, 4))
+        if (!App.checkMinArgsCountWithPrint("ticket add", params.length, 4))
             return;
 
-        Integer ticketId = Utils.tryParseInt(params[2]);
+        Integer ticketId = App.tryParseInt(params[2]);
         if (ticketId == null) {
-            Utils.printInvalidDataType("ticket add", "integer", params[2]);
+            App.printInvalidDataType("ticket add", "integer", params[2]);
             return;
         }
 
@@ -137,21 +143,21 @@ public class TicketCommand implements Command {
 			return;
 		}
 		
-        Integer productId = Utils.tryParseInt(params[4]);
+        Integer productId = App.tryParseInt(params[4]);
         if (productId == null) {
-            Utils.printInvalidDataType("ticket add", "integer", params[4]);
+            App.printInvalidDataType("ticket add", "integer", params[4]);
             return;
         }
 
-        Integer amount = Utils.tryParseInt(params[5]);
+        Integer amount = App.tryParseInt(params[5]);
         if (amount == null) {
-            Utils.printInvalidDataType("ticket add", "integer", params[5]);
+            App.printInvalidDataType("ticket add", "integer", params[5]);
             return;
         }
 
-		String[] personalizations = parsePersonalizations(6, params);
-        if (params.length > 6 && personalizations == null) {
-            return;
+		String[] personalizations = null;
+        if (params.length > 6) {
+			personalizations = parsePersonalizations(6, params);
 		}
 
         // Execute
@@ -184,7 +190,7 @@ public class TicketCommand implements Command {
 		}
 
 		if (ticket.addProduct(productToAdd, amount, personalizations)) {
-			System.out.println(ticket.summaryString());
+			System.out.print(ticket.summaryString());
 			System.out.println("ticket add: ok");
 		} else {
 			System.out.printf("ticket add: error: failed to add product\n");
@@ -204,12 +210,12 @@ public class TicketCommand implements Command {
      */
     private void evalRemove(String[] params, UserManager userManager, Inventory inventory) {
 		// Parse
-		if (!Utils.checkArgsCountWithPrint("ticket remove", params.length, 5))
+		if (!App.checkArgsCountWithPrint("ticket remove", params.length, 5))
             return;
 
-        Integer ticketId = Utils.tryParseInt(params[2]);
+        Integer ticketId = App.tryParseInt(params[2]);
         if (ticketId == null) {
-            Utils.printInvalidDataType("ticket remove", "integer", params[2]);
+            App.printInvalidDataType("ticket remove", "integer", params[2]);
             return;
         }
 
@@ -219,9 +225,9 @@ public class TicketCommand implements Command {
 			return;
 		}
 		
-        Integer productId = Utils.tryParseInt(params[4]);
+        Integer productId = App.tryParseInt(params[4]);
         if (productId == null) {
-            Utils.printInvalidDataType("ticket remove", "integer", params[4]);
+            App.printInvalidDataType("ticket remove", "integer", params[4]);
             return;
         }
 
@@ -250,7 +256,7 @@ public class TicketCommand implements Command {
 
 		Product removedProduct = ticket.removeProduct(productId);
 		if (removedProduct != null) {
-			System.out.println(ticket.summaryString());
+			System.out.print(ticket.summaryString());
 			System.out.println("ticket remove: ok");
 		} else {
 			System.out.printf("ticket remove: error: failed to remove product\n");
@@ -270,12 +276,12 @@ public class TicketCommand implements Command {
      */
     private void evalPrint(String[] params, UserManager userManager, Inventory inventory) {
 		// Parse
-		if (!Utils.checkArgsCountWithPrint("ticket print", params.length, 4))
+		if (!App.checkArgsCountWithPrint("ticket print", params.length, 4))
             return;
 
-        Integer ticketId = Utils.tryParseInt(params[2]);
+        Integer ticketId = App.tryParseInt(params[2]);
         if (ticketId == null) {
-            Utils.printInvalidDataType("ticket print", "integer", params[2]);
+            App.printInvalidDataType("ticket print", "integer", params[2]);
             return;
         }
 
@@ -299,8 +305,8 @@ public class TicketCommand implements Command {
 
 		Ticket ticket = cashier.findTicket(ticketId);
 		if (ticket != null) {
-			System.out.println(ticket.summaryString());
 			ticket.close();
+			System.out.print(ticket.summaryString());
 			System.out.println("ticket print: ok");
 		} else {
 			System.out.printf("ticket print: error: ticket with id '%d' not found in cashier with id '%s'\n", ticketId, cashierId);
@@ -322,14 +328,31 @@ public class TicketCommand implements Command {
     private void evalList(String[] params, UserManager userManager, Inventory inventory) {
 		Cashier[] cashiers = userManager.listCashiers();
 		Arrays.sort(cashiers, (c1, c2) -> c1.getId().compareTo(c2.getId()));
+		System.out.println("Ticket List:");
 		for (Cashier cashier : cashiers) {
-			System.out.println(cashier.getTicketsString());
+			System.out.print(cashier.getTicketsString());
 		}
 		System.out.println("ticket list: ok");
     }
 
 	private String[] parsePersonalizations(int beginIndex, String[] params) {
-		System.out.println("TicketCommand.parsePersonalizations: UNIMPLEMENTED");
-		return null;
+		int size = params.length-beginIndex;
+		String[] pers = new String[size];
+
+		boolean result = true;
+		int i = 0; 
+		while (i < size && result) {
+			String str = params[i + beginIndex];
+			result = str.length() >= 3 && str.substring(0, 3).equals("--p");
+			if (result) {
+				pers[i] = str.substring(3);
+			}
+			i++;
+		}
+
+		if (!result) {
+			return null;
+		}
+		return pers;
 	}
 }
