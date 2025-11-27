@@ -8,8 +8,7 @@ import java.util.*;
  */
 public class UserManager {
 	// using hashmap here since it will make my life easier, also there is no explicit limit on the amount of users -jy
-	private Map<String, Cashier> cashiers;
-	private Map<String, Client> clients;
+	private Map<String, User> users;
 
 	public static final int MIN_CASHIER_ID = 0;
 	public static final int MAX_CASHIER_ID = 9999999;
@@ -24,8 +23,7 @@ public class UserManager {
 	 * Creates an empty Cashier/Client set
 	 */
 	public UserManager() {
-		this.cashiers = new HashMap<>();
-		this.clients = new HashMap<>();
+		this.users = new HashMap<>();
 	}
 
 	// Client related
@@ -49,9 +47,9 @@ public class UserManager {
 			return null;
 
 		// Attempt to find the client with the same ID in the cashier set
-		if (!this.clients.containsKey(clientId)) {
+		if (!this.users.containsKey(clientId)) {
 			Client newClient = new Client(clientId, name, email, cashierResponsible);
-			this.clients.put(clientId, newClient);
+			this.users.put(clientId, newClient);
 			return newClient;
 		}
 
@@ -64,7 +62,7 @@ public class UserManager {
 	 * @return True if the Client was successfully deleted, false if the Client was not found
 	 */
 	public boolean removeClient(String clientId) {
-		Client removedClient = this.clients.remove(clientId);
+		User removedClient = this.users.remove(clientId);
 		return (removedClient != null);
 	}
 
@@ -74,7 +72,7 @@ public class UserManager {
 	 * @return Client instance in the set if found, null if not found
 	 */
 	public Client findClient(String clientId) {
-		return this.clients.get(clientId);
+		return (Client)this.users.get(clientId);
 	}
 
 	/**
@@ -82,15 +80,26 @@ public class UserManager {
 	 * @return Array of Client, array of zero length if there are none
 	 */
 	public Client[] listClients() {
-		if (!this.clients.isEmpty()) {
-			Iterator<Client> clientIterator = this.clients.values().iterator();
-			Client[] arrayClient = new Client[this.clients.size()];
-			int i = 0;
-			while (clientIterator.hasNext()) {
-				arrayClient[i] = clientIterator.next();
-				i++;
+		if (!this.users.isEmpty()) {
+			Iterator<User> userIterator = this.users.values().iterator();
+			List<Client> clientList = new ArrayList<>();
+			Client[] clientArray;
+
+			// Gets the list with all the clients
+			while (userIterator.hasNext()) {
+				User user = userIterator.next();
+				if (user instanceof Client){
+					clientList.add((Client)user);
+				}
 			}
-			return arrayClient;
+
+			//Transforms the list to an array
+			clientArray = new Client[clientList.size()];
+			for (int i = 0; i < clientList.size(); i++){
+				clientArray[i] = clientList.get(i);
+			}
+
+			return clientArray;
 		} else {
 			return new Client[0];
 		}
@@ -100,7 +109,7 @@ public class UserManager {
 	 * @return Client amount in User set
 	 */
 	public int getClientAmount() {
-		return this.clients.size();
+		return this.listClients().length;
 	}
 
 	// Cashier related
@@ -121,12 +130,12 @@ public class UserManager {
 
 		// If ID space is exhausted, do not add any more Cashiers
 		int maximumCashierAmountLimitedById = UserManager.MAX_CASHIER_ID - UserManager.MIN_CASHIER_ID + 1;
-		if (this.cashiers.size() >= maximumCashierAmountLimitedById)
+		if (this.listCashiers().length >= maximumCashierAmountLimitedById)
 			return null;
 
 		if (isEmailValid && isWorkerIdValid) {
 			// Attempt to find the cashier with the same ID in the cashier set
-			if (this.cashiers.containsKey(workerId))
+			if (this.users.containsKey(workerId))
 				return null;
 
 			// Update nextCashierId if needed for auto-increment
@@ -134,7 +143,7 @@ public class UserManager {
             // If the id is all 0 the number=0
             if(number.matches("^0+$")) number="0";
             // All the leading 0 are eliminated
-            else number.replaceAll("^0+", "");
+            else number = number.replaceAll("^0+", "");
 
 			int cashierIdValue = Integer.parseInt(number);
 			if (cashierIdValue >= this.nextCashierId)
@@ -142,7 +151,7 @@ public class UserManager {
 
 			// Add the cashier to the set
 			Cashier newCashier = new Cashier(workerId, name, email);
-			this.cashiers.put(workerId, newCashier);
+			this.users.put(workerId, newCashier);
 			return newCashier;
 		} else {
 			return null;
@@ -166,7 +175,7 @@ public class UserManager {
 	 * @return True if the Cashier was successfully deleted, false if the Cashier was not found
 	 */
 	public boolean removeCashier(String workerId){
-		Cashier removedCashier = this.cashiers.remove(workerId);
+		User removedCashier = this.users.remove(workerId);
 		return (removedCashier != null);
 	}
 
@@ -176,7 +185,7 @@ public class UserManager {
 	 * @return Cashier instance in the set if found, null if not found
 	 */
 	public Cashier findCashier(String workerId) {
-		return this.cashiers.get(workerId);
+		return (Cashier)this.users.get(workerId);
 	}
 
 	/**
@@ -184,14 +193,25 @@ public class UserManager {
 	 * @return Array of Cashier, array of zero length if there are none
 	 */
 	public Cashier[] listCashiers() {
-		Iterator<Cashier> cashierIterator = this.cashiers.values().iterator();
-		Cashier[] arrayCashier = new Cashier[this.cashiers.size()];
-		int i = 0;
-		while (cashierIterator.hasNext()) {
-			arrayCashier[i] = cashierIterator.next();
-			i++;
+		Iterator<User> userIterator = this.users.values().iterator();
+		List<Cashier> cashierList = new ArrayList<>();
+		Cashier[] cashierArray;
+
+		// Gets the list with all the clients
+		while (userIterator.hasNext()) {
+			User user = userIterator.next();
+			if (user instanceof Cashier){
+				cashierList.add((Cashier) user);
+			}
 		}
-		return arrayCashier;
+
+		//Transforms the list to an array
+		cashierArray = new Cashier[cashierList.size()];
+		for (int i = 0; i < cashierList.size(); i++){
+			cashierArray[i] = cashierList.get(i);
+		}
+
+		return cashierArray;
 	}
 
 	/**
@@ -216,7 +236,7 @@ public class UserManager {
 		if (!Cashier.isValidId(workerId))
 			return null;
 
-		Cashier cashier = this.cashiers.get(workerId);
+		Cashier cashier = (Cashier)this.users.get(workerId);
 		if (cashier != null)
 			return cashier.getTickets();
 		else
@@ -232,7 +252,7 @@ public class UserManager {
 		if (!Cashier.isValidId(workerId))
 			return null;
 
-		Cashier cashier = this.cashiers.get(workerId);
+		Cashier cashier = (Cashier)this.users.get(workerId);
 		if (cashier != null)
 			return cashier.getTicketsString();
 		else
@@ -243,7 +263,7 @@ public class UserManager {
 	 * @return Cashier amount in User set
 	 */
 	public int getCashierAmount() {
-		return this.cashiers.size();
+		return this.listCashiers().length;
 	}
 
 	/**
@@ -257,18 +277,20 @@ public class UserManager {
 
 		boolean isUnique = true;
 		Cashier currentCashier;
-		Iterator<Cashier> cashierIterator = this.cashiers.values().iterator();
+		Cashier[] cashiers = this.listCashiers();
+		int i = 0;
 		do {
-			currentCashier = cashierIterator.next();
+			currentCashier = cashiers[i];
 			Ticket[] cashierTicketList = currentCashier.getTickets();
-			int i = 0;
+			int j = 0;
 			Ticket ticket;
-			while (isUnique && i < cashierTicketList.length) {
-				ticket = cashierTicketList[i];
+			while (isUnique && j < cashierTicketList.length) {
+				ticket = cashierTicketList[j];
 				isUnique = (ticket.getId() != ticketId);
-				i++;
+				j++;
 			}
-		} while (isUnique && cashierIterator.hasNext());
+			i++;
+		} while (isUnique && i < cashiers.length);
 		return isUnique;
 	}
 
@@ -278,7 +300,7 @@ public class UserManager {
 	 */
 	private int getTicketAmount() {
 		int amount = 0;
-		for (Cashier c : this.cashiers.values()) {
+		for (Cashier c : this.listCashiers()) {
 			amount += c.getCreatedTicketAmount();
 		}
 		return amount;
@@ -328,7 +350,7 @@ public class UserManager {
 		// This is really fucking overengineered. I'm sorry ?_? -jy
 		// Check if ID space for cashier is exhausted
 		int maximumCashierAmountLimitedById = UserManager.MAX_CASHIER_ID - UserManager.MIN_CASHIER_ID + 1;
-		if (this.cashiers.size() >= maximumCashierAmountLimitedById)
+		if (this.listCashiers().length >= maximumCashierAmountLimitedById)
 			return null;
 
 		// Generate
@@ -339,7 +361,7 @@ public class UserManager {
 			String candidate;
 			do { // Generate possible ID candidate until a unique one is found
 				candidate = String.format("UW%07d", i++); // i++;
-			} while (this.cashiers.containsKey(candidate) && i <= UserManager.MAX_CASHIER_ID);
+			} while (this.users.containsKey(candidate) && i <= UserManager.MAX_CASHIER_ID);
 			return candidate;
 		}
     }
