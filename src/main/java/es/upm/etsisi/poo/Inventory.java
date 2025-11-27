@@ -114,7 +114,7 @@ public class Inventory {
      * Tries to create a new timed product with its attributes set to the values of the parameters
      * @return The product that was created, or null if the creation failed
      */
-    public Product createTimedProduct(int id, String name, double price, int people, TimedProduct.TimedType type, LocalDateTime expirationDate) {
+    public TimedProduct createTimedProduct(int id, String name, double price, int people, TimedProduct.TimedType type, LocalDateTime expirationDate) {
         if (!isValidId(id) || !isValidName(name) || !isValidPrice(price)) return null;
 
         // Check inventory full

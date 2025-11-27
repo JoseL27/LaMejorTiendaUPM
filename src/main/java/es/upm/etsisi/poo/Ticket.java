@@ -1,7 +1,6 @@
 package es.upm.etsisi.poo;
 
 import java.util.Iterator;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -103,7 +102,7 @@ public class Ticket implements Comparable<Ticket> {
 		return sb.toString();
 	}
 
-	public boolean getIsOpen() {
+	public boolean isOpen() {
 		return this.isOpen;
 	}
 

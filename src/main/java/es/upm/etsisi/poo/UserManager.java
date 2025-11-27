@@ -276,7 +276,7 @@ public class UserManager {
 	 * Loops through all cashiers and getting the amount of ticket created by them.
 	 * @return Amount of tickets created globally
 	 */
-	private int getGlobalCashierTicketAmount() {
+	private int getTicketAmount() {
 		int amount = 0;
 		for (Cashier c : this.cashiers.values()) {
 			amount += c.getCreatedTicketAmount();
@@ -344,4 +344,3 @@ public class UserManager {
 		}
     }
 }
-	

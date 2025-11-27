@@ -163,6 +163,7 @@ public class ProductCommand implements Command {
 				return;
 			}
 
+			TimedProduct addedProduct = inventory.createTimedProduct(id, name, price, maxPeople, type, expirationDate);
 			LocalDateTime prepDoneTime = LocalDateTime.now().plusHours(type.getHoursForPreparing());
 			if (prepDoneTime.isAfter(expirationDate)) {
 				System.out.printf("prod add: error: you need at least %d hours to prepare for this %s\n",
@@ -267,7 +268,7 @@ public class ProductCommand implements Command {
 			 List<Ticket> tickets = userManager.getAllTickets();
 
 			 for (Ticket ticket: tickets) {
-				 if (ticket.getIsOpen()) {
+				 if (ticket.isOpen()) {
 					 ticket.removeProduct(productToRemove.getId());
 				 }
 			 }
@@ -306,5 +307,4 @@ public class ProductCommand implements Command {
 		}
 		System.out.println("prod list: ok");
 	}
-	
 }

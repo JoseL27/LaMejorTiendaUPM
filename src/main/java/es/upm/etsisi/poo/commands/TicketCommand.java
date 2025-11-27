@@ -335,10 +335,6 @@ public class TicketCommand implements Command {
 		System.out.println("ticket list: ok");
     }
 
-    private boolean isValidAmount(int amount) {
-        return amount > 0 && amount <= Ticket.MAX_PRODUCTS;
-    }
-
 	private String[] parsePersonalizations(int beginIndex, String[] params) {
 		int size = params.length-beginIndex;
 		String[] pers = new String[size];
