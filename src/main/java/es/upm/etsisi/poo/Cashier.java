@@ -67,10 +67,10 @@ public class Cashier extends User implements Comparable<Cashier> {
 			
             if (ticket.isEmpty()){
                 result.append("EMPTY");
-            }else if (ticket.getIsOpen()){
+            }else if (ticket.isOpen()){
                 result.append("OPEN");
             }else{
-                result.append("CLOSED");
+                result.append("CLOSE");
             }
             result.append("\n");
         }
