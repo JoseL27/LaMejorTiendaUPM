@@ -126,14 +126,6 @@ public class Ticket implements Comparable<Ticket> {
 		}
 	}
 
-	public static int randomId() {
-		return (int)(Math.random() * 100000);		
-	}
-
-	public static boolean isValidId(int id) {
-		return id >= 0 && id <= 99999;
-	}
-
 	/**
 	 * Adds a product asociated to an amount to the ticket. Too things may happen:
 	 *  - If the product does not exist it will be added (as long as there is room)
@@ -181,8 +173,6 @@ public class Ticket implements Comparable<Ticket> {
 	 * @return    the removed product if it was found or null if it wasn't
 	 */
 	public Product removeProduct(int id) {
-		if (!Ticket.isValidId(id)) return null;
-		
 		ProductInfo foundProductInfo = null;
 		ProductInfo currentProductInfo = null;		
 		Iterator<ProductInfo> iterator = productInfos.iterator();

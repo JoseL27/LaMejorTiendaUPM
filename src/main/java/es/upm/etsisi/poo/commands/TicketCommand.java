@@ -85,11 +85,6 @@ public class TicketCommand implements Command {
 				return;
 			}
 			
-			if (!Ticket.isValidId(ticketId)) {
-				System.out.printf("ticket new: error: ticket id '%s' is invalid, expected a 5 digit number\n", ticketId);
-				return;
-			}
-			
 			if (!userManager.isTicketIdUnique(ticketId)) {
 				System.out.println("ticket new: id allready exists");
 				return;
@@ -161,8 +156,8 @@ public class TicketCommand implements Command {
 		}
 
         // Execute
-		if (!Ticket.isValidId(ticketId)) {
-			System.out.printf("ticket add: error: ticket id '%d' is invalid, expected a 5 digit number\n", ticketId);
+		if (ticketId < 0) {
+			System.out.printf("ticket add: error: ticket id '%d' is invalid, expected a positive number\n", ticketId);
 			return;
 		}
 			
@@ -232,8 +227,8 @@ public class TicketCommand implements Command {
         }
 
         // Execute
-		if (!Ticket.isValidId(ticketId)) {
-			System.out.printf("ticket remove: error: ticket id '%d' is invalid, expected a 5 digit number\n", ticketId);
+		if (ticketId < 0) {
+			System.out.printf("ticket remove: error: ticket id '%d' is invalid, expected a positive number\n", ticketId);
 			return;
 		}
 			
@@ -292,8 +287,8 @@ public class TicketCommand implements Command {
 		}
 
         // Execute
-		if (!Ticket.isValidId(ticketId)) {
-			System.out.printf("ticket print: error: ticket id '%d' is invalid, expected a 5 digit number\n", ticketId);
+		if (ticketId < 0) {
+			System.out.printf("ticket print: error: ticket id '%d' is invalid, expected a positive number\n", ticketId);
 			return;
 		}
 		

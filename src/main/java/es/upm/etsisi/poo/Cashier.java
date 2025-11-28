@@ -30,7 +30,7 @@ public class Cashier extends User implements Comparable<Cashier> {
      */
     public Ticket createTicket(int id){
         Ticket created = null;
-        if (Ticket.isValidId(id)){
+        if (id >= 0){
 			created = new Ticket(id);
             createdTickets.add(created);
         }
