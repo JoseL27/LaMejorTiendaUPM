@@ -62,7 +62,7 @@ public class ClientCommand implements Command {
 		String clientEmail = params[4];
 		
 		if (!Client.isValidId(clientId))  {
-			System.out.printf("ticket new: error: invalid client id '%s' expected 8 digits followed by a letter\n", clientId);
+			System.out.printf("ticket new: error: invalid client id '%s', please enter a valid NIF/NIE\n", clientId);
 			return;
 		}
 

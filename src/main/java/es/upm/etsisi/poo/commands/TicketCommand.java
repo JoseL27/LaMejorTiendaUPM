@@ -59,7 +59,7 @@ public class TicketCommand implements Command {
 		
 		String clientId = params[params.length - 1];
 		if (!Client.isValidId(clientId)) {
-			System.out.printf("ticket new: error: invalid client id '%s' expected 8 digits followed by a letter\n", clientId);
+			System.out.printf("ticket new: error: invalid client id '%s', please enter a valid NIF/NIE\n", clientId);
 			return;
 		}
 

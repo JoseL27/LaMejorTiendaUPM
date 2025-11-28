@@ -349,21 +349,30 @@ tUPM> echo "Hola mundo"
 
 tUPM> help
 Commands:
- prod add <id> "<name>" <category> <price>
- prod list
- prod update <id> NAME|CATEGORY|PRICE <value>
- prod remove <id>
- ticket new
- ticket add <prodId> <quantity>
- ticket remove <prodId>
- ticket print
- echo "<texto>"
- help
- exit
- 
+  client add "<nombre>" <DNI> <email> <cashId>
+  client remove <DNI>
+  client list
+  cash add [<id>] "<nombre>"<email>
+  cash remove <id>
+  cash list
+  cash tickets <id>
+  ticket new [<id>] <cashId> <userId>
+  ticket add <ticketId><cashId> <prodId> <amount> [--p<txt> --p<txt>] 
+  ticket remove <ticketId><cashId> <prodId> 
+  ticket print <ticketId> <cashId> 
+  ticket list
+  prod add <id> "<name>" <category> <price>
+  prod update <id> NAME|CATEGORY|PRICE <value>
+  prod addFood [<id>] "<name>" <price> <expiration:yyyy-MM-dd> <max_people>
+  prod addMeeting [<id>] "<name>" <price> <expiration:yyyy-MM-dd> <max_people>
+  prod list
+  prod remove <id>
+  help
+  echo “<text>” 
+  exit
+
 Categories: MERCH, STATIONERY, CLOTHES, BOOK, ELECTRONICS
-Discounts if there are ≥2 units in the category: MERCH 0%, STATIONERY 5%, CLOTHES 7%, BOOK 10%,
-ELECTRONICS 3%.
+Discounts if there are ≥2 units in the category: MERCH 0%, STATIONERY 5%, CLOTHES 7%, BOOK 10%, ELECTRONICS 3%.
 
 tUPM> 
 ```
@@ -595,6 +604,8 @@ Catalog:
 prod list: ok
 ```
 
+Beware of the double space before each entry.
+
 ### `prod add 5 "Camiseta talla:M UPM" CLOTHES 15 3` (Add personalizable clothes)
 ```
 {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0, maxPersonal:3}
@@ -606,8 +617,6 @@ prod add: ok
 {class:ProductPersonalized, id:6, name:'Camiseta talla:L UPM', category:CLOTHES, price:20.0, maxPersonal:4}
 prod add: ok
 ```
-
-Beware of the double space before each entry.
 
 ## Ticket command
 
