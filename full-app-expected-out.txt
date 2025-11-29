@@ -485,14 +485,14 @@ tUPM> prod add 6 "Camiseta talla:L UPM" CLOTHES 20 4
 prod add: ok
 
 tUPM> ticket new 212128 UW1234567 98948334B
-Ticket : 212128
+Ticket : 25-11-14-18:21-212128
   Total price: 0.0
   Total discount: 0.0
   Final Price: 0.0
 ticket new: ok
 
 tUPM> ticket add 212128 UW1234567 5 1
-Ticket : 212128
+Ticket : 25-11-14-18:21-212128
   {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0, maxPersonal:3}
   Total price: 15.0
   Total discount: 0.0
@@ -500,7 +500,7 @@ Ticket : 212128
 ticket add: ok
 
 tUPM> ticket add 212128 UW1234567 5 3 --pred --pblue --pgreen
-Ticket : 212128
+Ticket : 25-11-14-18:21-212128
   {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0, maxPersonal:3} **discount -1.05
   {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:19.5, maxPersonal:3, personalizationList:[red, blue, green]} **discount -1.365
   {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:19.5, maxPersonal:3, personalizationList:[red, blue, green]} **discount -1.365
@@ -511,7 +511,7 @@ Ticket : 212128
 ticket add: ok
 
 tUPM> ticket add 212128 UW1234567 6 3 --pred --pblue
-Ticket : 212128
+Ticket : 25-11-14-18:21-212128
   {class:ProductPersonalized, id:6, name:'Camiseta talla:L UPM', category:CLOTHES, price:24.0, maxPersonal:4, personalizationList:[red, blue]} **discount -1.68
   {class:ProductPersonalized, id:6, name:'Camiseta talla:L UPM', category:CLOTHES, price:24.0, maxPersonal:4, personalizationList:[red, blue]} **discount -1.68
   {class:ProductPersonalized, id:6, name:'Camiseta talla:L UPM', category:CLOTHES, price:24.0, maxPersonal:4, personalizationList:[red, blue]} **discount -1.68

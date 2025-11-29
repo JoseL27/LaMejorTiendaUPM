@@ -66,7 +66,7 @@ public class App {
             String fileName = args[0];
             try {
                 sc = new Scanner(new File(fileName));
-                app.run(sc);
+                app.run(sc, true);
             } catch (FileNotFoundException e) {
                 System.out.printf("error: file '%s' not found\n", fileName);
             } catch (Exception e) {
