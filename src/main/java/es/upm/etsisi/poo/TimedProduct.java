@@ -74,7 +74,10 @@ public class TimedProduct extends Product {
 
 		// NOTE(enrique): expected output indicates that this should the price being payed.
 		// So for example, when printing it as a product listing, it should be 0;
-		double effectivePrice = super.getPrice() * amount;
+		double effectivePrice = super.getPrice();
+        if (amount > 0){
+             effectivePrice = effectivePrice * amount;
+        }
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("{class:%s, id:%d, name:'%s', price:%.1f, date of Event:%s, max people allowed:%d",

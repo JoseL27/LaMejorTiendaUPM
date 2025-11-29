@@ -231,11 +231,21 @@ public class Inventory {
         return arrayProducts;
     }
 
-	// NOTE(enrique): Implementation Sugestion: loop through all products
-	// and find the greatest id value and add 1 to it (maybe even keep a 'greatest id value')
+    /**
+     * Generates a unique id by finding the greatest id in the inventory and adding 1 to it
+     * @return a product id, valid and unique
+     */
 	public int generateUniqueProductId() {
-		System.out.println("UserManager.generateUniqueTicketId: NOT IMPLEMENTED");
-		return -1;
+        //Searches for the greatest id in all the products
+        int greatestId = 0;
+        for (Product product: inventory){
+            if (product != null && product.getId() > greatestId){
+                greatestId = product.getId();
+            }
+        }
+
+        // Returns the id that is immediately next to the greatest id
+		return greatestId + 1;
 	}
 
 }
