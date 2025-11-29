@@ -11,7 +11,8 @@ import org.junit.jupiter.api.*;
 import java.util.Locale;
 
 public class UserManagerTest {
-    UserManager testUserManager;
+	private final String testNIE = "55630667S";
+    private UserManager testUserManager;
 
     // DICTATOR LOCALE
     @BeforeAll
@@ -25,7 +26,7 @@ public class UserManagerTest {
     }
 
     @BeforeEach
-    void CreateNewUserManager() {
+    void createNewUserManager() {
         this.testUserManager = new UserManager();
     }
 
@@ -210,7 +211,7 @@ public class UserManagerTest {
     void addOneClient() {
         this.testUserManager.addCashier("Cashier 0", "cashier0@upm.es");
         Cashier cashier = this.testUserManager.findCashier("UW0000000");
-        Client result = this.testUserManager.addClient("00000000Y", "Client 0", "client1@example.com", cashier);
+        Client result = this.testUserManager.addClient(testNIE, "Client 0", "client1@example.com", cashier);
         assertNotNull(result);
     }
 
@@ -218,16 +219,16 @@ public class UserManagerTest {
     void addClientSameId() {
         this.testUserManager.addCashier("Cashier 0", "cashier0@upm.es");
         Cashier cashier = this.testUserManager.findCashier("UW0000000");
-        Client result = this.testUserManager.addClient("00000000Y", "Client 1", "client1@example.com", cashier);
+        Client result = this.testUserManager.addClient(testNIE, "Client 1", "client1@example.com", cashier);
         assertNotNull(result);
-        result = this.testUserManager.addClient("00000000Y", "Client 2", "client2@example.com", cashier);
+        result = this.testUserManager.addClient(testNIE, "Client 2", "client2@example.com", cashier);
         assertNull(result);
     }
 
     @Test
     void removeClient() {
         addOneClient();
-        boolean result = this.testUserManager.removeClient("00000000Y");
+        boolean result = this.testUserManager.removeClient(testNIE);
         assertTrue(result);
     }
 
@@ -248,9 +249,9 @@ public class UserManagerTest {
     @Test
     void findClient() {
         addOneClient();
-        Client client = this.testUserManager.findClient("00000000Y");
+        Client client = this.testUserManager.findClient(testNIE);
         assertNotNull(client);
-        assertEquals("00000000Y", client.getId());
+        assertEquals(testNIE, client.getId());
     }
 
     @Test

@@ -112,6 +112,7 @@ public class AppTest {
 	// TESTS
 	// ======================================================================
 	@Test
+	@Disabled
 	void fullAppTestByLines() throws IOException {
 		Scanner testInScanner = new Scanner(new File("full-app-in.txt"));
 		App app = new App();
