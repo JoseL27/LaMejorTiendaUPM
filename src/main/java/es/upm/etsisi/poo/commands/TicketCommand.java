@@ -20,17 +20,17 @@ public class TicketCommand implements Command {
 	 * @param userManager  The userManager to use for user related operations in subcommands
 	 * @param inventory    The product store to use for product related operations in subcommands
      */
-    public void eval(String[] params, UserManager userManager, Inventory inventory) {
+    public void eval(String[] params) {
         // Parse
         if (!App.checkMinArgsCountWithPrint("ticket", params.length, 2)) return;
 
         // Execute
         switch (params[1].toLowerCase()) {
-            case "new"    -> evalNew(params, userManager, inventory);
-            case "add"    -> evalAdd(params, userManager, inventory);
-            case "remove" -> evalRemove(params, userManager, inventory);
-            case "print"  -> evalPrint(params, userManager, inventory);
-            case "list"   -> evalList(params, userManager, inventory);
+            case "new"    -> evalNew(params);
+            case "add"    -> evalAdd(params);
+            case "remove" -> evalRemove(params);
+            case "print"  -> evalPrint(params);
+            case "list"   -> evalList(params);
             default       -> System.out.println("ticket: invalid sub command");
         }
     }
@@ -46,7 +46,7 @@ public class TicketCommand implements Command {
 	 * @param userManager Context
 	 * @param inventory   Context
      */
-    private void evalNew(String[] params, UserManager userManager, Inventory inventory) {
+    private void evalNew(String[] params) {
         // Parse
         if (!App.checkArgsCountWithPrint("ticket new", params.length, 4, 5))
             return;
@@ -62,6 +62,8 @@ public class TicketCommand implements Command {
 			System.out.printf("ticket new: error: invalid client id '%s', please enter a valid NIF/NIE\n", clientId);
 			return;
 		}
+
+		UserManager userManager = UserManager.getInstance();		
 
 		// Execution
 		Cashier cashier = userManager.findCashier(cashierId);
@@ -121,7 +123,7 @@ public class TicketCommand implements Command {
 	 * @param userManager Context
 	 * @param inventory   Context
      */
-    private void evalAdd(String[] params, UserManager userManager, Inventory inventory) {
+    private void evalAdd(String[] params) {
         // Parse
         if (!App.checkMinArgsCountWithPrint("ticket add", params.length, 4))
             return;
@@ -166,13 +168,13 @@ public class TicketCommand implements Command {
 			return;
 		}
 		
-		Product productToAdd = inventory.readProduct(productId);
+		Product productToAdd = Inventory.getInstance().readProduct(productId);
 		if (productToAdd == null) {
 			System.out.printf("ticket add: error: could not find product with id %s\n", productId);
 			return;
 		}
 
-		Cashier cashier = userManager.findCashier(cashierId);
+		Cashier cashier = UserManager.getInstance().findCashier(cashierId);
 		if (cashier == null) {
 			System.out.printf("ticket new: error: cashier with id '%s' was not found\n", cashierId);
 			return;
@@ -203,7 +205,7 @@ public class TicketCommand implements Command {
 	 * @param userManager Context
 	 * @param inventory   Context
      */
-    private void evalRemove(String[] params, UserManager userManager, Inventory inventory) {
+    private void evalRemove(String[] params) {
 		// Parse
 		if (!App.checkArgsCountWithPrint("ticket remove", params.length, 5))
             return;
@@ -237,7 +239,7 @@ public class TicketCommand implements Command {
 			return;
 		}
 		
-		Cashier cashier = userManager.findCashier(cashierId);
+		Cashier cashier = UserManager.getInstance().findCashier(cashierId);
 		if (cashier == null) {
 			System.out.printf("ticket remove: error: cashier with id '%s' was not found\n", cashierId);
 			return;
@@ -269,7 +271,7 @@ public class TicketCommand implements Command {
 	 * @param userManager Context
 	 * @param inventory   Context
      */
-    private void evalPrint(String[] params, UserManager userManager, Inventory inventory) {
+    private void evalPrint(String[] params) {
 		// Parse
 		if (!App.checkArgsCountWithPrint("ticket print", params.length, 4))
             return;
@@ -292,7 +294,7 @@ public class TicketCommand implements Command {
 			return;
 		}
 		
-		Cashier cashier = userManager.findCashier(cashierId);
+		Cashier cashier = UserManager.getInstance().findCashier(cashierId);
 		if (cashier == null) {
 			System.out.printf("ticket print: error: cashier with id '%s' was not found\n", cashierId);
 			return;
@@ -320,8 +322,8 @@ public class TicketCommand implements Command {
 	 * @param userManager Context
 	 * @param inventory   Context
      */
-    private void evalList(String[] params, UserManager userManager, Inventory inventory) {
-		Cashier[] cashiers = userManager.listCashiers();
+    private void evalList(String[] params) {
+		Cashier[] cashiers = UserManager.getInstance().listCashiers();
 		Arrays.sort(cashiers, (c1, c2) -> c1.getId().compareTo(c2.getId()));
 		System.out.println("Ticket List:");
 		for (Cashier cashier : cashiers) {

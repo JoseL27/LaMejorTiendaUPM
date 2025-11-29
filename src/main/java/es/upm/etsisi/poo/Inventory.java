@@ -13,10 +13,17 @@ public class Inventory {
     private Product[] inventory; // List
     private int productAmount;
 
-    /**
-     * Creates a new Inventory with an empty inventory
-     */
-    public Inventory() {
+
+	private static Inventory instance = new Inventory();
+
+	public static Inventory getInstance() {
+		if (instance == null) {
+			instance = new Inventory();
+		}
+		return instance;
+	}
+
+    private Inventory() {
         this.inventory = new Product[MAX_PRODUCTS];
         this.productAmount = 0;
     }

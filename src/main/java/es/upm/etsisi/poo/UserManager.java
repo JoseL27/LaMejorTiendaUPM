@@ -19,10 +19,16 @@ public class UserManager {
 	public static final int MAX_TICKET_ID = 99999;
 	private int nextTicketId = MIN_TICKET_ID;
 
-	/**
-	 * Creates an empty Cashier/Client set
-	 */
-	public UserManager() {
+	private static UserManager instance = new UserManager();
+
+	public static UserManager getInstance() {
+		if (instance == null) {
+			instance = new UserManager();
+		}
+		return instance;
+	}
+
+	private UserManager() {
 		this.users = new HashMap<>();
 	}
 
