@@ -272,9 +272,6 @@ public class UserManager {
 	 * @return True if the given ID is unique, false if is not a 5-digit number or the ID is already taken
 	 */
 	public boolean isTicketIdUnique(int ticketId) {
-		if (ticketId > MAX_TICKET_ID)
-			return false;
-
 		boolean isUnique = true;
 		Cashier currentCashier;
 		Cashier[] cashiers = this.listCashiers();

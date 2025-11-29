@@ -123,7 +123,7 @@ public class CashCommand implements Command {
     private void evalTickets(String[] params, UserManager userManager, Inventory inventory) {
         if (!App.checkArgsCountWithPrint("cash tickets", params.length, 3)) return;
         String cashierId = params[2];
-		System.out.println("Tickets:");
+		System.out.println("Tickets: ");
 		String ticketsStr = userManager.findCashier(cashierId).getTicketsString();
 		if (ticketsStr != null && ticketsStr.length() > 0) { 
 			System.out.print(ticketsStr);

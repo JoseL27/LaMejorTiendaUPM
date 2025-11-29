@@ -10,14 +10,14 @@ Commands:
   cash list
   cash tickets <id>
   ticket new [<id>] <cashId> <userId>
-  ticket add <ticketId> <cashId> <prodId> <amount> [--p<txt> --p<txt> ...]
-  ticket remove <ticketId> <cashId> <prodId>
-  ticket print <ticketId> <cashId>
+  ticket add <ticketId> <cashId> <prodId> <amount> [--p<txt> --p<txt>] 
+  ticket remove <ticketId> <cashId> <prodId> 
+  ticket print <ticketId> <cashId> 
   ticket list
   prod add [<id>] "<name>" <category> <price> [<maxPers>]
   prod update <id> NAME|CATEGORY|PRICE <value>
-  prod addFood [<id>] "<name>" <price> <expiration: yyyy-MM-dd> <max_people>
-  prod addMeeting [<id>] "<name>" <price> <expiration: yyyy-MM-dd> <max_people>
+  prod addFood [<id>] "<name>" <price> <expiration:yyyy-MM-dd> <max_people>
+  prod addMeeting [<id>] "<name>" <price> <expiration:yyyy-MM-dd> <max_people>
   prod list
   prod remove <id>
   help
@@ -28,21 +28,21 @@ Categories: MERCH, STATIONERY, CLOTHES, BOOK, ELECTRONICS
 Discounts if there are ≥2 units in the category: MERCH 0%, STATIONERY 5%, CLOTHES 7%, BOOK 10%, ELECTRONICS 3%.
 
 tUPM> echo "Agrego Libro"
-"Agrego Libro"
+"Agrego Libro" 
 
 tUPM> prod add 1 "Libro POO" BOOK 25
 {class:Product, id:1, name:'Libro POO', category:BOOK, price:25.0}
 prod add: ok
 
 tUPM> echo "Agrego Camiseta"
-"Agrego Camiseta"
+"Agrego Camiseta" 
 
 tUPM> prod add 2 "Camiseta talla:M UPM" CLOTHES 15
 {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
 prod add: ok
 
 tUPM> echo "Listo Productos"
-"Listo Productos"
+"Listo Productos" 
 
 tUPM> prod list
 Catalog:
@@ -51,7 +51,7 @@ Catalog:
 prod list: ok
 
 tUPM> echo "Actualizo Nombre y Precio del Libro"
-"Actualizo Nombre y Precio del Libro"
+"Actualizo Nombre y Precio del Libro" 
 
 tUPM> prod update 1 NAME "Libro POO V2"
 {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:25.0}
@@ -62,7 +62,7 @@ tUPM> prod update 1 PRICE 30
 prod update: ok
 
 tUPM> echo "inserto libro repetido y lo borro"
-"inserto libro repetido y lo borro"
+"inserto libro repetido y lo borro" 
 
 tUPM> prod add 3 "Libro POO repetido Error" BOOK 25
 {class:Product, id:3, name:'Libro POO repetido Error', category:BOOK, price:25.0}
@@ -73,7 +73,7 @@ tUPM> prod remove 3
 prod remove: ok
 
 tUPM> echo "Creo un Trabajador"
-"Creo un Trabajador"
+"Creo un Trabajador" 
 
 tUPM> cash add UW1234567 "pepecurro3" pepe0@upm.es
 Cash{identifier='UW1234567', name='pepecurro3', email='pepe0@upm.es'}
@@ -84,7 +84,7 @@ Cash{identifier='UW1234568', name='pepecurro2', email='pepe0@upm.es'}
 cash add: ok
 
 tUPM> echo "Creo tres cliente listo borro uno y listo"
-"Creo tres cliente listo borro uno y listo"
+"Creo tres cliente listo borro uno y listo" 
 
 tUPM> client add "Pepe3" 55630667S pepe1@upm.es UW1234567
 Client{identifier='55630667S', name='Pepe3', email='pepe1@upm.es', cash=UW1234567}
@@ -94,18 +94,18 @@ tUPM> client add "Pepe2" 98948334B pepe2@upm.es UW1234567
 Client{identifier='98948334B', name='Pepe2', email='pepe2@upm.es', cash=UW1234567}
 client add: ok
 
-tUPM> client add "Pepe1" 18682724P pepe3@upm.es UW1234567
-Client{identifier='18682724P', name='Pepe1', email='pepe3@upm.es', cash=UW1234567}
+tUPM> client add "Pepe1" Y8682724P pepe3@upm.es UW1234567
+Client{identifier='Y8682724P', name='Pepe1', email='pepe3@upm.es', cash=UW1234567}
 client add: ok
 
 tUPM> client list
 Client:
-  Client{identifier='18682724P', name='Pepe1', email='pepe3@upm.es', cash=UW1234567}
+  Client{identifier='Y8682724P', name='Pepe1', email='pepe3@upm.es', cash=UW1234567}
   Client{identifier='98948334B', name='Pepe2', email='pepe2@upm.es', cash=UW1234567}
   Client{identifier='55630667S', name='Pepe3', email='pepe1@upm.es', cash=UW1234567}
 client list: ok
 
-tUPM> client remove 18682724P
+tUPM> client remove Y8682724P
 client remove: ok
 
 tUPM> client list
@@ -115,7 +115,7 @@ Client:
 client list: ok
 
 tUPM> echo "creo un cajero nuevo listo, lo booro y listo de nuevo"
-"creo un cajero nuevo listo, lo booro y listo de nuevo"
+"creo un cajero nuevo listo, lo booro y listo de nuevo" 
 
 tUPM> cash add UW1234569 "pepecurro1" pepe0@upm.es
 Cash{identifier='UW1234569', name='pepecurro1', email='pepe0@upm.es'}
@@ -138,10 +138,10 @@ Cash:
 cash list: ok
 
 tUPM> echo "miro los tickets de UW1234567 creo un ticket y vuelvo a printar"
-"miro los tickets de UW1234567 creo un ticket y vuelvo a printar"
+"miro los tickets de UW1234567 creo un ticket y vuelvo a printar" 
 
 tUPM> cash tickets UW1234567
-Tickets:
+Tickets: 
 cash tickets: ok
 
 tUPM> ticket new UW1234567 55630667S
@@ -152,25 +152,25 @@ Ticket : 25-11-14-18:21-00000
 ticket new: ok
 
 tUPM> cash tickets UW1234567
-Tickets:
+Tickets: 
   25-11-14-18:21-00000 - EMPTY
 cash tickets: ok
 
 tUPM> echo "creo un ticket con ID"
-"creo un ticket con ID"
+"creo un ticket con ID" 
 
-tUPM> ticket new 21212 UW1234567 55630667S
-Ticket : 25-11-14-18:21-21212
+tUPM> ticket new 212121 UW1234567 55630667S
+Ticket : 25-11-14-18:21-212121
   Total price: 0.0
   Total discount: 0.0
   Final Price: 0.0
 ticket new: ok
 
 tUPM> echo "Agrego un producto al ticket e imprimo el ticket"
-"Agrego un producto al ticket e imprimo el ticket"
+"Agrego un producto al ticket e imprimo el ticket" 
 
-tUPM> ticket add 21212 UW1234567 1 20
-Ticket : 25-11-14-18:21-21212
+tUPM> ticket add 212121 UW1234567 1 20
+Ticket : 25-11-14-18:21-212121
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
@@ -199,11 +199,11 @@ ticket add: ok
 tUPM> ticket list
 Ticket List:
   25-11-14-18:21-00000 - EMPTY
-  25-11-14-18:21-21212 - OPEN
+  25-11-14-18:21-212121 - OPEN
 ticket list: ok
 
-tUPM> ticket print 21212 UW1234567
-Ticket : 21212-25-11-14-18:21
+tUPM> ticket print 212121 UW1234567
+Ticket : 212121-25-11-14-18:21
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
@@ -232,21 +232,21 @@ ticket print: ok
 tUPM> ticket list
 Ticket List:
   25-11-14-18:21-00000 - EMPTY
-  21212-25-11-14-18:21 - CLOSED
+  212121-25-11-14-18:21 - CLOSE
 ticket list: ok
 
 tUPM> echo "Agrego dos productos al ticket e imprimo el ticket"
-"Agrego dos productos al ticket e imprimo el ticket"
+"Agrego dos productos al ticket e imprimo el ticket" 
 
-tUPM> ticket new 21213 UW1234567 98948334B
-Ticket : 25-11-14-18:21-21213
+tUPM> ticket new 212123 UW1234567 98948334B
+Ticket : 25-11-14-18:21-212123
   Total price: 0.0
   Total discount: 0.0
   Final Price: 0.0
 ticket new: ok
 
-tUPM> ticket add 21213 UW1234567 1 20
-Ticket : 25-11-14-18:21-21213
+tUPM> ticket add 212123 UW1234567 1 20
+Ticket : 25-11-14-18:21-212123
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
@@ -272,8 +272,8 @@ Ticket : 25-11-14-18:21-21213
   Final Price: 540.0
 ticket add: ok
 
-tUPM> ticket add 21213 UW1234567 2 1
-Ticket : 25-11-14-18:21-21213
+tUPM> ticket add 212123 UW1234567 2 1
+Ticket : 25-11-14-18:21-212123
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
@@ -300,8 +300,8 @@ Ticket : 25-11-14-18:21-21213
   Final Price: 555.0
 ticket add: ok
 
-tUPM> ticket remove 21213 UW1234567 2
-Ticket : 25-11-14-18:21-21213
+tUPM> ticket remove 212123 UW1234567 2
+Ticket : 25-11-14-18:21-212123
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0} **discount -3.0
@@ -327,8 +327,8 @@ Ticket : 25-11-14-18:21-21213
   Final Price: 540.0
 ticket remove: ok
 
-tUPM> ticket add 21213 UW1234567 2 3
-Ticket : 25-11-14-18:21-21213
+tUPM> ticket add 212123 UW1234567 2 3
+Ticket : 25-11-14-18:21-212123
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
@@ -360,12 +360,12 @@ ticket add: ok
 tUPM> ticket list
 Ticket List:
   25-11-14-18:21-00000 - EMPTY
-  21212-25-11-14-18:21 - CLOSED
-  25-11-14-18:21-21213 - OPEN
+  212121-25-11-14-18:21 - CLOSE
+  25-11-14-18:21-212123 - OPEN
 ticket list: ok
 
-tUPM> ticket print 21213 UW1234567
-Ticket : 21213-25-11-14-18:21
+tUPM> ticket print 212123 UW1234567
+Ticket : 212123-25-11-14-18:21
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
@@ -397,84 +397,84 @@ ticket print: ok
 tUPM> ticket list
 Ticket List:
   25-11-14-18:21-00000 - EMPTY
-  21212-25-11-14-18:21 - CLOSED
-  21213-25-11-14-18:21 - CLOSED
+  212121-25-11-14-18:21 - CLOSE
+  212123-25-11-14-18:21 - CLOSE
 ticket list: ok
 
 tUPM> echo "Trabajamos con productos de personas"
-"Trabajamos con productos de personas"
+"Trabajamos con productos de personas" 
 
-tUPM> prod addMeeting 23456 "Reunion Rotonda" 12 2025-12-01 100
-{class:Meeting, id:23456, name:'Reunion Rotonda', price:0.0, date of Event:2025-12-01, max people allowed:100}
+tUPM> prod addMeeting 23456 "Reunion Rotonda" 12 2025-11-21 100
+{class:Meeting, id:23456, name:'Reunion Rotonda', price:0.0, date of Event:2025-11-21, max people allowed:100}
 prod addMeeting: ok
 
-tUPM> prod addMeeting 23457 "Graduacion ETSISI" 40 2025-12-01 30
-{class:Meeting, id:23457, name:'Graduacion ETSISI', price:0.0, date of Event:2025-12-01, max people allowed:30}
+tUPM> prod addMeeting 23457 "Graduacion ETSISI" 40 2025-11-21 30
+{class:Meeting, id:23457, name:'Graduacion ETSISI', price:0.0, date of Event:2025-11-21, max people allowed:30}
 prod addMeeting: ok
 
-tUPM> prod addFood 23458 "Cafeteria ETSISI" 5 2025-12-01 300
-prod add: error: 300 is not a valid maximum of people (max 100)
+tUPM> prod addFood 23458 "Cafeteria ETSISI" 5 2025-11-21 300
+Error processing ->prod addFood ->Error adding product
 
-tUPM> prod addFood 23459 "Restaurante Asador" 50 2025-12-01 40
-{class:Food, id:23459, name:'Restaurante Asador', price:0.0, date of Event:2025-12-01, max people allowed:40}
+tUPM> prod addFood 23459 "Restaurante Asador" 50 2025-11-21 40
+{class:Food, id:23459, name:'Restaurante Asador', price:0.0, date of Event:2025-11-21, max people allowed:40}
 prod addFood: ok
 
 tUPM> prod list
 Catalog:
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
-  {class:Meeting, id:23456, name:'Reunion Rotonda', price:0.0, date of Event:2025-12-01, max people allowed:100}
-  {class:Meeting, id:23457, name:'Graduacion ETSISI', price:0.0, date of Event:2025-12-01, max people allowed:30}
-  {class:Food, id:23459, name:'Restaurante Asador', price:0.0, date of Event:2025-12-01, max people allowed:40}
+  {class:Meeting, id:23456, name:'Reunion Rotonda', price:0.0, date of Event:2025-11-21, max people allowed:100}
+  {class:Meeting, id:23457, name:'Graduacion ETSISI', price:0.0, date of Event:2025-11-21, max people allowed:30}
+  {class:Food, id:23459, name:'Restaurante Asador', price:0.0, date of Event:2025-11-21, max people allowed:40}
 prod list: ok
 
-tUPM> ticket new 21217 UW1234567 98948334B
-Ticket : 25-11-14-18:21-21217
+tUPM> ticket new 212127 UW1234567 98948334B
+Ticket : 212127
   Total price: 0.0
   Total discount: 0.0
   Final Price: 0.0
 ticket new: ok
 
-tUPM> ticket add 21217 UW1234567 23456 20
-Ticket : 25-11-14-18:21-21217
-  {class:Meeting, id:23456, name:'Reunion Rotonda', price:240.0, date of Event:2025-12-01, max people allowed:100, actual people in event:20}
+tUPM> ticket add 212127 UW1234567 23456 20
+Ticket : 212127
+  {class:Meeting, id:23456, name:'Reunion Rotonda', price:240.0, date of Event:2025-11-21, max people allowed:100, actual people in event:20}
   Total price: 240.0
   Total discount: 0.0
   Final Price: 240.0
 ticket add: ok
 
-tUPM> ticket add 21217 UW1234567 2 3
-Ticket : 25-11-14-18:21-21217
+tUPM> ticket add 212127 UW1234567 2 3
+Ticket : 212127
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
-  {class:Meeting, id:23456, name:'Reunion Rotonda', price:240.0, date of Event:2025-12-01, max people allowed:100, actual people in event:20}
+  {class:Meeting, id:23456, name:'Reunion Rotonda', price:240.0, date of Event:2025-11-21, max people allowed:100, actual people in event:20}
   Total price: 285.0
-  Total discount: 3.15
+  Total discount: 3.1499999
   Final Price: 281.85
 ticket add: ok
 
-tUPM> ticket print 21217 UW1234567
-Ticket : 21217-25-11-14-18:21
+tUPM> ticket print 212127 UW1234567
+Ticket : 212127-25-11-14-18:21
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
-  {class:Meeting, id:23456, name:'Reunion Rotonda', price:240.0, date of Event:2025-12-01, max people allowed:100, actual people in event:20}
+  {class:Meeting, id:23456, name:'Reunion Rotonda', price:240.0, date of Event:2025-11-21, max people allowed:100, actual people in event:20}
   Total price: 285.0
-  Total discount: 3.15
+  Total discount: 3.1499999
   Final Price: 281.85
 ticket print: ok
 
 tUPM> ticket list
 Ticket List:
   25-11-14-18:21-00000 - EMPTY
-  21212-25-11-14-18:21 - CLOSED
-  21213-25-11-14-18:21 - CLOSED
-  21217-25-11-14-18:21 - CLOSED
+  212121-25-11-14-18:21 - CLOSE
+  212123-25-11-14-18:21 - CLOSE
+  212127-25-11-14-18:21 - CLOSE
 ticket list: ok
 
 tUPM> echo "Trabajamos con productos personalizados"
-"Trabajamos con productos personalizados"
+"Trabajamos con productos personalizados" 
 
 tUPM> prod add 5 "Camiseta talla:M UPM" CLOTHES 15 3
 {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0, maxPersonal:3}
@@ -484,23 +484,23 @@ tUPM> prod add 6 "Camiseta talla:L UPM" CLOTHES 20 4
 {class:ProductPersonalized, id:6, name:'Camiseta talla:L UPM', category:CLOTHES, price:20.0, maxPersonal:4}
 prod add: ok
 
-tUPM> ticket new 21218 UW1234567 98948334B
-Ticket : 25-11-14-18:21-21218
+tUPM> ticket new 212128 UW1234567 98948334B
+Ticket : 212128
   Total price: 0.0
   Total discount: 0.0
   Final Price: 0.0
 ticket new: ok
 
-tUPM> ticket add 21218 UW1234567 5 1
-Ticket : 25-11-14-18:21-21218
+tUPM> ticket add 212128 UW1234567 5 1
+Ticket : 212128
   {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0, maxPersonal:3}
   Total price: 15.0
   Total discount: 0.0
   Final Price: 15.0
 ticket add: ok
 
-tUPM> ticket add 21218 UW1234567 5 3 --pred --pblue --pgreen
-Ticket : 25-11-14-18:21-21218
+tUPM> ticket add 212128 UW1234567 5 3 --pred --pblue --pgreen
+Ticket : 212128
   {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0, maxPersonal:3} **discount -1.05
   {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:19.5, maxPersonal:3, personalizationList:[red, blue, green]} **discount -1.365
   {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:19.5, maxPersonal:3, personalizationList:[red, blue, green]} **discount -1.365
@@ -510,8 +510,8 @@ Ticket : 25-11-14-18:21-21218
   Final Price: 68.355
 ticket add: ok
 
-tUPM> ticket add 21218 UW1234567 6 3 --pred --pblue
-Ticket : 25-11-14-18:21-21218
+tUPM> ticket add 212128 UW1234567 6 3 --pred --pblue
+Ticket : 212128
   {class:ProductPersonalized, id:6, name:'Camiseta talla:L UPM', category:CLOTHES, price:24.0, maxPersonal:4, personalizationList:[red, blue]} **discount -1.68
   {class:ProductPersonalized, id:6, name:'Camiseta talla:L UPM', category:CLOTHES, price:24.0, maxPersonal:4, personalizationList:[red, blue]} **discount -1.68
   {class:ProductPersonalized, id:6, name:'Camiseta talla:L UPM', category:CLOTHES, price:24.0, maxPersonal:4, personalizationList:[red, blue]} **discount -1.68
@@ -524,8 +524,8 @@ Ticket : 25-11-14-18:21-21218
   Final Price: 135.315
 ticket add: ok
 
-tUPM> ticket print 21218 UW1234567
-Ticket : 21218-25-11-14-18:21
+tUPM> ticket print 212128 UW1234567
+Ticket : 212128-25-11-14-18:21
   {class:ProductPersonalized, id:6, name:'Camiseta talla:L UPM', category:CLOTHES, price:24.0, maxPersonal:4, personalizationList:[red, blue]} **discount -1.68
   {class:ProductPersonalized, id:6, name:'Camiseta talla:L UPM', category:CLOTHES, price:24.0, maxPersonal:4, personalizationList:[red, blue]} **discount -1.68
   {class:ProductPersonalized, id:6, name:'Camiseta talla:L UPM', category:CLOTHES, price:24.0, maxPersonal:4, personalizationList:[red, blue]} **discount -1.68
@@ -541,4 +541,3 @@ ticket print: ok
 tUPM> exit
 Closing application.
 Goodbye!
-
