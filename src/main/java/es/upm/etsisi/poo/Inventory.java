@@ -186,7 +186,12 @@ public class Inventory {
         if (!isValidId(id)) return null;
         // if (category == null) return DataResult.INVALID_CATEGORY;
 
-        BaseProduct selectedProduct = (BaseProduct) this.readProduct(id);
+        BaseProduct selectedProduct;
+        try { // stinky hack coming up
+             selectedProduct = (BaseProduct) this.readProduct(id);
+        } catch (Exception e) {
+            selectedProduct = null;
+        }
 
         if (selectedProduct != null) {
             // Update product's category
