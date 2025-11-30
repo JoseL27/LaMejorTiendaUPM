@@ -4,6 +4,7 @@ import es.upm.etsisi.poo.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -63,7 +64,7 @@ public class ProductCommand implements Command {
 		String productCategoryString = params[parseIndex++];
 		BaseProduct.Category productCategory = BaseProduct.Category.fromLabel(productCategoryString);
 		if (productCategory == null) {
-            System.out.printf("%s: error: invalid %s '%s', expected one of: %s\n","prod add", "category", productCategoryString, BaseProduct.Category.values());
+            System.out.printf("%s: error: invalid %s '%s', expected one of: %s\n","prod add", "category", productCategoryString, Arrays.toString(BaseProduct.Category.values()));
             return;
 		}
 
@@ -223,7 +224,7 @@ public class ProductCommand implements Command {
 			BaseProduct.Category productCategory = BaseProduct.Category.fromLabel(params[4]);
 			if (productCategory == null) {
                 System.out.printf("%s: error: invalid %s '%s', expected one of: %s\n",
-                        "prod update", "category", params[4], BaseProduct.Category.values());
+                        "prod update", "category", params[4], Arrays.toString(BaseProduct.Category.values()));
             } else {
 				updatedProduct = inventory.updateProductCategory(productId, productCategory);
 			}
