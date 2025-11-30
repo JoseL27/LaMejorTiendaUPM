@@ -147,16 +147,27 @@ public class Ticket implements Comparable<Ticket> {
 		
 		ProductInfo duplicate = findDuplicateProductInfo(newProductInfo);
 		if (duplicate == null) {
-
-			if (product instanceof TimedProduct) {
+			if (product instanceof TimedProduct) { // First time adding TimedProduct, a TimedProduct counts as 1 item regardless of participant amount
 				TimedProduct timedProduct = (TimedProduct)product;
 				if (amount <= timedProduct.getMaxParticipants()) {
 					result = appendProductInfo(newProductInfo);
-					this.totalAmount++;
+					if (result)
+						this.totalAmount++;
 				}
-			} else { 
+			} else { // First time adding BaseProduct
 				result = appendProductInfo(newProductInfo);
-				this.totalAmount += newProductInfo.getAmount();
+				if (result)
+					this.totalAmount += newProductInfo.getAmount();
+			}
+		} else {
+			if (product instanceof TimedProduct) // Adding the same TimedProduct again should fail
+				result = false;
+			else {
+				if ((this.totalAmount + amount) <= MAX_PRODUCTS) { // Adding the same BaseProduct should increment amount
+					duplicate.addAmount(amount);
+					this.totalAmount += amount;
+					result = true;
+				}
 			}
 		}
 		
@@ -338,9 +349,16 @@ public class Ticket implements Comparable<Ticket> {
 	 */
 	private boolean appendProductInfo(ProductInfo productInfo) {
 		boolean result = false;
-		if (totalAmount <= MAX_PRODUCTS) {
-			productInfos.add(productInfo);
-			result = true;
+		if (productInfo.getProduct() instanceof TimedProduct) {
+			if ((this.totalAmount + 1) <= MAX_PRODUCTS) {
+				productInfos.add(productInfo);
+				result = true;
+			}
+		} else {
+			if ((productInfo.getAmount() + totalAmount) <= MAX_PRODUCTS) {
+				productInfos.add(productInfo);
+				result = true;
+			}
 		}
 		return result;
 	}

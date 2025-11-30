@@ -25,6 +25,8 @@ public class ProductInfo implements Comparable<ProductInfo> {
 	public int getAmount() { 
 		return this.amount;
 	}
+
+	public void addAmount(int more) { this.amount += more; }
 	
 	public String[] getPersonalizations() { 
 		return this.personalizations;
