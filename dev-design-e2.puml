@@ -146,7 +146,7 @@ class Ticket {
   + {static} isValidId(): boolean
 }
 
-class User {
+Abstract class User {
   - id: String
   - name: String
   - email: String
@@ -253,8 +253,14 @@ Inventory *--> Product
 App --> Inventory
 ProductInfo o--> Product
 Ticket *--> ProductInfo
+Ticket ..> Product
+Ticket ..> TimedProduct
+Ticket ..> BaseProduct
 
 UserManager *--> User
+UserManager ..> Client
+UserManager ..> Cashier
+UserManager ..> Ticket
 
 Cashier *--> Ticket
 Client o--> Ticket
