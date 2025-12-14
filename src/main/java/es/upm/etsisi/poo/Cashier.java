@@ -8,32 +8,28 @@ public class Cashier extends User implements Comparable<Cashier> {
     public static final String COMPANY_DOMAIN = "upm.es";
     private List<Ticket> createdTickets;
 
-    /* Funcionalidades relacionadas que deberian implementar otras clases:
-     * -Dar de alta clientes: desde el lugar donde se creen se debe comprobar que existe el cajero y pasar su id al cliente
-     * -Operaciones de ticket (add, remove, print y close): El cajero no estara implicado en las operaciones,
-     *      unicamente se comprobara si el id que realiza la operacion es el mismo que lo creo
-     * -Comprobar si el id existe antes de crear el cajero
-     * -Comprobar si el id de ticket existe antes de crear un ticket (desde el comando)
-    */
-
-
     /**
      * Creates new cashier with the id, name and email given in the parameters
      */
     public Cashier(String id, String name, String email) {
+        // Should handle: valid id format, valid upm email, none of the arguments is null
         super(id, name, email);
         createdTickets = new ArrayList<>();
+
+        if (!isValidId(id)) throw new IllegalArgumentException("Invalid cashier id: " + id);
+        else if (name == null) throw new IllegalArgumentException("Cashier name can not be null");
+        else if (!isCompanyEmail(email)) throw new IllegalArgumentException("Invalid cashier email: " + email);
     }
 
     /**
      * Creates a new ticket the id given in the parameter.
      */
     public Ticket createTicket(int id){
+        if (id < 0) throw new IllegalArgumentException("Ticket id has to be a positive number");
+
         Ticket created = null;
-        if (id >= 0){
-			created = new Ticket(id);
-            createdTickets.add(created);
-        }
+        created = new Ticket(id);
+        createdTickets.add(created);
 		return created;
     }
 
@@ -99,20 +95,26 @@ public class Cashier extends User implements Comparable<Cashier> {
 
     /**
      * Checks if email is a company email
-     * @return true if email contains a single @ and COMPANY_DOMAIN after it
+     * @return true if email is not null and contains a single @ and COMPANY_DOMAIN after it
      */
     public static boolean isCompanyEmail(String email){
         boolean result = true;
-        String[] splitEmail = email.split("@");
 
-        if (splitEmail.length != 2 || !splitEmail[1].equals(COMPANY_DOMAIN)) {
-            result = false;
+        if (email == null){
+            result =  false;
+        }else {
+            String[] splitEmail = email.split("@");
+
+            if (splitEmail.length != 2 || !splitEmail[1].equals(COMPANY_DOMAIN)) {
+                result = false;
+            }
         }
         return result;
     }
 
 	public static boolean isValidId(String id) {
-		return id.length() == 9 
+		return id != null
+            && id.length() == 9
 			&& Character.toUpperCase(id.charAt(0)) == 'U'
 			&& Character.toUpperCase(id.charAt(1)) == 'W'
 			&& (App.tryParseInt(id.substring(2)) != null);

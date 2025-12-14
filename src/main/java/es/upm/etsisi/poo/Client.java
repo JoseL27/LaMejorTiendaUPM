@@ -1,5 +1,7 @@
 package es.upm.etsisi.poo;
 
+import es.upm.etsisi.poo.exceptions.DuplicateItemException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,18 +10,21 @@ public class Client extends User implements Comparable<Client> {
 	private final Cashier managedBy;
 	private final List<Integer> ticketIds;
 
-	public Client(String id, String name, String email, Cashier cashier) {
+	public Client(String id, String name, String email, Cashier cashier) throws IllegalArgumentException {
 		super(id, name, email);
 		this.managedBy = cashier;
 		this.ticketIds = new ArrayList<>();
+
+        if (!isValidId(id)) throw new IllegalArgumentException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
+        else if (name == null) throw new IllegalArgumentException("Client name can not be null");
+        else if (email == null) throw new IllegalArgumentException("Client email can not be null");
+        else if (cashier == null) throw new IllegalArgumentException("Client needs an assigned cashier to be created");
 	}
 
-	public boolean addTicket(int ticketId) {
-		if (!ticketIds.contains(ticketId)) {
-			ticketIds.add(ticketId);
-			return true;
-		}
-		return false;
+	public void addTicket(int ticketId) throws DuplicateItemException{
+		if (ticketIds.contains(ticketId)) throw new DuplicateItemException("Client already posseses this ticket");
+
+        ticketIds.add(ticketId);
 	}
 
 	public static boolean isValidId(String id) {
