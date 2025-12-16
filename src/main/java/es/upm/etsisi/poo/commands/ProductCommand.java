@@ -54,16 +54,18 @@ public class ProductCommand implements Command {
 
 		String productIdOrName = params[parseIndex++];
 		String productName = null;
- 		Integer productId = App.tryParseInt(productIdOrName);
-		
+        int productId;
+        try {
+            productId = Integer.parseInt(productIdOrName);
+            productName = params[parseIndex++];
+        }catch(NumberFormatException ex) {
+            productName = productIdOrName;
+            productId = Inventory.getInstance().generateUniqueProductId();
+        }
+
 		// NOTE(enrique): Check the 3rd argument:
 		//  - If parsing the int succeeds then we assume its the ID and the next token is the name string (advance parsing)
 		//  - If it fails then we assume its the name and no ID was supplied (dont advance parsing), next token is the category
-		if (productId == null) {
-			productName = productIdOrName;
-		} else {
-			productName = params[parseIndex++];
-		}
 
         String productCategoryString = params[parseIndex++];
         BaseProduct.Category productCategory;
@@ -74,30 +76,28 @@ public class ProductCommand implements Command {
         }
 
 		String productPriceString = params[parseIndex++];
- 		Integer productPrice = App.tryParseInt(productPriceString);
-		if (productPrice == null){
-			App.printInvalidDataType("prod add", "integer", productPriceString);
-			return;
+        int productPrice;
+        try {
+            productPrice = Integer.parseInt(productPriceString);
+        }catch(NumberFormatException ex){
+            throw new FailedCommandException("Unable to add product, " + productPriceString + " is not a valid integer");
 		}
 
 		boolean specifiedMaxPers = false;
-		Integer productMaxPers = productCategory.getMaxPersonalizations();
+		int productMaxPers = productCategory.getMaxPersonalizations();
 		if (parseIndex < params.length) {
 			String productMaxPersString = params[parseIndex++];
-			productMaxPers = App.tryParseInt(productMaxPersString);
-			if (productMaxPers == null) {
-				App.printInvalidDataType("prod add", "integer", productMaxPersString);
-				return;
-			}
-			specifiedMaxPers = true;
+
+            try {
+                productMaxPers = Integer.parseInt(productMaxPersString);
+                specifiedMaxPers = true;
+            }catch (NumberFormatException ex){
+                throw new FailedCommandException("Unable to add product, " + productMaxPersString + " is not a valid integer");
+            }
 		}
 		
 		// Execute
 		Inventory inventory = Inventory.getInstance();
-
-		if (productId == null) {
-			productId = inventory.generateUniqueProductId();
-		}
 
         try {
             BaseProduct createdProduct = inventory.createBaseProduct(productId, productName, productCategoryString,
