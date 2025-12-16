@@ -16,8 +16,6 @@ public class Client extends User implements Comparable<Client> {
 		this.ticketIds = new ArrayList<>();
 
         if (!isValidId(id)) throw new IllegalArgumentException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
-        else if (name == null) throw new IllegalArgumentException("Client name can not be null");
-        else if (email == null) throw new IllegalArgumentException("Client email can not be null");
         else if (cashier == null) throw new IllegalArgumentException("Client needs an assigned cashier to be created");
 	}
 

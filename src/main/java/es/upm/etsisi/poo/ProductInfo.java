@@ -1,4 +1,5 @@
 package es.upm.etsisi.poo;
+
 import java.util.Arrays;
 
 public class ProductInfo implements Comparable<ProductInfo> {
@@ -11,8 +12,10 @@ public class ProductInfo implements Comparable<ProductInfo> {
 	private Product product;
 	private int amount;
 	private String[] personalizations;
-		
+
 	public ProductInfo(Product product, int amount, String[] personalizations) {
+        if (amount < 0) throw new IllegalArgumentException("Expected a positive amount, got " + amount);
+        if (product == null) throw new IllegalArgumentException("Can not create a product info from a null product");
 		this.product = product;
 		this.amount = amount;
 		this.personalizations = personalizations;

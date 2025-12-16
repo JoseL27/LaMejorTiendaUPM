@@ -75,8 +75,10 @@ public class UserManager {
 	 * @param clientId DNI
 	 * @return Client instance in the set if found, null if not found
 	 */
-	public Client findClient(String clientId) {
-		return (Client)this.users.get(clientId);
+	public Client findClient(String clientId) throws MissingItemException{
+		Client result = (Client)this.users.get(clientId);
+        if (result == null) throw new MissingItemException("Client with id " + clientId + " not found");
+        return result;
 	}
 
 	/**

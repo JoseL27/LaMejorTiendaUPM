@@ -1,5 +1,7 @@
 package es.upm.etsisi.poo;
 
+import es.upm.etsisi.poo.exceptions.MissingItemException;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,29 +13,26 @@ public class Cashier extends User implements Comparable<Cashier> {
     /**
      * Creates new cashier with the id, name and email given in the parameters
      */
-    public Cashier(String id, String name, String email) {
+    public Cashier(String id, String name, String email) throws IllegalArgumentException{
         // Should handle: valid id format, valid upm email, none of the arguments is null
         super(id, name, email);
         createdTickets = new ArrayList<>();
 
         if (!isValidId(id)) throw new IllegalArgumentException("Invalid cashier id: " + id);
-        else if (name == null) throw new IllegalArgumentException("Cashier name can not be null");
         else if (!isCompanyEmail(email)) throw new IllegalArgumentException("Invalid cashier email: " + email);
     }
 
     /**
      * Creates a new ticket the id given in the parameter.
      */
-    public Ticket createTicket(int id){
-        if (id < 0) throw new IllegalArgumentException("Ticket id has to be a positive number");
-
+    public Ticket createTicket(int id) throws IllegalArgumentException{
         Ticket created = null;
         created = new Ticket(id);
         createdTickets.add(created);
 		return created;
     }
 
-	public Ticket findTicket(int ticketId) {
+	public Ticket findTicket(int ticketId) throws MissingItemException {
         Iterator<Ticket> iterator = createdTickets.iterator();
         Ticket result = null;
         Ticket currentTicket;
@@ -44,6 +43,7 @@ public class Cashier extends User implements Comparable<Cashier> {
                 result = currentTicket;
             }
         }
+        if (result == null) throw new MissingItemException("The cashier does not own ticket with id " + ticketId);
 		return result;
 	}
 

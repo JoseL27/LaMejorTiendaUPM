@@ -1,9 +1,13 @@
 package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.*;
+import es.upm.etsisi.poo.exceptions.DataException;
+import es.upm.etsisi.poo.exceptions.FailedCommandException;
+import es.upm.etsisi.poo.exceptions.MissingItemException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,7 +22,7 @@ import java.util.List;
  */
 public class ProductCommand implements Command {
 	@Override
-	public void eval(String[] args) {
+	public void eval(String[] args) throws FailedCommandException {
 		if (!App.checkArgsCountWithPrint("prod", args.length, 2, 7)) return;
 
 		switch (args[1].toLowerCase()) {
@@ -41,7 +45,7 @@ public class ProductCommand implements Command {
 	 *               specifiying productId, productName, productCategory and productPrice,
 	 *               or null if it fails
 	 */	
-	public void evalAddBase(String[] params) {
+	public void evalAddBase(String[] params) throws FailedCommandException{
 		// Parse
 		if (!App.checkArgsCountWithPrint("prod add", params.length, 5, 7)) return;
 		
@@ -61,12 +65,13 @@ public class ProductCommand implements Command {
 			productName = params[parseIndex++];
 		}
 
-		String productCategoryString = params[parseIndex++];
-		BaseProduct.Category productCategory = BaseProduct.Category.fromLabel(productCategoryString);
-		if (productCategory == null) {
-            System.out.printf("%s: error: invalid %s '%s', expected one of: %s\n","prod add", "category", productCategoryString, Arrays.toString(BaseProduct.Category.values()));
-            return;
-		}
+        String productCategoryString = params[parseIndex++];
+        BaseProduct.Category productCategory;
+        try {
+            productCategory = BaseProduct.Category.valueOf(productCategoryString.toUpperCase());
+        }catch (IllegalArgumentException ex){
+            throw new FailedCommandException(String.format("%s: error: invalid %s '%s', expected one of: %s\n","prod add", "category", productCategoryString, Arrays.toString(BaseProduct.Category.values())));
+        }
 
 		String productPriceString = params[parseIndex++];
  		Integer productPrice = App.tryParseInt(productPriceString);
@@ -88,26 +93,20 @@ public class ProductCommand implements Command {
 		}
 		
 		// Execute
-		if (productMaxPers != null && (productMaxPers < 0 || productMaxPers > productCategory.getMaxPersonalizations())) {
-			System.out.printf("prod add: error: category %s only allows a max of %d personalizations, got %d\n",
-							  productCategory, productCategory.getMaxPersonalizations(), productMaxPers);
-			return;
-		}
-
 		Inventory inventory = Inventory.getInstance();
 
 		if (productId == null) {
 			productId = inventory.generateUniqueProductId();
 		}
-		
-		BaseProduct createdProduct = inventory.createBaseProduct(productId, productName, productCategory, 
-																 productPrice, productMaxPers, specifiedMaxPers);
-		if (createdProduct != null) {
-			System.out.println(createdProduct);
-			System.out.println("prod add: ok");
-		} else {
-			System.out.println("prod add: error: unexpected error");
-		}
+
+        try {
+            BaseProduct createdProduct = inventory.createBaseProduct(productId, productName, productCategoryString,
+                    productPrice, productMaxPers, specifiedMaxPers);
+            System.out.println(createdProduct);
+            System.out.println("prod add: ok");
+        }catch(DataException ex){
+            throw new FailedCommandException("Unable to add the product: " + ex.getMessage());
+        }
 	}
 
 	/**
@@ -116,7 +115,7 @@ public class ProductCommand implements Command {
 	 * @param userManager The manager containing all the info on cliets and cashiers (and by extension on tickets)
 	 * @param inventory The manager containing all the info on products, if the command succeeds, the product will be created here
 	 */
-	public void evalAddTimed(String[] params) {
+	public void evalAddTimed(String[] params) throws FailedCommandException {
 		if (params.length != 6 && params.length != 7){
 			System.out.println("prod " + params[1] + ": invalid number of parameters, got " + params.length + ", expected 6 or 7");
 			return;
@@ -128,16 +127,20 @@ public class ProductCommand implements Command {
 		LocalDateTime expirationDate;
 		int maxPeople;
 		TimedProduct.TimedType type;
+        int parseIndex = 1;
 
+        // Parsing
+        Inventory inventory = Inventory.getInstance();
 
-		int parseIndex = 1;
-		try {
-			// Parsing
+        String typeArgument = params[parseIndex++];
+        try {
+            type = TimedProduct.TimedType.valueOf(typeArgument.replaceAll("add", "").toUpperCase());
+        }catch (IllegalArgumentException ex) {
+            throw new FailedCommandException(String.format("%s: error: invalid %s '%s', expected one of: %s\n"
+                    ,"prod add", "category", typeArgument, Arrays.toString(TimedProduct.TimedType.values())));
+        }
 
-			Inventory inventory = Inventory.getInstance();
-
-			String typeArgument = params[parseIndex++];
-			type = TimedProduct.TimedType.fromLabel(typeArgument.replaceAll("add", ""));
+        try {
 			if (params.length == 6){
 				name = params[parseIndex++];
 				id = inventory.generateUniqueProductId();
@@ -150,41 +153,22 @@ public class ProductCommand implements Command {
 			maxPeople = Integer.parseInt(params[parseIndex]);
 
 			// Execution
-			if (!Inventory.isValidId(id)){
-				System.out.println("prod add: error:" + id + " is not a valid product id");
-				return;
-			}
-			if (!Inventory.isValidName(name)){
-				System.out.println("prod add: error:" + name + " is not a valid product name");
-				return;
-			}
-			if(price < 0){
-				System.out.println("prod add: error:" + price + " is not a valid product price");
-				return;
-			}
-			
-			if (maxPeople > TimedProduct.TIMED_PRODUCT_MAX_PEOPLE){
-				System.out.println("prod add: error: " + maxPeople + " is not a valid maximum of people (max " + TimedProduct.TIMED_PRODUCT_MAX_PEOPLE + ")");
-				return;
-			}
-
 			LocalDateTime prepDoneTime = LocalDateTime.now().plusHours(type.getHoursForPreparing());
 			if (prepDoneTime.isAfter(expirationDate)) {
-				System.out.printf("prod add: error: you need at least %d hours to prepare for this %s\n",
-								   type.getHoursForPreparing(), type.toString().toLowerCase());
-				return;
+				throw new FailedCommandException(String.format("prod add: error: you need at least %d hours to prepare for this %s\n",
+								   type.getHoursForPreparing(), type.toString().toLowerCase()));
 			}
 
-			Product addedProduct = inventory.createTimedProduct(id, name, price, maxPeople, type, expirationDate);
-			if (addedProduct == null){
-				System.out.println("prod add: error: Error adding product to the inventory");
-				return;
-			}
+			Product addedProduct = inventory.createTimedProduct(id, name, price, maxPeople, typeArgument, expirationDate);
 			System.out.println(addedProduct);
 			System.out.printf("prod %s: ok\n", typeArgument);
-		}catch (Exception e){
-			System.out.println("Invalid argument: "  + params[parseIndex] + " for index " + parseIndex);
-		}
+		}catch (NumberFormatException ex) {
+		    throw new FailedCommandException("Unable to add product, invalid argument: "  + params[parseIndex] + " for argument number " + parseIndex);
+		}catch (DateTimeParseException ex){
+            throw new FailedCommandException("Unable to add product, invalid date format.");
+        }catch (DataException ex){
+            throw new FailedCommandException("Unable to add product: " + ex.getMessage());
+        }
 	}
 	
 	
@@ -200,55 +184,48 @@ public class ProductCommand implements Command {
 	 *               or null
 	 * @see Product.Field
 	 */		
-	public void evalUpdate(String[] params) {
+	public void evalUpdate(String[] params) throws FailedCommandException{
 		if (!App.checkArgsCountWithPrint("prod update", params.length, 5)) return;
-		
- 		Integer productId = App.tryParseInt(params[2]);
-		if (productId == null){
-			App.printInvalidDataType("prod update", "integer", params[2]);
-			return;
-		}
 
-		String productFieldStr = params[3].toLowerCase();
+        int productId;
+        try {
+            productId = Integer.parseInt(params[2]);
+        }catch (NumberFormatException ex){
+            throw new FailedCommandException("Unable to update product: " + params[2] + " is not a valid integer");
+        }
 
 		Inventory inventory = Inventory.getInstance();
-
 		Product updatedProduct = null;
 		String fieldName = params[3].toLowerCase();
-		switch (fieldName) {
-		case "name" -> {
-			String productName = params[4];
-			updatedProduct = inventory.updateProductName(productId, productName);
-		}
-		case "category" -> {
-			BaseProduct.Category productCategory = BaseProduct.Category.fromLabel(params[4]);
-			if (productCategory == null) {
-                System.out.printf("%s: error: invalid %s '%s', expected one of: %s\n",
-                        "prod update", "category", params[4], Arrays.toString(BaseProduct.Category.values()));
-            } else {
-				updatedProduct = inventory.updateProductCategory(productId, productCategory);
-			}
-		}
-		case "price" -> {
-			Integer productPrice = App.tryParseInt(params[4]);
-			if (productPrice == null){
-				App.printInvalidDataType("prod update", "integer", params[4]);
-			} else { 
-				updatedProduct = inventory.updateProductPrice(productId, productPrice);
-			}
-		}
-		default -> {
-			System.out.println("prod update: invalid field");
-			return;
-		}
-		}
 
-		if (updatedProduct != null) {
-			System.out.println(updatedProduct);
-			System.out.println("prod update: ok");
-		} else { 
-			System.out.printf("prod update: error: unexpected issue\n");
-		}
+        try {
+            switch (fieldName) {
+                case "name" -> {
+                    String productName = params[4];
+                    updatedProduct = inventory.updateProductName(productId, productName);
+                }
+                case "category" -> {
+                    String productCategory = params[4];
+                    updatedProduct = inventory.updateProductCategory(productId, productCategory);
+                }
+                case "price" -> {
+                    int productPrice;
+                    try {
+                        productPrice = Integer.parseInt(params[4]);
+                    }catch (NumberFormatException ex){
+                        throw new FailedCommandException("Unable to update product: " + params[4] + " is not a valid integer");
+                    }
+                    updatedProduct = inventory.updateProductPrice(productId, productPrice);
+                }
+                default -> {
+                    throw new FailedCommandException("prod update: invalid field");
+                }
+            }
+            System.out.println(updatedProduct);
+            System.out.println("prod update: ok");
+        }catch (DataException ex){
+            throw new FailedCommandException("Unable to update product: " + ex.getMessage());
+        }
 	}
 
 	/**
@@ -259,37 +236,36 @@ public class ProductCommand implements Command {
 	 * @return       The result of the parse. If the amount of tokens is 3 and the 'id' parse succedes then a valid
 	 *               ProductCommand Remove instance or null
 	 */			
-	public void evalRemove(String[] params) {
+	public void evalRemove(String[] params) throws FailedCommandException{
 		 if (!App.checkArgsCountWithPrint("prod remove", params.length, 3)) return;
-
- 		 Integer productId = App.tryParseInt(params[2]);
-		 if (productId == null) {
-		 	App.printInvalidDataType("prod remove", "integer", params[2]);
-		 	return;
-		 }
+         int productId;
+         try {
+             productId = Integer.parseInt(params[2]);
+         }catch (NumberFormatException ex){
+             throw new FailedCommandException("Unable to remove product, " + params[2] + " is not a valid integer");
+         }
 		 Inventory inventory = Inventory.getInstance();
-		 
+
 		 Product productToRemove = inventory.readProduct(productId);
-		 if (productToRemove != null) {
-			 // Retrieves the active ticket from the system (Products should not be removed from closed tickets)
-			 List<Ticket> tickets = UserManager.getInstance().getAllTickets();
-
-			 for (Ticket ticket: tickets) {
-				 if (ticket.isOpen()) {
-					 ticket.removeProduct(productToRemove.getId());
-				 }
-			 }
-
-		 	if (inventory.deleteProduct(productId)) {
-		 		System.out.println(productToRemove);
-		 		System.out.println("prod remove: ok");
-		 	} else {
-		 		System.out.println("prod remove: error: unexpected error");
-		 	}
-			
-		 } else {
-		 	System.out.printf("prod remove: error: product with id %d not found\n", productId);
+		 if (productToRemove == null) {
+             throw new FailedCommandException("Unable to remove product, product with id " + productId + " not found");
 		 }
+        // Retrieves the active tickets from the system (Products should not be removed from closed tickets)
+        List<Ticket> tickets = UserManager.getInstance().getAllTickets();
+
+        for (Ticket ticket: tickets) {
+            if (ticket.isOpen()) {
+                ticket.removeProduct(productToRemove.getId());
+            }
+        }
+
+        try {
+            inventory.deleteProduct(productId);
+            System.out.println(productToRemove);
+            System.out.println("prod remove: ok");
+        }catch (MissingItemException ex){
+            throw new FailedCommandException("Unable to remove product, " + ex.getMessage());
+        }
 	}
 
 	/**
