@@ -37,7 +37,7 @@ public class CashierTest {
     
     @Test
         void toStringFormat() {
-        Cashier cs = new Cashier("0", "pierna", "cabeza@upm.es");
+        Cashier cs = new Cashier("UW9999999", "pierna", "cabeza@upm.es");
         
         String expected = String.format("Cash{identifier='%s', name='%s', email='%s'}",
                                         cs.getId(), cs.getName(), cs.getEmail());

@@ -49,18 +49,18 @@ public class ClientTest {
         assertTrue(Client.isValidId("E80206790"));
         assertTrue(Client.isValidId("W9785496B"));
         
-        assertFalse(Client.isValidId("Q5256608J"));
-        assertFalse(Client.isValidId("A14155667"));
-        assertFalse(Client.isValidId("R6554800J"));
-        assertFalse(Client.isValidId("E80206790"));
-        assertFalse(Client.isValidId("W9785496B"));
+        assertFalse(Client.isValidId("Q5256608A"));
+        assertFalse(Client.isValidId("A1415566B"));
+        assertFalse(Client.isValidId("R6554800C"));
+        assertFalse(Client.isValidId("D80206790"));
+        assertFalse(Client.isValidId("W9785496F"));
     }
     
     
     @Test
         void toStringFormat() {
-        Cashier cs = new Cashier("0", "andres", "andres@sevilla.com");
-        Client cl = new Client("0", "jose", "josqlito@correo.com", cs);
+        Cashier cs = new Cashier("UW9999999", "andres", "andres@upm.es");
+        Client cl = new Client("X0586929S", "jose", "josqlito@correo.com", cs);
         
         String expected = String.format("Client{identifier='%s', name='%s', email='%s', cash=%s}",
                                         cl.getId(), cl.getName(), cl.getEmail(), cs.getId());
