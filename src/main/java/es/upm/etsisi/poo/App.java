@@ -185,6 +185,8 @@ public class App {
                 command.eval(params);
             }catch (FailedCommandException ex){
                 System.out.println(ex.getMessage());
+            }catch (Exception ex){
+                System.out.println("Unexpected error: " + ex.getMessage());
             }
         }
     }

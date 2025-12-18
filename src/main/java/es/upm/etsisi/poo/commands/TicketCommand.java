@@ -69,39 +69,31 @@ public class TicketCommand implements Command {
         int ticketId;
 
 		// Execution
-        try {
+        try{
             cashier = userManager.findCashier(cashierId);
             client = userManager.findClient(clientId);
-        }catch (MissingItemException ex) {
-            throw new FailedCommandException("Unable to create ticket, " + ex.getMessage());
-        }
 
-        if (params.length == 5) {
-            try {
+            if (params.length == 5) {
                 ticketId = Integer.parseInt(params[2]);
-            } catch (NumberFormatException ex) {
-                throw new FailedCommandException("Unable to create ticket, " + params[2] + " is not a valid integer");
-            }
 
-            if (!userManager.isTicketIdUnique(ticketId)) {
-                throw new FailedCommandException("ticket new: id already exists");
-            }
-        } else {
-            try{
+                if (!userManager.isTicketIdUnique(ticketId)) {
+                    throw new FailedCommandException("ticket new: id already exists");
+                }
+            } else {
                 ticketId = userManager.generateUniqueTicketId();
-            }catch (IdSpaceExhaustedException ex){
-                throw new FailedCommandException("Unable to create ticket, " + ex.getMessage());
             }
-        }
 
-        try{
             Ticket created = cashier.createTicket(ticketId);
             client.addTicket(ticketId);
-
             System.out.print(created.summaryString());
             System.out.println("ticket new: ok");
+
         }catch (DuplicateItemException ex){
             throw new FailedCommandException("Unable to add ticket to the client, " + ex.getMessage());
+        }catch (MissingItemException | IdSpaceExhaustedException ex) {
+            throw new FailedCommandException("Unable to create ticket, " + ex.getMessage());
+        } catch (NumberFormatException ex) {
+            throw new FailedCommandException("Unable to create ticket, " + params[2] + " is not a valid integer");
         }catch (IllegalArgumentException ex){
             throw new FailedCommandException("Unable to add ticket to the cashier, " + ex.getMessage());
         }

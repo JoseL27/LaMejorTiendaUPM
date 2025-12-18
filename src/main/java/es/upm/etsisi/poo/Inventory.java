@@ -38,7 +38,7 @@ public class Inventory {
      * @param id Product ID
      * @return Product object's index in the array, -1 if not found or ID is invalid (ID < 0)
      */
-    public int readProductIndex(int id) {
+    private int readProductIndex(int id) {
         if (!Product.isValidId(id)) return -1;
         int result = -1;
         int i = 0;
