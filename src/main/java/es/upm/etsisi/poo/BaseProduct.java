@@ -30,31 +30,19 @@ public class BaseProduct extends Product {
         public int getMaxPersonalizations() {
 			return this.maxPersonalizations;
 		}
-
-        /**
-         * Function use in Parse.
-         * @param label String receive from the parse
-         * @return Category if is aceptable or null if the category does not exit
-         */
-        public static Category fromLabel(String label) {
-            Category category = null;
-            try {
-                category = Category.valueOf(label.toUpperCase());
-            } catch (Exception e) {
-            } finally {
-                return category;
-            }
-        }
     }
 
     private Category category;
 	private int maxPersonalizations;
 	private boolean personalized;
 
-    // It is assumed that all the parameters are valid, this should be handled before creating the object
-    public BaseProduct(int id, String name, double price, Category category, int maxPersonalizations, boolean personalized) {
+    public BaseProduct(int id, String name, double price, String category, int maxPersonalizations, boolean personalized) throws IllegalArgumentException{
         super(id, name, price);
-        this.category = category;
+        Category parsedCategory = Category.valueOf(category);
+        if (maxPersonalizations < 0 || maxPersonalizations > parsedCategory.getMaxPersonalizations())
+            throw new IllegalArgumentException("Expected a number between 0 and " + parsedCategory.getMaxPersonalizations() + " for max personalizations, got " + maxPersonalizations);
+
+        this.category = parsedCategory;
         this.maxPersonalizations = maxPersonalizations;
 		this.personalized = personalized;
     }
@@ -66,9 +54,9 @@ public class BaseProduct extends Product {
     public Category getCategory() {
         return category;
     }
-	
-    public void setCategory(Category category) {
-        this.category = category;
+
+    public void setCategory(String category) {
+        this.category = Category.valueOf(category);
     }
 
 	@Override

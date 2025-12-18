@@ -1,5 +1,7 @@
 package es.upm.etsisi.poo;
 
+import es.upm.etsisi.poo.exceptions.FailedCommandException;
+
 public interface Command {
-	public void eval(String[] args);
+	void eval(String[] args) throws FailedCommandException;
 }
