@@ -9,38 +9,86 @@ import org.junit.jupiter.api.Disabled;
 
 public class CashierTest {
     
+    public static final String[] VALID_WORKER_IDs = {
+        "UW1234567",
+        "UW6969420",
+        "UW0000000",
+        "UW9999999",
+    };
+    
+    public static final String[] INVALID_WORKER_IDs = {
+        "WW1234567",
+        "UU1234567",
+        "UW123456",
+        "UW12345678",
+    };
+    
+    public static final String[] VALID_COMPANY_EMAILs = {
+        "persona@upm.es",
+        "persona-grandiosamente-grandiosisima@upm.es",
+        "persona.grandiosamente.grandiosisima@upm.es",
+    };
+    
+    public static final String[] INVALID_COMPANY_EMAILs = {
+        "persona@upv.es",
+        "persona@upm.esp",
+        "persona@@upm.es",
+        "@upm.es",
+    };
+    
+    public static final Cashier VALID_CASHIER = 
+        new Cashier(VALID_WORKER_IDs[0], "persona", VALID_COMPANY_EMAILs[0]);
+    
     @Disabled
         @Test
         void validateId() {
-        assertTrue(Cashier.isValidId("UW1234567"));
-        assertTrue(Cashier.isValidId("UW0000000"));
-        assertTrue(Cashier.isValidId("UW9999999"));
+        for (String id : VALID_WORKER_IDs) 
+            assertTrue(Cashier.isValidId(id), String.format("Expected %s to be a valid worker id, was invalid", id));
         
-        assertFalse(Cashier.isValidId("WW1234567"));
-        assertFalse(Cashier.isValidId("UU1234567"));
-        assertFalse(Cashier.isValidId("UW123456"));
-        assertFalse(Cashier.isValidId("UW12345678"));
+        for (String id : INVALID_WORKER_IDs) 
+            assertTrue(Cashier.isValidId(id), String.format("Expected %s to be a invalid worker id, was valid", id));
     }
     
     @Disabled
         @Test
         void validateCompanyEmail() {
-        assertTrue(Cashier.isCompanyEmail("persona@upm.es"));
-        assertTrue(Cashier.isCompanyEmail("persona-grandiosamente-grandiosisima@upm.es"));
-        assertTrue(Cashier.isCompanyEmail("persona.grandiosamente.grandiosisima@upm.es"));
+        for (String e : VALID_COMPANY_EMAILs) 
+            assertTrue(Cashier.isCompanyEmail(e), 
+                       String.format("Expected %s to be a valid company email, was invalid", e));
         
-        assertFalse(Cashier.isCompanyEmail("persona@upv.es"));
-        assertFalse(Cashier.isCompanyEmail("persona@upm.esp"));
-        assertFalse(Cashier.isCompanyEmail("persona@@upm.es"));
-        assertFalse(Cashier.isCompanyEmail("@upm.es"));
+        for (String e : INVALID_COMPANY_EMAILs) 
+            assertTrue(Cashier.isCompanyEmail(e), 
+                       String.format("Expected %s to be a invalid company email, was valid", e));
     }
     
     @Test
+        void constructorRegular() {
+        assertDoesNotThrow(() -> {
+                               new Cashier(VALID_WORKER_IDs[0], "fernando", VALID_COMPANY_EMAILs[0]);
+                           });
+    }
+    
+    @Test
+        void constructorFailId() {
+        assertThrows(IllegalArgumentException.class, () -> {
+                         new Cashier(INVALID_WORKER_IDs[0], "fernando", VALID_COMPANY_EMAILs[0]);
+                     });
+    }
+    
+    @Test
+        void constructorFailEmail() {
+        assertThrows(IllegalArgumentException.class, () -> {
+                         new Cashier(VALID_WORKER_IDs[0], "fernando", INVALID_COMPANY_EMAILs[0]);
+                     });
+    }
+    
+    
+    @Test
         void toStringFormat() {
-        Cashier cs = new Cashier("UW9999999", "pierna", "cabeza@upm.es");
-        
+        Cashier cs = VALID_CASHIER;
         String expected = String.format("Cash{identifier='%s', name='%s', email='%s'}",
                                         cs.getId(), cs.getName(), cs.getEmail());
         assertEquals(expected, cs.toString());
     }
+    
 }

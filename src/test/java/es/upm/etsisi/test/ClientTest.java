@@ -10,52 +10,142 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ClientTest {
     
+    public static final String[] VALID_NIFs = {
+        "60860897E",
+        "89650658Q",
+        "79631068P",
+        "10454534E",
+        "83597236X",
+    };
+    
+    public static final String[] INVALID_NIFs = {
+        "60860897F",
+        "89650658D",
+        "79631068C",
+        "10454534B",
+        "83597236A",
+    };
+    
+    
+    public static final String[] VALID_NIEs = {
+        "X0586929S",
+        "X9357778K",
+        "X4234859F",
+        "X3490423N",
+        "Z6949267Y",
+    };
+    
+    
+    public static final String[] INVALID_NIEs = {
+        "X0586929A",
+        "X9357778B",
+        "X4234859C",
+        "X3490423D",
+        "Z6949267E",
+    };
+    
+    public static final String[] VALID_CIFs = {
+        "A14155667",
+        "R6554800J",
+        "E80206790",
+        "W9785496B",
+        "Q5256608J",
+    };
+    
+    public static final String[] INVALID_CIFs = {
+        "Q5256608A",
+        "A1415566B",
+        "R6554800C",
+        "D80206790",
+        "W9785496F",
+    };
+    
+    public static final Client VALID_CLIENT = 
+        new Client(VALID_NIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
+    
+    void testClientId(String id, String tag, boolean expected) {
+        if (Client.isValidId(id) != expected) {
+            String expStr = expected ? "valid" : "invalid";
+            String wasStr = !expected ? "valid" : "invalid";
+            fail(String.format("Expected '%s' to be %s %s, was %s\n", id, expStr, tag, wasStr));
+        }
+    }
+    
     @Test
         void idValidationNIF() {
-        assertTrue(Client.isValidId("60860897E"));
-        assertTrue(Client.isValidId("89650658Q"));
-        assertTrue(Client.isValidId("79631068P"));
-        assertTrue(Client.isValidId("10454534E"));
-        assertTrue(Client.isValidId("83597236X"));
+        for (String id : VALID_NIFs) 
+            testClientId(id, "nif", true);
         
-        assertFalse(Client.isValidId("60860897F"));
-        assertFalse(Client.isValidId("89650658D"));
-        assertFalse(Client.isValidId("79631068C"));
-        assertFalse(Client.isValidId("10454534B"));
-        assertFalse(Client.isValidId("83597236A"));
+        for (String id : INVALID_NIFs) 
+            testClientId(id, "nif", false);
     }
     
     @Test
         void idValidationNIE() {
-        assertTrue(Client.isValidId("X0586929S"));
-        assertTrue(Client.isValidId("X9357778K"));
-        assertTrue(Client.isValidId("X4234859F"));
-        assertTrue(Client.isValidId("X3490423N"));
-        assertTrue(Client.isValidId("Z6949267Y"));
+        for (String id : VALID_NIEs) 
+            testClientId(id, "nie", true);
         
-        assertFalse(Client.isValidId("X0586929A"));
-        assertFalse(Client.isValidId("X9357778B"));
-        assertFalse(Client.isValidId("X4234859C"));
-        assertFalse(Client.isValidId("X3490423D"));
-        assertFalse(Client.isValidId("Z6949267E"));
+        for (String id : INVALID_NIEs) 
+            testClientId(id, "nie", false);
     }
     
     @Disabled // NOTE(erb): for future CompanyClients
         @Test
         void idValidationCIF() {
-        assertTrue(Client.isValidId("Q5256608J"));
-        assertTrue(Client.isValidId("A14155667"));
-        assertTrue(Client.isValidId("R6554800J"));
-        assertTrue(Client.isValidId("E80206790"));
-        assertTrue(Client.isValidId("W9785496B"));
+        for (String id : VALID_CIFs) 
+            testClientId(id, "nie", true);
         
-        assertFalse(Client.isValidId("Q5256608A"));
-        assertFalse(Client.isValidId("A1415566B"));
-        assertFalse(Client.isValidId("R6554800C"));
-        assertFalse(Client.isValidId("D80206790"));
-        assertFalse(Client.isValidId("W9785496F"));
+        for (String id : INVALID_CIFs) 
+            testClientId(id, "nie", false);
     }
     
+    @Test
+        void constructorRegular() {
+        assertDoesNotThrow(() -> {
+                               new Client(VALID_NIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
+                               
+                               new Client(VALID_NIEs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
+                               
+                               /* 
+                                                              new Client(VALID_CIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
+                                */
+                           });
+    }
+    
+    @Test
+        void constructorFailIdNIF() { 
+        assertThrows(IllegalArgumentException.class, () -> {
+                         new Client(INVALID_NIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
+                     });
+        
+        
+    }
+    
+    @Test
+        void constructorFailIdNIE() { 
+        assertThrows(IllegalArgumentException.class, () -> {
+                         new Client(INVALID_NIEs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
+                     });
+        
+    }
+    
+    
+    @Disabled
+        @Test
+        void constructorFailIdCIF() { 
+        assertThrows(IllegalArgumentException.class, () -> {
+                         new Client(INVALID_CIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
+                     });
+        
+    }
+    
+    @Test
+        void constructorFailNullCashier() { 
+        assertThrows(IllegalArgumentException.class, () -> {
+                         new Client(VALID_NIEs[0], "jose", "josqlito@correo.com", null);
+                     });
+        
+    }
     
     @Test
         void toStringFormat() {
