@@ -228,12 +228,12 @@ public class App {
     }
 
     /**
-     * Function that check the DateToCheck is after than the LimitDate.
+     * Function that check the DateToCheck is before the LimitDate.
      * @param LimitDate
      * @param DateToCheck
-     * @return boolean LimitDate is lower
+     * @return boolean DateToCheck is sooner than LimitDate
      */
-    public static boolean validDate(LocalDateTime LimitDate, LocalDateTime DateToCheck) {
-        return LimitDate.isAfter(DateToCheck);
+    public static boolean validDate(LocalDateTime DateToCheck, LocalDateTime LimitDate ) {
+        return DateToCheck.isBefore(LimitDate);
     }
 }
