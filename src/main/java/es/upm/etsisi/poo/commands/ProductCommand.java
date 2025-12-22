@@ -129,7 +129,6 @@ public class ProductCommand implements Command {
 		int maxPeople;
 		TimedProduct.TimedType type;
 
-
 		int parseIndex = 1;
 		try {
 			// Parsing
