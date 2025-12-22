@@ -65,6 +65,7 @@ public class BaseProduct extends Product {
     public Category getCategory() {
         return category;
     }
+    public boolean getPersonalized() {return this.personalized;}
 	
     public void setCategory(Category category) {
         this.category = category;
