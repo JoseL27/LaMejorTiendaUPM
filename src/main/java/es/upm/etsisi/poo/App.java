@@ -2,6 +2,7 @@ package es.upm.etsisi.poo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 import java.util.Locale;
 
@@ -224,5 +225,15 @@ public class App {
 
     public static boolean checkArgsCountWithPrint(String prefix, int amount, int expectedAmount) {
         return checkArgsCountWithPrint(prefix, amount, expectedAmount, expectedAmount);
+    }
+
+    /**
+     * Function that check the DateToCheck is after than the LimitDate.
+     * @param LimitDate
+     * @param DateToCheck
+     * @return boolean LimitDate is lower
+     */
+    public static boolean validDate(LocalDateTime LimitDate, LocalDateTime DateToCheck) {
+        return LimitDate.isAfter(DateToCheck);
     }
 }
