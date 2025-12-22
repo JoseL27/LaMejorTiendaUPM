@@ -14,14 +14,14 @@ public class Inventory {
     private int productAmount;
 
 
-	private static Inventory instance = new Inventory();
+    private static Inventory instance = new Inventory();
 
-	public static Inventory getInstance() {
-		if (instance == null) {
-			instance = new Inventory();
-		}
-		return instance;
-	}
+    public static Inventory getInstance() {
+        if (instance == null) {
+            instance = new Inventory();
+        }
+        return instance;
+    }
 
     private Inventory() {
         this.inventory = new Product[MAX_PRODUCTS];
@@ -30,6 +30,7 @@ public class Inventory {
 
     /**
      * Checks if given ID is valid (idToCheck >= 0)
+     *
      * @param idToCheck numeric id to check
      * @return true if valid, otherwise return false
      */
@@ -40,6 +41,7 @@ public class Inventory {
 
     /**
      * Check if given name is valid (nameToCheck.length < 100)
+     *
      * @param nameToCheck Name string to check
      * @return true if valid, otherwise return false
      */
@@ -49,6 +51,7 @@ public class Inventory {
 
     /**
      * Check if given price is valid (priceToCheck > 0)
+     *
      * @param priceToCheck Price double to check
      * @return true if valid, otherwise return false
      */
@@ -58,6 +61,7 @@ public class Inventory {
 
     /**
      * Attempts to find the product with the same ID, returning its position in the array
+     *
      * @param id Product ID
      * @return Product object's index in the array, -1 if not found or ID is invalid (ID < 0)
      */
@@ -75,6 +79,7 @@ public class Inventory {
 
     /**
      * Attempts to find the product with the same ID
+     *
      * @param id Product ID
      * @return Product with the specified id, null if not found or ID is invalid (ID < 0)
      */
@@ -93,10 +98,11 @@ public class Inventory {
 
     /**
      * Creates a product and adds it to the array
-     * @param id Product ID (must be a positive integer)
-     * @param name Product name (length must be less than 100)
+     *
+     * @param id       Product ID (must be a positive integer)
+     * @param name     Product name (length must be less than 100)
      * @param category Product Category
-     * @param price Product price (must be greater than 0)
+     * @param price    Product price (must be greater than 0)
      * @return true if the product is created correctly, false in other case
      */
     public BaseProduct createBaseProduct(int id, String name, BaseProduct.Category category, double price, int maxPers, boolean personalized) {
@@ -119,6 +125,7 @@ public class Inventory {
 
     /**
      * Tries to create a new timed product with its attributes set to the values of the parameters
+     *
      * @return The product that was created, or null if the creation failed
      */
     public TimedProduct createTimedProduct(int id, String name, double price, int people, TimedProduct.TimedType type, LocalDateTime expirationDate) {
@@ -141,7 +148,8 @@ public class Inventory {
 
     /**
      * Updates a product's name specifying its product ID
-     * @param id Product ID (must be a positive integer)
+     *
+     * @param id   Product ID (must be a positive integer)
      * @param name Product name (length must be less than 100)
      * @return true if the product's name is updated correctly, false in other case
      */
@@ -154,12 +162,13 @@ public class Inventory {
         if (selectedProduct != null) {
             selectedProduct.setName(name);
         }
-		return selectedProduct;
+        return selectedProduct;
     }
 
     /**
      * Updates a product's price specifying its product ID
-     * @param id Product ID (must be a positive integer)
+     *
+     * @param id    Product ID (must be a positive integer)
      * @param price Product price (must be greater than 0)
      * @return true if the product's price is updated correctly, false in other case
      */
@@ -172,12 +181,13 @@ public class Inventory {
         if (selectedProduct != null) {
             selectedProduct.setPrice(price);
         }
-		return selectedProduct;
+        return selectedProduct;
     }
 
     /**
      * Updates a product's category specifying its product ID
-     * @param id Product ID (must be a positive integer)
+     *
+     * @param id       Product ID (must be a positive integer)
      * @param category Product Category
      * @return true if the product's category is updated correctly, false in other case
      */
@@ -188,20 +198,21 @@ public class Inventory {
 
         BaseProduct selectedProduct;
         try { // stinky hack coming up
-             selectedProduct = (BaseProduct) this.readProduct(id);
+            selectedProduct = (BaseProduct) this.readProduct(id);
         } catch (Exception e) {
             selectedProduct = null;
         }
 
         if (selectedProduct != null) {
             // Update product's category
-             selectedProduct.setCategory(category);
+            selectedProduct.setCategory(category);
         }
-		return selectedProduct;
+        return selectedProduct;
     }
 
     /**
      * Deletes a product specifying its product ID from the array
+     *
      * @param id Product ID (must be a positive integer)
      * @return true if the product is deleted correctly, false in other case
      */
@@ -225,6 +236,7 @@ public class Inventory {
 
     /**
      * Returns an array of all products added. Ordered by first added product to last added product.
+     *
      * @return Array of products with length of total product amount in the catalogue. Null if the inventory is empty
      */
     public Product[] listProducts() {
@@ -238,19 +250,24 @@ public class Inventory {
 
     /**
      * Generates a unique id by finding the greatest id in the inventory and adding 1 to it
+     *
      * @return a product id, valid and unique
      */
-	public int generateUniqueProductId() {
+    public int generateUniqueProductId() {
         //Searches for the greatest id in all the products
         int greatestId = 0;
-        for (Product product: inventory){
-            if (product != null && product.getId() > greatestId){
+        for (Product product : inventory) {
+            if (product != null && product.getId() > greatestId) {
                 greatestId = product.getId();
             }
         }
 
         // Returns the id that is immediately next to the greatest id
-		return greatestId + 1;
-	}
+        return greatestId + 1;
+    }
+
+    public boolean isTimedProduct(Product product) {
+        return product instanceof TimedProduct;
+    }
 
 }

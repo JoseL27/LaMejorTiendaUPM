@@ -178,7 +178,7 @@ public class TicketCommand implements Command {
             return;
         }
 
-        if (productToAdd instanceof TimedProduct) {
+        if (Inventory.getInstance().isTimedProduct(productToAdd)) {
             TimedProduct timedProduct = (TimedProduct) productToAdd; //Cast before checking
             if (!(validDate(LocalDateTime.now(), timedProduct.getExpirationDate()))) {
                 System.out.printf("ticket add: error: not enough time to prepare, you need more than %s hours\n",
