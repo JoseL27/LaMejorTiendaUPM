@@ -21,8 +21,6 @@ public class TicketCommand implements Command {
      * This method is responsible for parsing different subcommands.
      *
      * @param params      The token stream to parse on each subcommand
-     * @param userManager The userManager to use for user related operations in subcommands
-     * @param inventory   The product store to use for product related operations in subcommands
      */
     public void eval(String[] params) {
         // Parse
@@ -315,12 +313,14 @@ public class TicketCommand implements Command {
 
         Ticket ticket = cashier.findTicket(ticketId);
         if (ticket != null) {
-            ticket.close();
-            System.out.print(ticket.summaryString());
-            System.out.println("ticket print: ok");
+            if(ticket.tryClose()){
+                System.out.print(ticket.summaryString());
+                System.out.println("ticket print: ok");
+            }else{
+                System.out.printf("ticket print: error: ticket with id '%d' has TimedProducts out of date\n", ticketId);
+            }
         } else {
             System.out.printf("ticket print: error: ticket with id '%d' not found in cashier with id '%s'\n", ticketId, cashierId);
-            return;
         }
     }
 
