@@ -6,9 +6,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.text.DecimalFormat;
 
-import static es.upm.etsisi.poo.App.validDate;
-
-
 /**
  * Ticket class to manage an application ticket which consists of a product list with amounts.
  *
@@ -127,7 +124,7 @@ public class Ticket implements Comparable<Ticket> {
             Product product = productInfos.get(i).getProduct(); //Get the product
             if (Inventory.getInstance().isTimedProduct(product)) {
                 TimedProduct timedProduct = (TimedProduct) product;
-                resul = validDate(LocalDateTime.now(), timedProduct.getExpirationDate());
+                resul = LocalDateTime.now().isBefore(timedProduct.getExpirationDate());
             }
             i--;
         }

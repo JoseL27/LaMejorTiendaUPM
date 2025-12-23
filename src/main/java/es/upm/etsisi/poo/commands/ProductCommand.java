@@ -6,9 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-
-import static es.upm.etsisi.poo.App.validDate;
-
 /**
  * ProductCommand class that parses a stream of tokens into a specific ProductCommand,
  * being one of the following formats:
@@ -173,7 +170,7 @@ public class ProductCommand implements Command {
             }
 
             LocalDateTime prepDoneTime = LocalDateTime.now().plusHours(type.getHoursForPreparing());
-            if (validDate(prepDoneTime, expirationDate)) {
+            if (prepDoneTime.isBefore(expirationDate)) {
                 System.out.printf("prod add: error: you need at least %d hours to prepare for this %s\n",
                         type.getHoursForPreparing(), type.toString().toLowerCase());
                 return;

@@ -58,7 +58,7 @@ public class TimedProduct extends Product {
     }
 
     public LocalDateTime getExpirationDate() {
-        return this.expirationDate;
+        return this.expirationDate.minusHours(type.hoursForPreparing);
     }
 
     @Override

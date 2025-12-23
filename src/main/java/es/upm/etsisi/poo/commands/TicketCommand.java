@@ -5,8 +5,6 @@ import es.upm.etsisi.poo.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
-import static es.upm.etsisi.poo.App.validDate;
-
 /**
  * Represents a command that falls under the ticket category, being those:
  * - ticket new (resetea ticket en curso)
@@ -178,7 +176,7 @@ public class TicketCommand implements Command {
 
         if (Inventory.getInstance().isTimedProduct(productToAdd)) {
             TimedProduct timedProduct = (TimedProduct) productToAdd; //Cast before checking
-            if (!(validDate(LocalDateTime.now(), timedProduct.getExpirationDate()))) {
+            if (LocalDateTime.now().isAfter(timedProduct.getExpirationDate())) {
                 System.out.printf("ticket add: error: not enough time to prepare, you need more than %s hours\n",
                         timedProduct.getType().getHoursForPreparing());
                 return;

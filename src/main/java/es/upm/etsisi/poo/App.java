@@ -226,14 +226,4 @@ public class App {
     public static boolean checkArgsCountWithPrint(String prefix, int amount, int expectedAmount) {
         return checkArgsCountWithPrint(prefix, amount, expectedAmount, expectedAmount);
     }
-
-    /**
-     * Function that check the DateToCheck is before the LimitDate.
-     * @param LimitDate
-     * @param DateToCheck
-     * @return boolean DateToCheck is sooner than LimitDate
-     */
-    public static boolean validDate(LocalDateTime DateToCheck, LocalDateTime LimitDate ) {
-        return DateToCheck.isBefore(LimitDate);
-    }
 }
