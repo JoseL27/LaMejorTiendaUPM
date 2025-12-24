@@ -1,5 +1,9 @@
 package es.upm.etsisi.poo;
 
+import es.upm.etsisi.poo.exceptions.DuplicateItemException;
+import es.upm.etsisi.poo.exceptions.FullCollectionException;
+
+import java.time.DateTimeException;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
@@ -63,7 +67,8 @@ public class Ticket implements Comparable<Ticket> {
      * To create a ticket with a "random id" use randomId() function
      * then check if the id is unique in the store and create it using this constructor.
      */
-    public Ticket(int id) {
+    public Ticket(int id) throws IllegalArgumentException {
+        if (id < 0) throw new IllegalArgumentException("Ticket id should be a not negative number");
         resetProductInfos();
         this.id = id;
         this.isOpen = true;
@@ -117,23 +122,18 @@ public class Ticket implements Comparable<Ticket> {
         this.productInfos = new ArrayList<ProductInfo>();
     }
 
-    public boolean tryClose() {
-        boolean resul = true;
-        int i = productInfos.size() - 1;
-        while (resul && i >= 0) {
-            Product product = productInfos.get(i).getProduct(); //Get the product
+    public void tryClose() {
+        for (ProductInfo productInfo : productInfos) {
+            Product product = productInfo.getProduct(); //Get the product
             if (Inventory.getInstance().isTimedProduct(product)) {
                 TimedProduct timedProduct = (TimedProduct) product;
-                resul = LocalDateTime.now().isBefore(timedProduct.getExpirationDate());
+                if (LocalDateTime.now().isAfter(timedProduct.getExpirationDate())) {
+                    throw new DateTimeException(String.format("Product %s is past its expiration date", product));
+                }
             }
-            i--;
         }
-        if (resul) {
-            int j=0;
-            this.productInfos = finalProductInfo();
-            close();
-        }
-        return resul;
+        this.productInfos = finalProductInfo();
+        close();
     }
 
     private void close() {
@@ -159,9 +159,8 @@ public class Ticket implements Comparable<Ticket> {
      * @see findDuplicateProductInfo
      * @see appendProductInfo
      */
-    public boolean addProduct(Product product, int amount, String[] personalizations) {
+    public void addProduct(Product product, int amount, String[] personalizations) throws DuplicateItemException, FullCollectionException{
         ProductInfo newProductInfo = new ProductInfo(product, amount, personalizations);
-        boolean result = false;
 
         ProductInfo duplicate = findDuplicateProductInfo(newProductInfo);
         if (duplicate == null) {
@@ -169,28 +168,23 @@ public class Ticket implements Comparable<Ticket> {
                 // First time adding TimedProduct, a TimedProduct counts as 1 item regardless of participant amount
                 TimedProduct timedProduct = (TimedProduct) product;
                 if (amount <= timedProduct.getMaxParticipants()) {
-                    result = appendProductInfo(newProductInfo);
-                    if (result)
-                        this.totalAmount++;
+                    appendProductInfo(newProductInfo);
+                    this.totalAmount++;
                 }
             } else { // First time adding BaseProduct
-                result = appendProductInfo(newProductInfo);
-                if (result)
-                    this.totalAmount += newProductInfo.getAmount();
+                appendProductInfo(newProductInfo);
+                this.totalAmount += newProductInfo.getAmount();
             }
         } else {
             if (product instanceof TimedProduct) // Adding the same TimedProduct again should fail
-                result = false;
+                throw new DuplicateItemException("This timed product already exists in ticket");
             else {
                 if ((this.totalAmount + amount) <= MAX_PRODUCTS) { // Adding the same BaseProduct should increment amount
                     duplicate.addAmount(amount);
                     this.totalAmount += amount;
-                    result = true;
                 }
             }
         }
-
-        return result;
     }
 
     /**
@@ -202,7 +196,8 @@ public class Ticket implements Comparable<Ticket> {
      * @param id the id of the product to attempt to remove
      * @return the removed product if it was found or null if it wasn't
      */
-    public Product removeProduct(int id) {
+    public boolean removeProduct(int id) {
+        boolean result = false;
         ProductInfo foundProductInfo = null;
         ProductInfo currentProductInfo = null;
         Iterator<ProductInfo> iterator = productInfos.iterator();
@@ -223,12 +218,10 @@ public class Ticket implements Comparable<Ticket> {
                 this.totalAmount -= foundProductInfo.getAmount();
             }
 
-            if (productInfos.remove(foundProductInfo)) {
-                return removed;
-            }
+            result = productInfos.remove(foundProductInfo);
         }
 
-        return null;
+        return result;
     }
 
     /**
@@ -366,20 +359,14 @@ public class Ticket implements Comparable<Ticket> {
      * @param productInfo the productInfo to add at the end
      * @return false if 'count == productInfos.length'
      */
-    private boolean appendProductInfo(ProductInfo productInfo) {
-        boolean result = false;
+    private void appendProductInfo(ProductInfo productInfo) throws FullCollectionException{
         if (productInfo.getProduct() instanceof TimedProduct) {
-            if ((this.totalAmount + 1) <= MAX_PRODUCTS) {
-                productInfos.add(productInfo);
-                result = true;
-            }
+            if ((this.totalAmount + 1) > MAX_PRODUCTS) throw new FullCollectionException("Ticket is already full");
+            productInfos.add(productInfo);
         } else {
-            if ((productInfo.getAmount() + totalAmount) <= MAX_PRODUCTS) {
-                productInfos.add(productInfo);
-                result = true;
-            }
+            if ((productInfo.getAmount() + totalAmount) > MAX_PRODUCTS) throw new FullCollectionException("Ticket is already full");
+            productInfos.add(productInfo);
         }
-        return result;
     }
 
     public int compareTo(Ticket ticket) {
@@ -406,7 +393,7 @@ public class Ticket implements Comparable<Ticket> {
               TimedProduct oldProductAux = (TimedProduct) oldProduct;
               // New TimedObject
               TimedProduct timedProductAux = new TimedProduct(oldProduct.getId(),oldProduct.getName(),oldProduct.getPrice(),
-                      oldProductAux.getMaxParticipants(),oldProductAux.getType(),oldProductAux.getExpirationDate());
+                      oldProductAux.getMaxParticipants(),oldProductAux.getType().toString(),oldProductAux.getExpirationDate());
               //New instance
               ProductInfo info= new ProductInfo(timedProductAux,productInfo.getAmount(),persAux);
               aux.add(info);
@@ -414,7 +401,7 @@ public class Ticket implements Comparable<Ticket> {
               BaseProduct oldProductAux = (BaseProduct) oldProduct;
               // New TimedObject
               BaseProduct BaseProductAux = new BaseProduct(oldProduct.getId(),oldProduct.getName(),oldProduct.getPrice(),
-                      oldProductAux.getCategory(),oldProductAux.getMaxPersonalizations(),oldProductAux.getPersonalized());
+                      oldProductAux.getCategory().toString(),oldProductAux.getMaxPersonalizations(),oldProductAux.getPersonalized());
               //New instance
               ProductInfo info= new ProductInfo(BaseProductAux,productInfo.getAmount(),persAux);
               aux.add(info);

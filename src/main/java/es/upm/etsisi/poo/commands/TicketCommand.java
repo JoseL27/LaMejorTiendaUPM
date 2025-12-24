@@ -1,7 +1,10 @@
 package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.*;
+import es.upm.etsisi.poo.exceptions.*;
 
+
+import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -20,7 +23,7 @@ public class TicketCommand implements Command {
      *
      * @param params      The token stream to parse on each subcommand
      */
-    public void eval(String[] params) {
+    public void eval(String[] params) throws FailedCommandException {
         // Parse
         if (!App.checkMinArgsCountWithPrint("ticket", params.length, 2)) return;
 
@@ -46,66 +49,54 @@ public class TicketCommand implements Command {
      * @param userManager Context
      * @param inventory   Context
      */
-    private void evalNew(String[] params) {
+    private void evalNew(String[] params) throws FailedCommandException{
         // Parse
         if (!App.checkArgsCountWithPrint("ticket new", params.length, 4, 5))
             return;
 
-        String cashierId = params[params.length - 2];
-        if (!Cashier.isValidId(cashierId)) {
-            System.out.printf("ticket new: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId);
-            return;
-        }
+		String cashierId = params[params.length - 2];
+		if (!Cashier.isValidId(cashierId)) {
+			throw new FailedCommandException(String.format("ticket new: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId));
+		}
+		
+		String clientId = params[params.length - 1];
+		if (!Client.isValidId(clientId)) {
+            throw new FailedCommandException(String.format("ticket new: error: invalid client id '%s', please enter a valid NIF/NIE\n", clientId));
+		}
 
-        String clientId = params[params.length - 1];
-        if (!Client.isValidId(clientId)) {
-            System.out.printf("ticket new: error: invalid client id '%s', please enter a valid NIF/NIE\n", clientId);
-            return;
-        }
+		UserManager userManager = UserManager.getInstance();
+        Cashier cashier;
+        Client client;
+        int ticketId;
 
-        UserManager userManager = UserManager.getInstance();
+		// Execution
+        try{
+            cashier = userManager.findCashier(cashierId);
+            client = userManager.findClient(clientId);
 
-        // Execution
-        Cashier cashier = userManager.findCashier(cashierId);
-        if (cashier == null) {
-            System.out.printf("ticket new: error: cashier with id '%s' was not found\n", cashierId);
-            return;
-        }
+            if (params.length == 5) {
+                ticketId = Integer.parseInt(params[2]);
 
-        Client client = userManager.findClient(clientId);
-        if (client == null) {
-            System.out.printf("ticket new: error: client with id '%s' was not found\n", clientId);
-            return;
-        }
-
-        Integer ticketId = null;
-
-        if (params.length == 5) {
-            ticketId = App.tryParseInt(params[2]);
-            if (ticketId == null) {
-                App.printInvalidDataType("ticket new", "integer", params[2]);
-                return;
-            }
-
-            if (!userManager.isTicketIdUnique(ticketId)) {
-                System.out.println("ticket new: id allready exists");
-                return;
-            }
-        } else {
-            ticketId = userManager.generateUniqueTicketId();
-        }
-
-        if (client.addTicket(ticketId)) {
-            Ticket created = cashier.createTicket(ticketId);
-
-            if (created != null) {
-                System.out.print(created.summaryString());
-                System.out.println("ticket new: ok");
+                if (!userManager.isTicketIdUnique(ticketId)) {
+                    throw new FailedCommandException("ticket new: id already exists");
+                }
             } else {
-                System.out.println("ticket new: error: failed to add ticket to cashier.");
+                ticketId = userManager.generateUniqueTicketId();
             }
-        } else {
-            System.out.println("ticket new: error: failed to add the ticket to the client");
+
+            Ticket created = cashier.createTicket(ticketId);
+            client.addTicket(ticketId);
+            System.out.print(created.summaryString());
+            System.out.println("ticket new: ok");
+
+        }catch (DuplicateItemException ex){
+            throw new FailedCommandException("Unable to add ticket to the client, " + ex.getMessage());
+        }catch (MissingItemException | IdSpaceExhaustedException ex) {
+            throw new FailedCommandException("Unable to create ticket, " + ex.getMessage());
+        } catch (NumberFormatException ex) {
+            throw new FailedCommandException("Unable to create ticket, " + params[2] + " is not a valid integer");
+        }catch (IllegalArgumentException ex){
+            throw new FailedCommandException("Unable to add ticket to the cashier, " + ex.getMessage());
         }
     }
 
@@ -123,83 +114,68 @@ public class TicketCommand implements Command {
      * @param userManager Context
      * @param inventory   Context
      */
-    private void evalAdd(String[] params) {
+    private void evalAdd(String[] params) throws FailedCommandException{
         // Parse
         if (!App.checkMinArgsCountWithPrint("ticket add", params.length, 4))
             return;
 
-        Integer ticketId = App.tryParseInt(params[2]);
-        if (ticketId == null) {
-            App.printInvalidDataType("ticket add", "integer", params[2]);
-            return;
-        }
-
+        int ticketId;
         String cashierId = params[3];
-        if (!Cashier.isValidId(cashierId)) {
-            System.out.printf("ticket new: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId);
-            return;
-        }
-
-        Integer productId = App.tryParseInt(params[4]);
-        if (productId == null) {
-            App.printInvalidDataType("ticket add", "integer", params[4]);
-            return;
-        }
-
-        Integer amount = App.tryParseInt(params[5]);
-        if (amount == null) {
-            App.printInvalidDataType("ticket add", "integer", params[5]);
-            return;
-        }
-
+        int productId;
+        int amount;
         String[] personalizations = null;
+
+        try {
+            ticketId = Integer.parseInt(params[2]);
+        }catch (NumberFormatException ex){
+            throw new FailedCommandException("Unable to add product to ticket, " + params[2] + " is not a valid integer");
+        }
+
+		if (!Cashier.isValidId(cashierId)) {
+			throw new FailedCommandException(String.format("ticket add: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId));
+		}
+
+        try {
+            productId = Integer.parseInt(params[4]);
+        }catch(NumberFormatException ex){
+            throw new FailedCommandException("Unable to add product to ticket, " + params[4] + " is not a valid integer");
+        }
+
+        try {
+            amount = Integer.parseInt(params[5]);
+        }catch(NumberFormatException ex){
+            throw new FailedCommandException("Unable to add product to ticket, " + params[5] + " is not a valid integer");
+        }
+
         if (params.length > 6) {
             personalizations = parsePersonalizations(6, params);
         }
 
         // Execute
-        if (ticketId < 0) {
-            System.out.printf("ticket add: error: ticket id '%d' is invalid, expected a positive number\n", ticketId);
-            return;
-        }
-
-        if (!Inventory.isValidId(productId)) {
-            System.out.printf("ticket add: error: expected id greater or equal than zero\n");
-            return;
-        }
-
         Product productToAdd = Inventory.getInstance().readProduct(productId);
-        if (productToAdd == null) {
-            System.out.printf("ticket add: error: could not find product with id %s\n", productId);
-            return;
-        }
+		if (ticketId < 0) {
+			throw new FailedCommandException(String.format("ticket add: error: ticket id '%d' is invalid, expected a positive number\n", ticketId));
+		}
+		if (productToAdd == null) {
+			throw new FailedCommandException(String.format("ticket add: error: could not find product with id %s\n", productId));
+		}
+      
+    if (Inventory.getInstance().isTimedProduct(productToAdd)) {
+          TimedProduct timedProduct = (TimedProduct) productToAdd; //Cast before checking
+          if (LocalDateTime.now().isAfter(timedProduct.getExpirationDate())) {
+            throw new FailedCommandException(String.format("ticket add: error: not enough time to prepare, you need more than %s hours\n",
+                      timedProduct.getType().getHoursForPreparing()));
+          }
+    }
 
-        if (Inventory.getInstance().isTimedProduct(productToAdd)) {
-            TimedProduct timedProduct = (TimedProduct) productToAdd; //Cast before checking
-            if (LocalDateTime.now().isAfter(timedProduct.getExpirationDate())) {
-                System.out.printf("ticket add: error: not enough time to prepare, you need more than %s hours\n",
-                        timedProduct.getType().getHoursForPreparing());
-                return;
-            }
-        }
-
-        Cashier cashier = UserManager.getInstance().findCashier(cashierId);
-        if (cashier == null) {
-            System.out.printf("ticket new: error: cashier with id '%s' was not found\n", cashierId);
-            return;
-        }
-
-        Ticket ticket = cashier.findTicket(ticketId);
-        if (ticket == null) {
-            System.out.printf("ticket add: error: ticket with id '%d' not found in cashier with id '%s'\n", ticketId, cashierId);
-            return;
-        }
-
-        if (ticket.addProduct(productToAdd, amount, personalizations)) {
+        try {
+            Cashier cashier = UserManager.getInstance().findCashier(cashierId);
+            Ticket ticket = cashier.findTicket(ticketId);
+            ticket.addProduct(productToAdd, amount, personalizations);
             System.out.print(ticket.summaryString());
             System.out.println("ticket add: ok");
-        } else {
-            System.out.printf("ticket add: error: failed to add product\n");
+        }catch (DataException ex){
+            throw new FailedCommandException("Unable to add product to ticket, " + ex.getMessage());
         }
     }
 
@@ -214,58 +190,53 @@ public class TicketCommand implements Command {
      * @param userManager Context
      * @param inventory   Context
      */
-    private void evalRemove(String[] params) {
+    private void evalRemove(String[] params) throws FailedCommandException{
         // Parse
         if (!App.checkArgsCountWithPrint("ticket remove", params.length, 5))
             return;
 
-        Integer ticketId = App.tryParseInt(params[2]);
-        if (ticketId == null) {
-            App.printInvalidDataType("ticket remove", "integer", params[2]);
-            return;
-        }
-
+        int ticketId;
         String cashierId = params[3];
-        if (!Cashier.isValidId(cashierId)) {
-            System.out.printf("ticket remove: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId);
-            return;
+
+        try {
+            ticketId = Integer.parseInt(params[2]);
+        }catch(NumberFormatException ex) {
+            throw new FailedCommandException("Unable to remove product from ticket, " + params[2] + " is not a valid integer");
         }
 
-        Integer productId = App.tryParseInt(params[4]);
-        if (productId == null) {
-            App.printInvalidDataType("ticket remove", "integer", params[4]);
-            return;
+        if (!Cashier.isValidId(cashierId)) {
+            throw new FailedCommandException(String.format("ticket remove: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId));
+        }
+
+        int productId;
+        try {
+            productId = Integer.parseInt(params[4]);
+        }catch(NumberFormatException ex) {
+            throw new FailedCommandException("Unable to remove product from ticket, " + params[4] + " is not a valid integer");
         }
 
         // Execute
         if (ticketId < 0) {
-            System.out.printf("ticket remove: error: ticket id '%d' is invalid, expected a positive number\n", ticketId);
-            return;
+            throw new FailedCommandException(String.format("ticket remove: error: ticket id '%d' is invalid, expected a positive number", ticketId));
+        }
+        if (!Product.isValidId(productId)) {
+            throw new FailedCommandException(("ticket remove: error: expected product id greater or equal than zero"));
         }
 
-        if (!Inventory.isValidId(productId)) {
-            System.out.printf("ticket remove: error: expected id greater or equal than zero\n");
-            return;
+        Cashier cashier;
+        Ticket ticket;
+        try {
+            cashier = UserManager.getInstance().findCashier(cashierId);
+            ticket = cashier.findTicket(ticketId);
+        }catch(MissingItemException ex){
+            throw new FailedCommandException("Unable to remove product from ticket, " + ex.getMessage());
         }
 
-        Cashier cashier = UserManager.getInstance().findCashier(cashierId);
-        if (cashier == null) {
-            System.out.printf("ticket remove: error: cashier with id '%s' was not found\n", cashierId);
-            return;
-        }
-
-        Ticket ticket = cashier.findTicket(ticketId);
-        if (ticket == null) {
-            System.out.printf("ticket remove: error: ticket with id '%d' not found in cashier with id '%s'\n", ticketId, cashierId);
-            return;
-        }
-
-        Product removedProduct = ticket.removeProduct(productId);
-        if (removedProduct != null) {
+        if (ticket.removeProduct(productId)) {
             System.out.print(ticket.summaryString());
             System.out.println("ticket remove: ok");
         } else {
-            System.out.printf("ticket remove: error: failed to remove product\n");
+            throw new FailedCommandException(("ticket remove: error: failed to remove product"));
         }
     }
 
@@ -280,45 +251,38 @@ public class TicketCommand implements Command {
      * @param userManager Context
      * @param inventory   Context
      */
-    private void evalPrint(String[] params) {
-        // Parse
-        if (!App.checkArgsCountWithPrint("ticket print", params.length, 4))
+    private void evalPrint(String[] params) throws FailedCommandException{
+		// Parse
+		if (!App.checkArgsCountWithPrint("ticket print", params.length, 4))
             return;
 
-        Integer ticketId = App.tryParseInt(params[2]);
-        if (ticketId == null) {
-            App.printInvalidDataType("ticket print", "integer", params[2]);
-            return;
+        int ticketId;
+        try {
+            ticketId = Integer.parseInt(params[2]);
+        }catch(NumberFormatException ex) {
+            throw new FailedCommandException("Unable to add ticket, " + params[2] + " is not a valid integer");
         }
 
-        String cashierId = params[3];
-        if (!Cashier.isValidId(cashierId)) {
-            System.out.printf("ticket print: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId);
-            return;
-        }
+		String cashierId = params[3];
+		if (!Cashier.isValidId(cashierId)) {
+			throw new FailedCommandException(String.format("ticket print: error: invalid cashier id '%s' expected 'UW' followed by 7 digits", cashierId));
+		}
 
         // Execute
-        if (ticketId < 0) {
-            System.out.printf("ticket print: error: ticket id '%d' is invalid, expected a positive number\n", ticketId);
-            return;
-        }
+		if (ticketId < 0) {
+			throw new FailedCommandException(String.format("ticket print: error: ticket id '%d' is invalid, expected a positive number", ticketId));
+		}
 
-        Cashier cashier = UserManager.getInstance().findCashier(cashierId);
-        if (cashier == null) {
-            System.out.printf("ticket print: error: cashier with id '%s' was not found\n", cashierId);
-            return;
-        }
-
-        Ticket ticket = cashier.findTicket(ticketId);
-        if (ticket != null) {
-            if(ticket.tryClose()){
-                System.out.print(ticket.summaryString());
-                System.out.println("ticket print: ok");
-            }else{
-                System.out.printf("ticket print: error: ticket with id '%d' has TimedProducts out of date\n", ticketId);
-            }
-        } else {
-            System.out.printf("ticket print: error: ticket with id '%d' not found in cashier with id '%s'\n", ticketId, cashierId);
+        try {
+            Cashier cashier = UserManager.getInstance().findCashier(cashierId);
+            Ticket ticket = cashier.findTicket(ticketId);
+            ticket.tryClose();
+            System.out.print(ticket.summaryString());
+            System.out.println("ticket print: ok");
+        }catch (MissingItemException ex){
+            throw new FailedCommandException("Unable to print ticket, " + ex.getMessage());
+        }catch (DateTimeException ex){
+            throw new FailedCommandException("Unable to prit ticket, " + ex.getMessage());
         }
     }
 

@@ -5,7 +5,10 @@ public abstract class User {
     private String name;
     private String email;
 
-    public User(String id, String name, String email){
+    public User(String id, String name, String email) throws IllegalArgumentException{
+        if (id == null) throw new IllegalArgumentException("User id can not be null");
+        if (name == null) throw new IllegalArgumentException("User name can not be null");
+        if (email == null) throw new IllegalArgumentException("User email can not be null");
         this.id = id;
         this.name = name;
         this.email = email;

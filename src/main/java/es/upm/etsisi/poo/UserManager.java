@@ -1,5 +1,7 @@
 package es.upm.etsisi.poo;
 
+import es.upm.etsisi.poo.exceptions.*;
+
 import java.util.*;
 
 /**
@@ -39,27 +41,23 @@ public class UserManager {
 	 * @param clientId DNI
 	 * @param name Client's name
 	 * @param email Client's email, could be any email
-	 * @param cashierResponsible Cashier who is linked with the creation of this Client
-	 * @return True if successful, false if otherwise
+	 * @param assignedCashierId Cashier who is linked with the creation of this Client
+	 * @return The client that was created
 	 */
-	public Client addClient(String clientId, String name, String email, Cashier cashierResponsible) {
-		// Check null in any field
-		if (clientId == null || !Client.isValidId(clientId) || name == null || email == null || cashierResponsible == null)
-			return null;
+	public Client addClient(String clientId, String name, String email, String assignedCashierId) throws DataException{
+        try {
+            // Make sure assignedCashierId exists within the Cashier set
+            Cashier foundCashier = this.findCashier(assignedCashierId);
+            Client newClient = new Client(clientId, name, email, foundCashier);
 
-		// Make sure cashierResponsible exists within the Cashier set
-		Cashier findCashier = this.findCashier(cashierResponsible.getId());
-		if (findCashier == null || !findCashier.equals(cashierResponsible)) // Shortcircuit is fun
-			return null;
+            // Attempt to find the client with the same ID in the cashier set
+            if (this.users.containsKey(clientId)) throw new DuplicateItemException("Client with id " + clientId + " already exists");
 
-		// Attempt to find the client with the same ID in the cashier set
-		if (!this.users.containsKey(clientId)) {
-			Client newClient = new Client(clientId, name, email, cashierResponsible);
-			this.users.put(clientId, newClient);
-			return newClient;
-		}
-
-		return null;
+            this.users.put(clientId, newClient);
+            return newClient;
+        }catch (IllegalArgumentException ex){
+            throw new InvalidDataException("Error creating client: " + ex.getMessage());
+        }
 	}
 
 	/**
@@ -67,9 +65,9 @@ public class UserManager {
 	 * @param clientId DNI
 	 * @return True if the Client was successfully deleted, false if the Client was not found
 	 */
-	public boolean removeClient(String clientId) {
+	public void removeClient(String clientId) throws MissingItemException{
 		User removedClient = this.users.remove(clientId);
-		return (removedClient != null);
+        if (removedClient == null) throw new MissingItemException("Client with id " + clientId + " not found");
 	}
 
 	/**
@@ -77,8 +75,10 @@ public class UserManager {
 	 * @param clientId DNI
 	 * @return Client instance in the set if found, null if not found
 	 */
-	public Client findClient(String clientId) {
-		return (Client)this.users.get(clientId);
+	public Client findClient(String clientId) throws MissingItemException{
+		Client result = (Client)this.users.get(clientId);
+        if (result == null) throw new MissingItemException("Client with id " + clientId + " not found");
+        return result;
 	}
 
 	/**
@@ -125,52 +125,47 @@ public class UserManager {
 	 * @param workerId Cashier ID, must start with UW(7 numbers)
 	 * @param name Cashier's name
 	 * @param email Cashier's corporate email, must end in specific domain (See Cashier class)
-	 * @return True if successful, false if the worker with the same id already exists, or the ID space for cashier is exhausted, or email format is not correct
+	 * @return The cashier that was created
+     * @throws DataException if the worker with the same id already exists, or the ID space for cashier is exhausted, or email format is not correct
 	 */
-	public Cashier addCashier(String workerId, String name, String email) {
-		// Sanity check for email and workedId
-		if (workerId == null || name == null || email == null)
-			return null;
-		boolean isEmailValid = Cashier.isCompanyEmail(email);
-		boolean isWorkerIdValid = Cashier.isValidId(workerId);
+	public Cashier addCashier(String workerId, String name, String email) throws DataException{
+        try {
+            // If ID space is exhausted, do not add any more Cashiers
+            int maximumCashierAmountLimitedById = UserManager.MAX_CASHIER_ID - UserManager.MIN_CASHIER_ID + 1;
+            if (this.listCashiers().length >= maximumCashierAmountLimitedById)
+                throw new IdSpaceExhaustedException("All of the ids for cashiers have been already used");
 
-		// If ID space is exhausted, do not add any more Cashiers
-		int maximumCashierAmountLimitedById = UserManager.MAX_CASHIER_ID - UserManager.MIN_CASHIER_ID + 1;
-		if (this.listCashiers().length >= maximumCashierAmountLimitedById)
-			return null;
+            // Attempt to find the cashier with the same ID in the cashier set
+            if (this.users.containsKey(workerId)) throw new DuplicateItemException("Cashier with id " + workerId + " already exists");
 
-		if (isEmailValid && isWorkerIdValid) {
-			// Attempt to find the cashier with the same ID in the cashier set
-			if (this.users.containsKey(workerId))
-				return null;
-
-			// Update nextCashierId if needed for auto-increment
-			String number = workerId.substring(2); // Remove 'UW'
+            // Update nextCashierId if needed for auto-increment
+            String number = workerId.substring(2); // Remove 'UW'
             // If the id is all 0 the number=0
-            if(number.matches("^0+$")) number="0";
-            // All the leading 0 are eliminated
+            if (number.matches("^0+$")) number = "0";
+                // All the leading 0 are eliminated
             else number = number.replaceAll("^0+", "");
 
-			int cashierIdValue = Integer.parseInt(number);
-			if (cashierIdValue >= this.nextCashierId)
-				this.nextCashierId = cashierIdValue + 1;
+            int cashierIdValue = Integer.parseInt(number);
+            if (cashierIdValue >= this.nextCashierId)
+                this.nextCashierId = cashierIdValue + 1;
 
-			// Add the cashier to the set
-			Cashier newCashier = new Cashier(workerId, name, email);
-			this.users.put(workerId, newCashier);
-			return newCashier;
-		} else {
-			return null;
-		}
+            // Add the cashier to the set
+            Cashier newCashier = new Cashier(workerId, name, email);
+            this.users.put(workerId, newCashier);
+            return newCashier;
+        }catch (IllegalArgumentException ex){
+            throw new InvalidDataException("Error creating cashier: " + ex.getMessage());
+        }
 	}
 
 	/**
 	 * Creates a cashier and adds it to the User set, generating its ID automatically (auto-increment if possible, random if not).
 	 * @param name Cashier's name
 	 * @param email Cashier's corporate email, must end in specific domain (See Cashier class)
-	 * @return True if successful, false if the worker with the same id already exists, or the ID space for cashier is exhausted
+	 * @return The cashier that was created
+     * @throws DataException if the worker with the same id already exists, or the ID space for cashier is exhausted
 	 */
-	public Cashier addCashier(String name, String email) {
+	public Cashier addCashier(String name, String email) throws DataException {
 		String newCashierId = this.generateUniqueCashierId();
 		return this.addCashier(newCashierId, name, email);
 	}
@@ -178,20 +173,23 @@ public class UserManager {
 	/**
 	 * Removes a cashier from the User set.
 	 * @param workerId Cashier's ID
-	 * @return True if the Cashier was successfully deleted, false if the Cashier was not found
+	 * @throws MissingItemException if the cashier is not found
 	 */
-	public boolean removeCashier(String workerId){
+	public void removeCashier(String workerId) throws MissingItemException{
 		User removedCashier = this.users.remove(workerId);
-		return (removedCashier != null);
+        if (removedCashier == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
 	}
 
 	/**
 	 * Finds the specified Cashier with the specified ID.
 	 * @param workerId Cashier's ID
-	 * @return Cashier instance in the set if found, null if not found
+	 * @return Cashier instance in the set if found
+     * @throws MissingItemException if the cashier is not found
 	 */
-	public Cashier findCashier(String workerId) {
-		return (Cashier)this.users.get(workerId);
+	public Cashier findCashier(String workerId) throws MissingItemException{
+        Cashier result = (Cashier)this.users.get(workerId);
+        if (result == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
+		return result;
 	}
 
 	/**
@@ -238,15 +236,13 @@ public class UserManager {
 	 * @return Array of Ticket instances created by the specified Cashier, if the cashier has no tickets this will
 	 * return zero length array, but if the cashier does not exist, this will return null instead
 	 */
-	public Ticket[] listCashierTicketsArray(String workerId) {
-		if (!Cashier.isValidId(workerId))
-			return null;
+	public Ticket[] listCashierTicketsArray(String workerId) throws MissingItemException, IllegalArgumentException{
+		if (!Cashier.isValidId(workerId)) throw new IllegalArgumentException("Invalid cashier id: " + workerId);
 
 		Cashier cashier = (Cashier)this.users.get(workerId);
-		if (cashier != null)
-			return cashier.getTickets();
-		else
-			return null;
+        if (cashier == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
+
+        return cashier.getTickets();
 	}
 
 	/**
@@ -254,15 +250,12 @@ public class UserManager {
 	 * @param workerId Cashier's ID
 	 * @return String containing the tickets created by the specified Cashier
 	 */
-	public String listCashierTickets(String workerId) {
-		if (!Cashier.isValidId(workerId))
-			return null;
+	public String listCashierTickets(String workerId) throws MissingItemException, IllegalArgumentException{
+        if (!Cashier.isValidId(workerId)) throw new IllegalArgumentException("Invalid cashier id: " + workerId);
 
 		Cashier cashier = (Cashier)this.users.get(workerId);
-		if (cashier != null)
-			return cashier.getTicketsString();
-		else
-			return null;
+        if (cashier == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
+        return cashier.getTicketsString();
 	}
 
 	/**
@@ -318,7 +311,7 @@ public class UserManager {
 	 */
 	// NOTE(enrique): Implementation Sugestion: loop through all tickets of all cashiers
 	// and find the greatest id value and add 1 to it (maybe even keep a 'greatest id value')
-	public Integer generateUniqueTicketId() {
+	public Integer generateUniqueTicketId() throws IdSpaceExhaustedException{
 		// Check if ID space for ticket is exhausted
 		// int maximumTicketAmountLimitedById = UserManager.MAX_TICKET_ID - UserManager.MIN_TICKET_ID + 1;
 		// int globalTicketAmount = this.getGlobalCashierTicketAmount();
@@ -335,10 +328,9 @@ public class UserManager {
 				candidate = i++;
 			} while (!isTicketIdUnique(candidate) && i <= UserManager.MAX_TICKET_ID);
 			// Check again if the candidate is unique, or the ID space is already exhausted
-			if (isTicketIdUnique(candidate))
-				return candidate;
-			else
-				return null;
+			if (!isTicketIdUnique(candidate))
+                throw new IdSpaceExhaustedException("All of the ids for tickets have already been used");
+            return candidate;
 		}
 	}
 
@@ -349,12 +341,12 @@ public class UserManager {
 	 * @return Worker ID for cashier, guaranteed to be unique in the current set, will return null if all
 	 * available numbers are exhausted. Returns ID range between 'UW0000000' and 'UW9999999'.
 	 */
-    public String generateUniqueCashierId(){
+    public String generateUniqueCashierId() throws IdSpaceExhaustedException{
 		// This is really fucking overengineered. I'm sorry ?_? -jy
 		// Check if ID space for cashier is exhausted
 		int maximumCashierAmountLimitedById = UserManager.MAX_CASHIER_ID - UserManager.MIN_CASHIER_ID + 1;
 		if (this.listCashiers().length >= maximumCashierAmountLimitedById)
-			return null;
+            throw new IdSpaceExhaustedException("All of the ids for cashiers have already been used");
 
 		// Generate
 		if (this.nextCashierId <= MAX_CASHIER_ID) { // auto-increment possible

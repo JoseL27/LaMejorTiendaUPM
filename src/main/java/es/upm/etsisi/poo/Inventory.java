@@ -1,5 +1,10 @@
 package es.upm.etsisi.poo;
 
+import es.upm.etsisi.poo.exceptions.DataException;
+import es.upm.etsisi.poo.exceptions.DuplicateItemException;
+import es.upm.etsisi.poo.exceptions.FullCollectionException;
+import es.upm.etsisi.poo.exceptions.MissingItemException;
+
 import java.time.LocalDateTime;
 
 /**
@@ -29,44 +34,13 @@ public class Inventory {
     }
 
     /**
-     * Checks if given ID is valid (idToCheck >= 0)
-     *
-     * @param idToCheck numeric id to check
-     * @return true if valid, otherwise return false
-     */
-    public static boolean isValidId(int idToCheck) {
-        // Change if 0 is not an allowed ID
-        return idToCheck >= 0;
-    }
-
-    /**
-     * Check if given name is valid (nameToCheck.length < 100)
-     *
-     * @param nameToCheck Name string to check
-     * @return true if valid, otherwise return false
-     */
-    public static boolean isValidName(String nameToCheck) {
-        return nameToCheck.length() < Product.PRODUCT_MAX_NAME_LENGTH;
-    }
-
-    /**
-     * Check if given price is valid (priceToCheck > 0)
-     *
-     * @param priceToCheck Price double to check
-     * @return true if valid, otherwise return false
-     */
-    private boolean isValidPrice(double priceToCheck) {
-        return priceToCheck > 0;
-    }
-
-    /**
      * Attempts to find the product with the same ID, returning its position in the array
      *
      * @param id Product ID
      * @return Product object's index in the array, -1 if not found or ID is invalid (ID < 0)
      */
-    public int readProductIndex(int id) {
-        if (!isValidId(id)) return -1;
+    private int readProductIndex(int id) {
+        if (!Product.isValidId(id)) return -1;
         int result = -1;
         int i = 0;
         while (result == -1 && i < this.productAmount) {
@@ -84,7 +58,7 @@ public class Inventory {
      * @return Product with the specified id, null if not found or ID is invalid (ID < 0)
      */
     public Product readProduct(int id) {
-        if (!isValidId(id)) return null;
+        if (!Product.isValidId(id)) return null;
         // Linear search for products with the same ID
         Product result = null;
         int i = 0;
@@ -105,21 +79,21 @@ public class Inventory {
      * @param price    Product price (must be greater than 0)
      * @return true if the product is created correctly, false in other case
      */
-    public BaseProduct createBaseProduct(int id, String name, BaseProduct.Category category, double price, int maxPers, boolean personalized) {
-        if (!isValidId(id) || !isValidName(name) || !isValidPrice(price)) return null;
+    public BaseProduct createBaseProduct(int id, String name, String category, double price, int maxPers, boolean personalized) throws DataException{
 
         // Check inventory full
         if (this.productAmount >= MAX_PRODUCTS) return null;
 
         Product selectedProduct = this.readProduct(id);
+        if (selectedProduct != null) throw new DuplicateItemException("Product with id " + id + " already exists");
 
-        if (selectedProduct == null) {
+        try {
             BaseProduct prodToAdd = new BaseProduct(id, name, price, category, maxPers, personalized);
             this.inventory[this.productAmount] = prodToAdd;
             this.productAmount++;
             return prodToAdd;
-        } else {
-            return null;
+        }catch (IllegalArgumentException ex){
+            throw new DataException("Error creating product: " + ex.getMessage());
         }
     }
 
@@ -128,22 +102,22 @@ public class Inventory {
      *
      * @return The product that was created, or null if the creation failed
      */
-    public TimedProduct createTimedProduct(int id, String name, double price, int people, TimedProduct.TimedType type, LocalDateTime expirationDate) {
-        if (!isValidId(id) || !isValidName(name) || !isValidPrice(price)) return null;
-
+    public TimedProduct createTimedProduct(int id, String name, double price, int people, String type, LocalDateTime expirationDate) throws DataException{
         // Check inventory full
-        if (this.productAmount >= MAX_PRODUCTS) return null;
+        if (this.productAmount >= MAX_PRODUCTS) throw new FullCollectionException("No space left in inventory");
 
-        TimedProduct prodToAdd = null;
         //Check if already exists
         Product selectedProduct = this.readProduct(id);
+        if (selectedProduct != null) throw new DuplicateItemException("Product with id " + id + " already exists");
 
-        if (selectedProduct == null) {
-            prodToAdd = new TimedProduct(id, name, price, people, type, expirationDate);
+        try {
+            TimedProduct prodToAdd = new TimedProduct(id, name, price, people, type, expirationDate);
             this.inventory[this.productAmount] = prodToAdd;
             this.productAmount++;
+            return prodToAdd;
+        }catch (IllegalArgumentException ex){
+            throw new DataException("Error creating product: " + ex.getMessage());
         }
-        return prodToAdd;
     }
 
     /**
@@ -153,14 +127,14 @@ public class Inventory {
      * @param name Product name (length must be less than 100)
      * @return true if the product's name is updated correctly, false in other case
      */
-    public Product updateProductName(int id, String name) {
-        // Sanity checks: ID >= 0, name.length < 100
-        if (!isValidId(id) || !isValidName(name)) return null;
-
+    public Product updateProductName(int id, String name) throws DataException {
         Product selectedProduct = this.readProduct(id);
 
-        if (selectedProduct != null) {
+        if (selectedProduct == null) throw new MissingItemException("Product with id " + id + "does not exist");
+        try {
             selectedProduct.setName(name);
+        }catch (IllegalArgumentException ex){
+            throw new DataException("Unable to update name: " + ex.getMessage());
         }
         return selectedProduct;
     }
@@ -172,14 +146,14 @@ public class Inventory {
      * @param price Product price (must be greater than 0)
      * @return true if the product's price is updated correctly, false in other case
      */
-    public Product updateProductPrice(int id, double price) {
-        // Sanity checks: ID >= 0, price > 0
-        if (!isValidId(id) || !isValidPrice(price)) return null;
-
+    public Product updateProductPrice(int id, double price) throws DataException{
         Product selectedProduct = this.readProduct(id);
 
-        if (selectedProduct != null) {
+        if (selectedProduct == null) throw new MissingItemException("Product with id " + id + "does not exist");
+        try{
             selectedProduct.setPrice(price);
+        }catch (IllegalArgumentException ex){
+            throw new DataException("Unable to update price: " + ex.getMessage());
         }
         return selectedProduct;
     }
@@ -191,21 +165,19 @@ public class Inventory {
      * @param category Product Category
      * @return true if the product's category is updated correctly, false in other case
      */
-    public BaseProduct updateProductCategory(int id, BaseProduct.Category category) {
-        // Sanity checks: ID >= 0, category != null
-        if (!isValidId(id)) return null;
-        // if (category == null) return DataResult.INVALID_CATEGORY;
-
+    public BaseProduct updateProductCategory(int id, String category) throws DataException{
         BaseProduct selectedProduct;
         try { // stinky hack coming up
-            selectedProduct = (BaseProduct) this.readProduct(id);
-        } catch (Exception e) {
-            selectedProduct = null;
+             selectedProduct = (BaseProduct) this.readProduct(id);
+        } catch (ClassCastException ex) {
+            throw new DataException("The product with id " + id + " is not a base product");
         }
 
-        if (selectedProduct != null) {
-            // Update product's category
+        if (selectedProduct == null) throw new MissingItemException("Product with id " + id + "does not exist");
+        try {
             selectedProduct.setCategory(category);
+        }catch (IllegalArgumentException ex){
+            throw new DataException("Unable to update category, " + category + " is not a valid category");
         }
         return selectedProduct;
     }
@@ -216,21 +188,14 @@ public class Inventory {
      * @param id Product ID (must be a positive integer)
      * @return true if the product is deleted correctly, false in other case
      */
-    public boolean deleteProduct(int id) {
-        // Sanity checks: ID >= 0
-        if (!isValidId(id)) return false;
-
+    public void deleteProduct(int id) throws MissingItemException{
         int selectedProductIndex = this.readProductIndex(id);
 
-        if (selectedProductIndex != -1) {
-            // Remove product from array
-            this.productAmount--;
-            for (int i = selectedProductIndex; i < this.productAmount; i++) {
-                this.inventory[i] = this.inventory[i + 1];
-            }
-            return true;
-        } else {
-            return false;
+        if (selectedProductIndex == -1) throw new MissingItemException("Product with id " + id + " does not exist");
+        // Remove product from array
+        this.productAmount--;
+        for (int i = selectedProductIndex; i < this.productAmount; i++) {
+            this.inventory[i] = this.inventory[i + 1];
         }
     }
 

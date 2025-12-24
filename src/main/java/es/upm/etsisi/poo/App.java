@@ -10,6 +10,7 @@ import es.upm.etsisi.poo.commands.CashCommand;
 import es.upm.etsisi.poo.commands.ClientCommand;
 import es.upm.etsisi.poo.commands.ProductCommand;
 import es.upm.etsisi.poo.commands.TicketCommand;
+import es.upm.etsisi.poo.exceptions.FailedCommandException;
 
 public class App {
 	
@@ -181,7 +182,13 @@ public class App {
         }
 
         if (command != null) {
-            command.eval(params);
+            try {
+                command.eval(params);
+            }catch (FailedCommandException ex){
+                System.out.println(ex.getMessage());
+            }catch (Exception ex){
+                System.out.println("Unexpected error: " + ex.getMessage());
+            }
         }
     }
 

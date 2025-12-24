@@ -3,6 +3,11 @@ package es.upm.etsisi.poo.commands;
 import java.util.Arrays;
 
 import es.upm.etsisi.poo.*;
+import es.upm.etsisi.poo.exceptions.DataException;
+import es.upm.etsisi.poo.exceptions.FailedCommandException;
+import es.upm.etsisi.poo.exceptions.MissingItemException;
+
+import javax.xml.crypto.Data;
 
 /**
  * Command to manage clients (add, remove, list)
@@ -25,7 +30,8 @@ public class ClientCommand implements Command {
 	 */
 
 	@Override
-	public void eval(String[] params) {
+	public void eval(String[] params) throws FailedCommandException{
+        // Throw exception (invalid argument amount)
 		if(!App.checkArgsCountWithPrint("client", params.length, 2, 6)) { return; }
 		final String subcommand = params[1].toLowerCase();
 		switch (subcommand) {
@@ -52,7 +58,8 @@ public class ClientCommand implements Command {
 	 *                 [5] - creator cashier's identifier.
 	 * @param manager  The UserManager instance used to find the creator cashier and add the new client.
 	 */
-	public void evalAdd(String[] params) {
+	public void evalAdd(String[] params) throws FailedCommandException{
+        // Throw exception (invalid argument amount)
 		if (!App.checkArgsCountWithPrint("client add", params.length, 6)) {
 			return;
 		}
@@ -60,46 +67,39 @@ public class ClientCommand implements Command {
 		String clientName  = params[2];
 		String clientId    = params[3];
 		String clientEmail = params[4];
-		
-		if (!Client.isValidId(clientId))  {
-			System.out.printf("ticket new: error: invalid client id '%s', please enter a valid NIF/NIE\n", clientId);
-			return;
-		}
-
+        String creatorId   = params[5];
 		UserManager userManager = UserManager.getInstance();
 
-		Cashier creator = userManager.findCashier(params[5]);
-		
-		Client addedClient = userManager.addClient(clientId, clientName, clientEmail, creator);
-		if (addedClient != null) {
-			System.out.println(addedClient);
-			System.out.println("client add: ok");
-		} else {
-			System.out.printf("client add: error: client with id %s could not be added\n", params[2]);
-		}
+        try {
+            Client addedClient = userManager.addClient(clientId, clientName, clientEmail, creatorId);
+            System.out.println(addedClient);
+            System.out.println("client add: ok");
+        }catch (DataException ex){
+            throw new FailedCommandException("Cannot add the client: " + ex.getMessage());
+        }
 
 	}
 
-	public void evalRemove(String[] params) {
+	public void evalRemove(String[] params) throws FailedCommandException{
 
+        // Throw exception (invalid argument amount)
 		if (!App.checkArgsCountWithPrint("client remove", params.length, 3)) {
 			return;
 		}
-		if (UserManager.getInstance().removeClient(params[2])) {
-			System.out.println("client remove: ok");
-		} else {
-			System.out.printf("client remove: client with id '%s' not found\n", params[2]);
-		}
+        try {
+            UserManager.getInstance().removeClient(params[2]);
+            System.out.println("client remove: ok");
+        }catch (MissingItemException ex) {
+            throw new FailedCommandException("Cannot remove the client: " + ex.getMessage());
+        }
 		
 	}
 
 	public void evalList() {
-
 		Client[] clients = UserManager.getInstance().listClients();
 		Arrays.sort(clients);
 		if (clients.length == 0) {
 			System.out.println("client list: no clients.");
-
 		} else {
 			System.out.println("Client:");
 			for (Client client : clients) {
@@ -108,6 +108,4 @@ public class ClientCommand implements Command {
 			System.out.println("client list: ok");
 		}
 	}
-
 }
-

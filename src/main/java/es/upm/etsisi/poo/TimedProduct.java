@@ -20,17 +20,7 @@ public class TimedProduct extends Product {
             this.hoursForPreparing = hoursForPreparing;
         }
 
-        public static TimedType fromLabel(String label) {
-            TimedType result = null;
-            try {
-                result = TimedType.valueOf(label.toUpperCase());
-            } catch (Exception e) {
-            } finally {
-                return result;
-            }
-        }
-
-        public int getHoursForPreparing() {
+        public int getHoursForPreparing(){
             return hoursForPreparing;
         }
     }
@@ -42,9 +32,11 @@ public class TimedProduct extends Product {
     private LocalDateTime expirationDate;
 
     // It is assumed that all the parameters are valid, this should be handled before creating the object
-    public TimedProduct(int id, String name, double individualPrice, int maxParticipants, TimedType type, LocalDateTime expirationDate) {
+    public TimedProduct(int id, String name, double individualPrice, int maxParticipants, String type, LocalDateTime expirationDate) throws IllegalArgumentException{
         super(id, name, individualPrice);
-        this.type = type;
+        if (maxParticipants < 0 || maxParticipants > TIMED_PRODUCT_MAX_PEOPLE)
+            throw new IllegalArgumentException("Max participants for a timed product should be between 0 and " + TIMED_PRODUCT_MAX_PEOPLE);
+        this.type = TimedType.valueOf(type);
         this.maxParticipants = maxParticipants;
         this.expirationDate = expirationDate;
     }
