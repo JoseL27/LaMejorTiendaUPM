@@ -1,8 +1,3 @@
-E1 Version
-
-
-
-
 E2 Version
 
 Ticket, inventory, Client/Cashier module.
