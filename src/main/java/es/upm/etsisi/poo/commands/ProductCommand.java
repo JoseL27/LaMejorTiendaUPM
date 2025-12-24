@@ -10,15 +10,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
-
 /**
- *  ProductCommand class that parses a stream of tokens into a specific ProductCommand,
- *  being one of the following formats:
- *      - prod add <id> "<nombre>" <categoria> <precio> (agrega un producto con nuevo id)
- *      - prod list (lista productos actuales)
- *      - prod update <id> campo valor (campos: nombre|categoria|precio)
- *      - prod remove <id>
- *  @see Command
+ * ProductCommand class that parses a stream of tokens into a specific ProductCommand,
+ * being one of the following formats:
+ * - prod add <id> "<nombre>" <categoria> <precio> (agrega un producto con nuevo id)
+ * - prod list (lista productos actuales)
+ * - prod update <id> campo valor (campos: nombre|categoria|precio)
+ * - prod remove <id>
+ *
+ * @see Command
  */
 public class ProductCommand implements Command {
 	@Override
@@ -67,45 +67,37 @@ public class ProductCommand implements Command {
 		//  - If parsing the int succeeds then we assume its the ID and the next token is the name string (advance parsing)
 		//  - If it fails then we assume its the name and no ID was supplied (dont advance parsing), next token is the category
 
-        String productCategoryString = params[parseIndex++];
         BaseProduct.Category productCategory;
+        int productPrice;
+        int productMaxPers;
+        String productCategoryString = params[parseIndex++];
+        String productPriceString = params[parseIndex++];
         try {
             productCategory = BaseProduct.Category.valueOf(productCategoryString.toUpperCase());
-        }catch (IllegalArgumentException ex){
-            throw new FailedCommandException(String.format("%s: error: invalid %s '%s', expected one of: %s\n","prod add", "category", productCategoryString, Arrays.toString(BaseProduct.Category.values())));
-        }
-
-		String productPriceString = params[parseIndex++];
-        int productPrice;
-        try {
             productPrice = Integer.parseInt(productPriceString);
-        }catch(NumberFormatException ex){
-            throw new FailedCommandException("Unable to add product, " + productPriceString + " is not a valid integer");
-		}
 
-		boolean specifiedMaxPers = false;
-		int productMaxPers = productCategory.getMaxPersonalizations();
-		if (parseIndex < params.length) {
-			String productMaxPersString = params[parseIndex++];
+            boolean specifiedMaxPers = false;
+            productMaxPers = productCategory.getMaxPersonalizations();
+            if (parseIndex < params.length) {
+                String productMaxPersString = params[parseIndex++];
 
-            try {
                 productMaxPers = Integer.parseInt(productMaxPersString);
                 specifiedMaxPers = true;
-            }catch (NumberFormatException ex){
-                throw new FailedCommandException("Unable to add product, " + productMaxPersString + " is not a valid integer");
             }
-		}
-		
-		// Execute
-		Inventory inventory = Inventory.getInstance();
 
-        try {
+            // Execute
+            Inventory inventory = Inventory.getInstance();
+
             BaseProduct createdProduct = inventory.createBaseProduct(productId, productName, productCategoryString,
                     productPrice, productMaxPers, specifiedMaxPers);
             System.out.println(createdProduct);
             System.out.println("prod add: ok");
         }catch(DataException ex){
             throw new FailedCommandException("Unable to add the product: " + ex.getMessage());
+        }catch (NumberFormatException ex){
+            throw new FailedCommandException("Unable to add product, invalid integer value in arguments");
+        }catch (IllegalArgumentException ex){
+            throw new FailedCommandException(String.format("%s: error: invalid %s '%s', expected one of: %s\n","prod add", "category", productCategoryString, Arrays.toString(BaseProduct.Category.values())));
         }
 	}
 
@@ -117,8 +109,7 @@ public class ProductCommand implements Command {
 	 */
 	public void evalAddTimed(String[] params) throws FailedCommandException {
 		if (params.length != 6 && params.length != 7){
-			System.out.println("prod " + params[1] + ": invalid number of parameters, got " + params.length + ", expected 6 or 7");
-			return;
+			throw new FailedCommandException("prod " + params[1] + ": invalid number of parameters, got " + params.length + ", expected 6 or 7");
 		}
 
 		int id;
@@ -131,16 +122,11 @@ public class ProductCommand implements Command {
 
         // Parsing
         Inventory inventory = Inventory.getInstance();
-
         String typeArgument = params[parseIndex++];
+
         try {
             type = TimedProduct.TimedType.valueOf(typeArgument.replaceAll("add", "").toUpperCase());
-        }catch (IllegalArgumentException ex) {
-            throw new FailedCommandException(String.format("%s: error: invalid %s '%s', expected one of: %s\n"
-                    ,"prod add", "category", typeArgument, Arrays.toString(TimedProduct.TimedType.values())));
-        }
 
-        try {
 			if (params.length == 6){
 				name = params[parseIndex++];
 				id = inventory.generateUniqueProductId();
@@ -148,6 +134,7 @@ public class ProductCommand implements Command {
 				id = Integer.parseInt(params[parseIndex++]);
 				name = params[parseIndex++];
 			}
+
 			price = Double.parseDouble(params[parseIndex++]);
 			expirationDate = LocalDate.parse(params[parseIndex++]).atStartOfDay();
 			maxPeople = Integer.parseInt(params[parseIndex]);
@@ -168,6 +155,9 @@ public class ProductCommand implements Command {
             throw new FailedCommandException("Unable to add product, invalid date format.");
         }catch (DataException ex){
             throw new FailedCommandException("Unable to add product: " + ex.getMessage());
+        }catch (IllegalArgumentException ex) {
+            throw new FailedCommandException(String.format("%s: error: invalid %s '%s', expected one of: %s\n"
+                    ,"prod add", "category", typeArgument, Arrays.toString(TimedProduct.TimedType.values())));
         }
 	}
 	
@@ -188,17 +178,13 @@ public class ProductCommand implements Command {
 		if (!App.checkArgsCountWithPrint("prod update", params.length, 5)) return;
 
         int productId;
-        try {
-            productId = Integer.parseInt(params[2]);
-        }catch (NumberFormatException ex){
-            throw new FailedCommandException("Unable to update product: " + params[2] + " is not a valid integer");
-        }
-
 		Inventory inventory = Inventory.getInstance();
 		Product updatedProduct = null;
 		String fieldName = params[3].toLowerCase();
 
         try {
+            productId = Integer.parseInt(params[2]);
+
             switch (fieldName) {
                 case "name" -> {
                     String productName = params[4];
@@ -210,11 +196,7 @@ public class ProductCommand implements Command {
                 }
                 case "price" -> {
                     int productPrice;
-                    try {
-                        productPrice = Integer.parseInt(params[4]);
-                    }catch (NumberFormatException ex){
-                        throw new FailedCommandException("Unable to update product: " + params[4] + " is not a valid integer");
-                    }
+                    productPrice = Integer.parseInt(params[4]);
                     updatedProduct = inventory.updateProductPrice(productId, productPrice);
                 }
                 default -> {
@@ -225,6 +207,8 @@ public class ProductCommand implements Command {
             System.out.println("prod update: ok");
         }catch (DataException ex){
             throw new FailedCommandException("Unable to update product: " + ex.getMessage());
+        }catch (NumberFormatException ex){
+            throw new FailedCommandException("Unable to update product: invalid integer value in arguments");
         }
 	}
 

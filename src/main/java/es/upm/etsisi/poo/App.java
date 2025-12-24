@@ -2,6 +2,7 @@ package es.upm.etsisi.poo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 import java.util.Locale;
 
@@ -185,6 +186,8 @@ public class App {
                 command.eval(params);
             }catch (FailedCommandException ex){
                 System.out.println(ex.getMessage());
+            }catch (Exception ex){
+                System.out.println("Unexpected error: " + ex.getMessage());
             }
         }
     }

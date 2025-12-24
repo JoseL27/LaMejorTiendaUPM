@@ -50,7 +50,6 @@ public class BaseProduct extends Product {
 	public int getMaxPersonalizations() {
 		return this.maxPersonalizations;
 	}
-
     public Category getCategory() {
         return category;
     }
@@ -58,6 +57,7 @@ public class BaseProduct extends Product {
     public void setCategory(String category) {
         this.category = Category.valueOf(category);
     }
+    public boolean getPersonalized() {return this.personalized;}
 
 	@Override
     public String toString() {
