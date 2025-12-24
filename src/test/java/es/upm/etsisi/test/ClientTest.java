@@ -4,11 +4,10 @@ package es.upm.etsisi.test;
 
 import es.upm.etsisi.poo.Client;
 import es.upm.etsisi.poo.Cashier;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ClientTest {
+public class ClientTest extends BaseTest {
     
     public static final String[] VALID_NIFs = {
         "60860897E",

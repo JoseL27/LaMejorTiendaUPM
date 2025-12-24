@@ -1,41 +1,13 @@
 package es.upm.etsisi.test;
 
+import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import es.upm.etsisi.poo.exceptions.MissingItemException;
-import es.upm.etsisi.poo.exceptions.DuplicateItemException;
-import es.upm.etsisi.poo.exceptions.DataException;
-import es.upm.etsisi.poo.Cashier;
-import es.upm.etsisi.poo.Client;
-import es.upm.etsisi.poo.UserManager;
-import es.upm.etsisi.poo.Ticket;
-import org.junit.jupiter.api.*;
-import java.lang.reflect.Field;
-import java.util.Locale;
+import es.upm.etsisi.poo.*;
+import es.upm.etsisi.poo.exceptions.*;
 
-
-public class UserManagerTest {
+public class UserManagerTest extends BaseTest {
 	private final String testNIE = ClientTest.VALID_NIEs[0];
-    
-    // DICTATOR LOCALE
-    @BeforeAll
-        static void setEnUSLocale() {
-        Locale.setDefault(new Locale("en", "US"));
-    }
-    
-    @AfterAll
-        static void unsetEnUSLocale() {
-        Locale.setDefault(Locale.getDefault());
-    }
-    
-    @BeforeEach
-        void createNewUserManager() {
-        try {
-            Field f = UserManager.class.getDeclaredField("instance");
-            f.setAccessible(true);
-            f.set(null, null);
-        } catch (Exception e) { }
-    }
     
     @Test
         void normalAddCashier() {

@@ -2,41 +2,15 @@ package es.upm.etsisi.test;
 
 import java.util.Locale;
 
-import es.upm.etsisi.poo.Product;
-import es.upm.etsisi.poo.BaseProduct;
-import es.upm.etsisi.poo.Inventory;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterAll;
-import es.upm.etsisi.poo.exceptions.MissingItemException;
-import es.upm.etsisi.poo.exceptions.DuplicateItemException;
-import es.upm.etsisi.poo.exceptions.DataException;
+import es.upm.etsisi.poo.*;
+import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
-import java.lang.reflect.Field;
 
-public class InventoryTest {
+import es.upm.etsisi.poo.*;
+import es.upm.etsisi.poo.exceptions.*;
+
+public class InventoryTest extends BaseTest {
     
-	// DICTATOR LOCALE 
-	@BeforeAll
-        static void setEnUSLocale() {
-		Locale.setDefault(new Locale("en", "US"));
-	}
-	
-	@AfterAll
-        static void unsetEnUSLocale() {
-		Locale.setDefault(Locale.getDefault());
-	}
-    
-    @BeforeEach
-        void createNewUserManager() {
-        try {
-            Field f = Inventory.class.getDeclaredField("instance");
-            f.setAccessible(true);
-            f.set(null, null);
-        } catch (Exception e) { }
-    }
-	
 	// Success
 	@Test
         void addBaseProducts() {

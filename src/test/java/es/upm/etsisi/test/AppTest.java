@@ -1,44 +1,21 @@
 package es.upm.etsisi.test;
 
 import es.upm.etsisi.poo.App;
-import es.upm.etsisi.poo.BaseProduct;
-import es.upm.etsisi.poo.Ticket;
+import es.upm.etsisi.poo.UserManager;
 import es.upm.etsisi.poo.Inventory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.nio.file.Paths;
-import java.nio.file.Path;
-import java.nio.file.Files;
+import java.io.*;
+import java.nio.file.*;
 
 import java.util.Scanner;
 import java.util.List;
 import java.util.Iterator;
-import java.util.Locale;
 import java.lang.StringBuilder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class AppTest {
-	// DICTATOR LOCALE 
-	@BeforeAll
-        static void setEnUSLocale() {
-		Locale.setDefault(new Locale("en", "US"));
-	}
-	
-	@AfterAll
-        static void unsetEnUSLocale() {
-		Locale.setDefault(Locale.getDefault());
-	}
-	
+public class AppTest extends BaseTest {
 	private PrintStream systemOut;
 	private ByteArrayOutputStream testOut;
 	private App testApp;
@@ -134,7 +111,7 @@ public class AppTest {
 	}
     
 	// ======================================================================
-	// TESTS
+	// FULL APP TESTS
 	// ======================================================================
     
 	@Test
@@ -148,4 +125,6 @@ public class AppTest {
         void fullAppE3() throws IOException {
         fullAppTest("test-io/e3/in.txt", "test-io/e3/out.txt");
 	}
+    
+    // NOTE(erb): test all commands through runCommand()
 }

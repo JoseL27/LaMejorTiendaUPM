@@ -1,13 +1,12 @@
 /* date = December 14th 2025 11:10 pm */
 package es.upm.etsisi.test;
 
+import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import es.upm.etsisi.poo.Cashier;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 
-public class CashierTest {
+public class CashierTest extends BaseTest {
     
     public static final String[] VALID_WORKER_IDs = {
         "UW1234567",
