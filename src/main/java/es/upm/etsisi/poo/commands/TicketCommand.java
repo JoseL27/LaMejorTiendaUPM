@@ -4,6 +4,7 @@ import es.upm.etsisi.poo.*;
 import es.upm.etsisi.poo.exceptions.*;
 
 
+import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -275,14 +276,13 @@ public class TicketCommand implements Command {
         try {
             Cashier cashier = UserManager.getInstance().findCashier(cashierId);
             Ticket ticket = cashier.findTicket(ticketId);
-            if(ticket.tryClose()){
-                System.out.print(ticket.summaryString());
-                System.out.println("ticket print: ok");
-            }else{
-                System.out.printf("ticket print: error: ticket with id '%d' has TimedProducts out of date\n", ticketId);
-            }
+            ticket.tryClose();
+            System.out.print(ticket.summaryString());
+            System.out.println("ticket print: ok");
         }catch (MissingItemException ex){
             throw new FailedCommandException("Unable to print ticket, " + ex.getMessage());
+        }catch (DateTimeException ex){
+            throw new FailedCommandException("Unable to prit ticket, " + ex.getMessage());
         }
     }
 
