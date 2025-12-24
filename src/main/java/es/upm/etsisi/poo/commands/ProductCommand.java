@@ -10,15 +10,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
-
 /**
- *  ProductCommand class that parses a stream of tokens into a specific ProductCommand,
- *  being one of the following formats:
- *      - prod add <id> "<nombre>" <categoria> <precio> (agrega un producto con nuevo id)
- *      - prod list (lista productos actuales)
- *      - prod update <id> campo valor (campos: nombre|categoria|precio)
- *      - prod remove <id>
- *  @see Command
+ * ProductCommand class that parses a stream of tokens into a specific ProductCommand,
+ * being one of the following formats:
+ * - prod add <id> "<nombre>" <categoria> <precio> (agrega un producto con nuevo id)
+ * - prod list (lista productos actuales)
+ * - prod update <id> campo valor (campos: nombre|categoria|precio)
+ * - prod remove <id>
+ *
+ * @see Command
  */
 public class ProductCommand implements Command {
 	@Override
