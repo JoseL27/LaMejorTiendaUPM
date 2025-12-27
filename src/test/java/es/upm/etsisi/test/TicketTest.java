@@ -140,7 +140,7 @@ public class TicketTest extends BaseTest {
         @Test
         void addBaseProduct_sameIdDifferentPersonalizations_countsAsDifferentItems() throws Exception {
             Ticket t = new Ticket(1);
-            // CLOTHES permite personalizaciones (máx 5)
+            // CLOTHES permite personalizaciones (máx. 5)
             BaseProduct p = baseProduct(10, "Alpha", 10.0, "CLOTHES", 5, true);
 
             t.addProduct(p, 1, new String[]{"A"});
