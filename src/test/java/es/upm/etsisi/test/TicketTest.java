@@ -85,25 +85,26 @@ public class TicketTest extends BaseTest {
     class AddProduct_BaseProduct {
 
         @Test
-        void addBaseProduct_firstTime_discountAppearsForBookWhenAmountGt1() throws Exception {
+        void addBaseProduct_firstTime_discountAppearsForClothesWhenAmountGt1() throws Exception {
             Ticket t = new Ticket(1);
-            BaseProduct p = baseProduct(10, "Alpha", 10.0, "BOOK", 0, false);
+            // CLOTHES: descuento 7%
+            BaseProduct p = baseProduct(10, "Alpha", 10.0, "CLOTHES", 0, false);
 
-            t.addProduct(p, 2, new String[0]); // BOOK tiene 10% y amount=2 => aplica descuento
+            t.addProduct(p, 2, new String[0]); // 2 unidades => aplica descuento de categoría
 
             String s = t.summaryString();
             assertTrue(s.contains("Ticket : " + openComposedId(1)));
-            assertTrue(s.contains("**discount -"), "En BOOK con 2 unidades debe aparecer descuento");
+            assertTrue(s.contains("**discount -"), "En CLOTHES con 2 unidades debe aparecer descuento");
             assertTrue(s.contains("  Total price: 20.0"));
-            // descuento por item: 10% de 10.0 = 1.0; por 2 => 2.0
-            assertTrue(s.contains("  Total discount: 2.0"));
-            assertTrue(s.contains("  Final Price: 18.0"));
+            // descuento: 7% de 10.0 = 0.7 por item; por 2 => 1.4
+            assertTrue(s.contains("  Total discount: 1.4"));
+            assertTrue(s.contains("  Final Price: 18.6"));
         }
 
         @Test
         void addBaseProduct_duplicateSamePersonalizations_incrementsAmount() throws Exception {
             Ticket t = new Ticket(1);
-            BaseProduct p = baseProduct(10, "Alpha", 10.0, "BOOK", 0, false);
+            BaseProduct p = baseProduct(10, "Alpha", 10.0, "CLOTHES", 0, false);
 
             t.addProduct(p, 1, new String[0]);
             t.addProduct(p, 1, new String[0]);
@@ -115,8 +116,8 @@ public class TicketTest extends BaseTest {
         @Test
         void addBaseProduct_newProduct_overflow_throwsFullCollectionException() throws Exception {
             Ticket t = new Ticket(1);
-            BaseProduct p1 = baseProduct(10, "Alpha", 1.0, "BOOK", 0, false);
-            BaseProduct p2 = baseProduct(11, "Beta", 1.0, "BOOK", 0, false);
+            BaseProduct p1 = baseProduct(10, "Alpha", 1.0, "CLOTHES", 0, false);
+            BaseProduct p2 = baseProduct(11, "Beta", 1.0, "CLOTHES", 0, false);
 
             t.addProduct(p1, Ticket.MAX_PRODUCTS, new String[0]); // llena totalAmount=100
 
@@ -126,7 +127,7 @@ public class TicketTest extends BaseTest {
         @Test
         void addBaseProduct_duplicateOverflow_doesNothing_noException() throws Exception {
             Ticket t = new Ticket(1);
-            BaseProduct p1 = baseProduct(10, "Alpha", 1.0, "BOOK", 0, false);
+            BaseProduct p1 = baseProduct(10, "Alpha", 1.0, "CLOTHES", 0, false);
 
             t.addProduct(p1, 99, new String[0]);
             // duplicado: si se pasa de MAX, tu código NO lanza, simplemente no incrementa
@@ -139,7 +140,8 @@ public class TicketTest extends BaseTest {
         @Test
         void addBaseProduct_sameIdDifferentPersonalizations_countsAsDifferentItems() throws Exception {
             Ticket t = new Ticket(1);
-            BaseProduct p = baseProduct(10, "Alpha", 10.0, "MERCH", 3, true);
+            // CLOTHES permite personalizaciones (máx 5)
+            BaseProduct p = baseProduct(10, "Alpha", 10.0, "CLOTHES", 5, true);
 
             t.addProduct(p, 1, new String[]{"A"});
             t.addProduct(p, 1, new String[]{"B", "C"}); // distinta personalización => no es duplicado
@@ -154,16 +156,16 @@ public class TicketTest extends BaseTest {
         @Test
         void addBaseProduct_personalization_affectsPriceAndDiscount() throws Exception {
             Ticket t = new Ticket(1);
-            BaseProduct p = baseProduct(10, "Alpha", 10.0, "MERCH", 3, true);
+            BaseProduct p = baseProduct(10, "Alpha", 10.0, "CLOTHES", 5, true);
 
             t.addProduct(p, 2, new String[]{"X", "Y"}); // 2 pers => +20% => 12.0 cada uno
 
             String s = t.summaryString();
             // total price = 12.0*2 = 24.0
             assertTrue(s.contains("  Total price: 24.0"));
-            // descuento BOOK 10%: 1.2 por item => 2.4
-            assertTrue(s.contains("  Total discount: 2.4"));
-            assertTrue(s.contains("  Final Price: 21.6"));
+            // descuento CLOTHES 7%: 0.84 por item => 1.68
+            assertTrue(s.contains("  Total discount: 1.68"));
+            assertTrue(s.contains("  Final Price: 22.32"));
         }
     }
 
@@ -208,7 +210,7 @@ public class TicketTest extends BaseTest {
         @Test
         void removeProduct_existing_returnsTrue_andEmptiesTicket() throws Exception {
             Ticket t = new Ticket(1);
-            BaseProduct p = baseProduct(10, "Alpha", 10.0, "BOOK", 0, false);
+            BaseProduct p = baseProduct(10, "Alpha", 10.0, "CLOTHES", 0, false);
 
             t.addProduct(p, 1, new String[0]);
             assertTrue(t.removeProduct(10));
@@ -224,8 +226,8 @@ public class TicketTest extends BaseTest {
         @Test
         void removeProduct_freesCapacity_baseProduct() throws Exception {
             Ticket t = new Ticket(1);
-            BaseProduct p1 = baseProduct(10, "Alpha", 1.0, "BOOK", 0, false);
-            BaseProduct p2 = baseProduct(11, "Beta", 1.0, "BOOK", 0, false);
+            BaseProduct p1 = baseProduct(10, "Alpha", 1.0, "CLOTHES", 0, false);
+            BaseProduct p2 = baseProduct(11, "Beta", 1.0, "CLOTHES", 0, false);
 
             t.addProduct(p1, 100, new String[0]);
             assertThrows(FullCollectionException.class, () -> t.addProduct(p2, 1, new String[0]));
@@ -268,7 +270,7 @@ public class TicketTest extends BaseTest {
         @Test
         void tryClose_makesDefensiveCopy_productsNotAffectedByExternalMutation() throws Exception {
             Ticket t = new Ticket(1);
-            BaseProduct p = baseProduct(10, "Alpha", 10.0, "MERCH", 3, true);
+            BaseProduct p = baseProduct(10, "Alpha", 10.0, "CLOTHES", 5, true);
             String[] pers = new String[]{"X"};
 
             t.addProduct(p, 1, pers);
