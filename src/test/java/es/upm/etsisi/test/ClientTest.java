@@ -106,7 +106,7 @@ public class ClientTest extends BaseTest {
                                new Client(VALID_NIEs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
                                
                                /* 
-                                                              new Client(VALID_CIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
+                                new Client(VALID_CIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
                                 */
                            });
     }
