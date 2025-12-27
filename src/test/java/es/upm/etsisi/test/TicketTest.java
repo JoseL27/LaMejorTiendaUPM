@@ -139,7 +139,7 @@ public class TicketTest extends BaseTest {
         @Test
         void addBaseProduct_sameIdDifferentPersonalizations_countsAsDifferentItems() throws Exception {
             Ticket t = new Ticket(1);
-            BaseProduct p = baseProduct(10, "Alpha", 10.0, "BOOK", 3, true);
+            BaseProduct p = baseProduct(10, "Alpha", 10.0, "MERCH", 3, true);
 
             t.addProduct(p, 1, new String[]{"A"});
             t.addProduct(p, 1, new String[]{"B", "C"}); // distinta personalización => no es duplicado
@@ -154,7 +154,7 @@ public class TicketTest extends BaseTest {
         @Test
         void addBaseProduct_personalization_affectsPriceAndDiscount() throws Exception {
             Ticket t = new Ticket(1);
-            BaseProduct p = baseProduct(10, "Alpha", 10.0, "BOOK", 3, true);
+            BaseProduct p = baseProduct(10, "Alpha", 10.0, "MERCH", 3, true);
 
             t.addProduct(p, 2, new String[]{"X", "Y"}); // 2 pers => +20% => 12.0 cada uno
 
@@ -268,7 +268,7 @@ public class TicketTest extends BaseTest {
         @Test
         void tryClose_makesDefensiveCopy_productsNotAffectedByExternalMutation() throws Exception {
             Ticket t = new Ticket(1);
-            BaseProduct p = baseProduct(10, "Alpha", 10.0, "BOOK", 3, true);
+            BaseProduct p = baseProduct(10, "Alpha", 10.0, "MERCH", 3, true);
             String[] pers = new String[]{"X"};
 
             t.addProduct(p, 1, pers);
