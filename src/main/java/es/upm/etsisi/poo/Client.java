@@ -9,12 +9,15 @@ public class Client extends User implements Comparable<Client> {
 
 	private final Cashier managedBy;
 	private final List<Integer> ticketIds;
+    private final String clientEmail;
 
 	public Client(String id, String name, String email, Cashier cashier) throws IllegalArgumentException {
-		super(id, name, email);
+		super(id, name);
 		this.managedBy = cashier;
 		this.ticketIds = new ArrayList<>();
+        this.clientEmail = email;
 
+        if (email == null) throw new IllegalArgumentException("User email can not be null");
         if (!isValidId(id)) throw new IllegalArgumentException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
         else if (cashier == null) throw new IllegalArgumentException("Client needs an assigned cashier to be created");
 	}
@@ -26,7 +29,7 @@ public class Client extends User implements Comparable<Client> {
 	}
 
 	public static boolean isValidId(String id) {
-		// See: https://www.interior.gob.es/opencms/en/servicios-al-ciudadano/tramites-y-gestiones/dni/calculo-del-digito-de-control-del-nif-nie
+        // See: https://www.interior.gob.es/opencms/en/servicios-al-ciudadano/tramites-y-gestiones/dni/calculo-del-digito-de-control-del-nif-nie
 		// Basic sanity treatment to input
 		if (id == null || id.length() != 9)
 			return false;
@@ -84,7 +87,11 @@ public class Client extends User implements Comparable<Client> {
 		return expectedChecksumLetter == nifChecksumLetter;
 	}
 
-	@Override
+    public String getClientEmail() {
+        return clientEmail;
+    }
+
+    @Override
 	public int compareTo(Client c) {
 		return this.getName().compareTo(c.getName());
 	}
@@ -92,6 +99,6 @@ public class Client extends User implements Comparable<Client> {
 	@Override
 	public String toString() {
 		return String.format("Client{identifier='%s', name='%s', email='%s', cash=%s}",
-							 this.getId(), this.getName(), this.getEmail(), this.managedBy.getId());
+							 this.getId(), this.getName(), this.getClientEmail(), this.managedBy.getId());
 	}
 }

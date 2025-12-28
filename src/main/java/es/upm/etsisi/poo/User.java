@@ -4,10 +4,9 @@ public abstract class User {
     private String id;
     private String name;
 
-    public User(String id, String name, String email) throws IllegalArgumentException{
+    public User(String id, String name) throws IllegalArgumentException{
         if (id == null) throw new IllegalArgumentException("User id can not be null");
         if (name == null) throw new IllegalArgumentException("User name can not be null");
-        if (email == null) throw new IllegalArgumentException("User email can not be null");
         this.id = id;
         this.name = name;
     }
