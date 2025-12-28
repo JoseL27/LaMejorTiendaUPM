@@ -9,18 +9,15 @@ import java.util.List;
 public class Cashier extends User implements Comparable<Cashier> {
     public static final String COMPANY_DOMAIN = "upm.es";
     private List<Ticket> createdTickets;
-    private final String CashierEmail;
 
     /**
      * Creates new cashier with the id, name and email given in the parameters
      */
     public Cashier(String id, String name, String email) throws IllegalArgumentException{
         // Should handle: valid id format, valid upm email, none of the arguments is null
-        super(id, name);
+        super(id, name, email);
         createdTickets = new ArrayList<>();
-        CashierEmail = email;
 
-        if (email == null) throw new IllegalArgumentException("User email can not be null");
         if (!isValidId(id)) throw new IllegalArgumentException("Invalid cashier id: " + id);
         else if (!isCompanyEmail(email)) throw new IllegalArgumentException("Invalid cashier email: " + email);
     }
@@ -96,10 +93,6 @@ public class Cashier extends User implements Comparable<Cashier> {
         return this.createdTickets.size();
     }
 
-    public String getCashierEmail() {
-        return CashierEmail;
-    }
-
     /**
      * Checks if email is a company email
      * @return true if email is not null and contains a single @ and COMPANY_DOMAIN after it
@@ -128,8 +121,6 @@ public class Cashier extends User implements Comparable<Cashier> {
 			&& (App.tryParseInt(id.substring(2)) != null);
 	}
 
-
-
 	@Override
 	public int compareTo(Cashier c) {
 		return this.getName().compareTo(c.getName());
@@ -138,7 +129,7 @@ public class Cashier extends User implements Comparable<Cashier> {
     @Override
     public String toString() {
 		return String.format("Cash{identifier='%s', name='%s', email='%s'}",
-							 this.getId(), this.getName(), this.getCashierEmail());
+							 this.getId(), this.getName(), this.getEmail());
 	}
 
 }
