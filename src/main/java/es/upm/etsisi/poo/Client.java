@@ -15,7 +15,7 @@ public class Client extends User implements Comparable<Client> {
 		this.managedBy = cashier;
 		this.ticketIds = new ArrayList<>();
 
-        if (!isValidId(id)) throw new IllegalArgumentException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
+        if (!isValidDNI(id)) throw new IllegalArgumentException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
         else if (cashier == null) throw new IllegalArgumentException("Client needs an assigned cashier to be created");
 	}
 
@@ -25,7 +25,7 @@ public class Client extends User implements Comparable<Client> {
         ticketIds.add(ticketId);
 	}
 
-	public static boolean isValidId(String id) {
+	public static boolean isValidDNI(String id) {
 		// See: https://www.interior.gob.es/opencms/en/servicios-al-ciudadano/tramites-y-gestiones/dni/calculo-del-digito-de-control-del-nif-nie
 		// Basic sanity treatment to input
 		if (id == null || id.length() != 9)

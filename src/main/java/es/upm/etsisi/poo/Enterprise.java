@@ -1,17 +1,11 @@
 package es.upm.etsisi.poo;
 
-import java.util.Locale;
-
 public class Enterprise extends User {
-    public Enterprise(String id, String name) throws IllegalArgumentException {
-        super(id, name);
-        if (!isValidId(id)) throw new IllegalArgumentException("Invalid cashier id: " + id);
+    public Enterprise(String id, String name,String email) throws IllegalArgumentException {
+        super(id, name, email);
+        if (!isValidNIF(id)) throw new IllegalArgumentException("Invalid cashier id: " + id);
     }
 
-    public static boolean isValidId(String id) {
-        boolean result = false;
-        return result;
-    }
 
 
     private static final String CONTROL_LETTERS = "JABCDEFGHI"; // 0->J, 1->A, ... 9->I
