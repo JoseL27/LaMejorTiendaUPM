@@ -119,6 +119,7 @@ public class Cashier extends User implements Comparable<Cashier> {
         return result;
     }
 
+
 	public static boolean isValidId(String id) {
 		return id != null
             && id.length() == 9
