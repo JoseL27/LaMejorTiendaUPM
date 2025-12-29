@@ -231,8 +231,4 @@ public class Inventory {
         return greatestId + 1;
     }
 
-    public boolean isTimedProduct(Product product) {
-        return product instanceof TimedProduct;
-    }
-
 }

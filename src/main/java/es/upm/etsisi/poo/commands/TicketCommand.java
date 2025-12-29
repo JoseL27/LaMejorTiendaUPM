@@ -160,7 +160,7 @@ public class TicketCommand implements Command {
 			throw new FailedCommandException(String.format("ticket add: error: could not find product with id %s\n", productId));
 		}
       
-    if (Inventory.getInstance().isTimedProduct(productToAdd)) {
+    if (istanceof(productToAdd)) {
           TimedProduct timedProduct = (TimedProduct) productToAdd; //Cast before checking
           if (LocalDateTime.now().isAfter(timedProduct.getExpirationDate())) {
             throw new FailedCommandException(String.format("ticket add: error: not enough time to prepare, you need more than %s hours\n",
