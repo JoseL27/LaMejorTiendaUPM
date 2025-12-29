@@ -60,7 +60,7 @@ public class TicketCommand implements Command {
 		}
 		
 		String clientId = params[params.length - 1];
-		if (!Client.isValidDNI(clientId)) {
+		if (Client.isValidId(clientId)==null) {
             throw new FailedCommandException(String.format("ticket new: error: invalid client id '%s', please enter a valid NIF/NIE\n", clientId));
 		}
 
