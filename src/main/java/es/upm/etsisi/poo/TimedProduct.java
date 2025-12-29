@@ -53,7 +53,7 @@ public class TimedProduct extends Product {
     }
     
     @Override
-        public boolean duplicateOf(Product product) {
+        public boolean duplicateOf(InventoryItem product) {
         return (product != null)
             && product.getClass() == this.getClass()
             && product.getId() != this.getId();
