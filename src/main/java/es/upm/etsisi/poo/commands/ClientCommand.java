@@ -71,7 +71,7 @@ public class ClientCommand implements Command {
 		UserManager userManager = UserManager.getInstance();
 
         try {
-            Client addedClient = userManager.addClient(clientId, clientName, clientEmail, creatorId);
+            Client addedClient = userManager.addClient(clientId, clientName, clientEmail, creatorId, Client.isValidId(clientId));
             System.out.println(addedClient);
             System.out.println("client add: ok");
         }catch (DataException ex){

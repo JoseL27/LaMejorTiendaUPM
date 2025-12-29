@@ -12,13 +12,16 @@ public class Client extends User implements Comparable<Client> {
 
     private final Cashier managedBy;
     private final List<Integer> ticketIds;
+    private final IdType idType;
 
-    public Client(String id, String name, String email, Cashier cashier) throws IllegalArgumentException {
+    public Client(String id, String name, String email, Cashier cashier, IdType idType) throws IllegalArgumentException {
         super(id, name, email);
         this.managedBy = cashier;
+        this.idType = idType;
+
         this.ticketIds = new ArrayList<>();
 
-        if (isValidId(id) == null)
+        if (idType == null)
             throw new IllegalArgumentException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
         else if (cashier == null) throw new IllegalArgumentException("Client needs an assigned cashier to be created");
     }
