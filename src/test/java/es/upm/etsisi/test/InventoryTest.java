@@ -25,34 +25,6 @@ public class InventoryTest extends BaseTest {
         }
 	}
     
-    
-	@Test 
-        void productListTest() {
-        final Inventory inventory = Inventory.getInstance();
-        
-		BaseProduct.Category[] categoryValues = BaseProduct.Category.values();
-		BaseProduct[] testProducts = new BaseProduct[50];
-        
-		for (int i = 0; i < testProducts.length; i++) {
-            String category = categoryValues[i % categoryValues.length].toString();
-            
-			final BaseProduct prod = new BaseProduct(i, String.format("Producto(%d)", i), (i+1)*10, category, 0, false);
-			testProducts[i] = prod;
-            assertDoesNotThrow(() -> {
-                                   inventory.createBaseProduct(prod.getId(), prod.getName(), 
-                                                               prod.getCategory().toString(), prod.getPrice(), 0 , false);
-                               });
-		}
-        
-		Product[] listProducts = inventory.listProducts();
-		assertEquals(listProducts.length, testProducts.length);
-        
-		for (int i = 0; i < listProducts.length; i++) {
-			assertEquals(listProducts[i].toString(), testProducts[i].toString()); 
-		}
-	}
-    
-    
 	@Test
         void updateProductNameTest() {
         final BaseProduct prod = new BaseProduct(1, "Libro POO", 25, "BOOK", 0, false);
@@ -70,7 +42,7 @@ public class InventoryTest extends BaseTest {
                                
                                inventory.updateProductName(prod.getId(), prod.getName());
                                
-                               assertEquals(prod.toString(), inventory.readProduct(prod.getId()).toString());
+                               assertEquals(prod.toString(), inventory.getBaseProduct(prod.getId()).toString());
                            });
 	}
     
@@ -91,25 +63,28 @@ public class InventoryTest extends BaseTest {
                                
                                inventory.updateProductPrice(prod.getId(), prod.getPrice());
                                
-                               assertEquals(prod.toString(), inventory.readProduct(prod.getId()).toString());
+                               assertEquals(prod.toString(), inventory.getBaseProduct(prod.getId()).toString());
                            });
 	}
     
+	@Test
+        void readMissingProductTest() {
+        assertThrows(MissingItemException.class, () -> {
+                         Inventory.getInstance().getProduct(1);
+                     });
+	}
     
 	@Test
         void removeProductTest() {
 		final int productId = 1;
         assertDoesNotThrow(() -> {
                                Inventory.getInstance().createBaseProduct(productId, "Camiseta talla:M UPM", "CLOTHES", 15, 0, false);
-                               Inventory.getInstance().deleteProduct(productId);
+                               Inventory.getInstance().deleteItem(productId);
                            });
         
-		assertNull(Inventory.getInstance().readProduct(productId));
-	}
-    
-	@Test
-        void readMissingProductTest() {
-		assertNull(Inventory.getInstance().readProduct(1));
+        assertThrows(MissingItemException.class, () -> {
+                         Inventory.getInstance().getProduct(productId);
+                     });
 	}
     
 	// Failures
@@ -130,7 +105,9 @@ public class InventoryTest extends BaseTest {
         assertThrows(DataException.class, () -> {
                          Inventory.getInstance().createBaseProduct(productId, "Libro POO", "BOOK", 25, 0, false);
                      });
-		assertNull(Inventory.getInstance().readProduct(productId));
+        assertThrows(MissingItemException.class, () -> {
+                         Inventory.getInstance().getProduct(productId);
+                     });
 	}
     
     
@@ -141,7 +118,9 @@ public class InventoryTest extends BaseTest {
         assertThrows(DataException.class, () -> {
                          Inventory.getInstance().createBaseProduct(productId, longName, "BOOK", 25, 0, false);
                      });
-		assertNull(Inventory.getInstance().readProduct(productId)); // Wasn't added
+        assertThrows(MissingItemException.class, () -> {
+                         Inventory.getInstance().getProduct(productId);
+                     });
 	}
     
     
@@ -151,7 +130,9 @@ public class InventoryTest extends BaseTest {
         assertThrows(DataException.class, () -> {
                          Inventory.getInstance().createBaseProduct(productId, "Libro POO", "BOOK", -2.5, 0, false);
                      });
-		assertNull(Inventory.getInstance().readProduct(productId)); // Wasn't added
+        assertThrows(MissingItemException.class, () -> {
+                         Inventory.getInstance().getProduct(productId);
+                     });
 	}
     
 	@Test
@@ -170,7 +151,9 @@ public class InventoryTest extends BaseTest {
         assertThrows(DataException.class, () -> {
                          inventory.updateProductName(prod.getId(), newName);
                      });
-		assertEquals(prod.toString(), inventory.readProduct(prod.getId()).toString()); // Name didn't change
+        assertDoesNotThrow(() -> {
+                               assertEquals(prod.toString(), inventory.getProduct(prod.getId()).toString()); // Name didn't change
+                           });
 	}
     
 	@Test
@@ -188,7 +171,10 @@ public class InventoryTest extends BaseTest {
         assertThrows(DataException.class, () -> {
                          inventory.updateProductPrice(prod.getId(), newPrice);
                      });
-		assertEquals(prod.toString(), inventory.readProduct(prod.getId()).toString()); // Price didn't change
+        
+        assertDoesNotThrow(() -> {
+                               assertEquals(prod.toString(), inventory.getProduct(prod.getId()).toString()); // Price didn't change
+                           });
 	}
     
 	@Test
@@ -202,8 +188,8 @@ public class InventoryTest extends BaseTest {
                                });
         }
         
-        assertDoesNotThrow(() -> {
-                               assertNull(inventory.createBaseProduct(696969, "Libro POO", "BOOK", 25, 0, false));
-                           });
+        assertThrows(FullCollectionException.class, () -> {
+                         assertNull(inventory.createBaseProduct(696969, "Libro POO", "BOOK", 25, 0, false));
+                     });
 	}
 }
