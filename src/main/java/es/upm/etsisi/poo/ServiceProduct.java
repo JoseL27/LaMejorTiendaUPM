@@ -31,7 +31,7 @@ public class ServiceProduct extends InventoryItem {
     }
     
     
-    public ServiceProduct newServiceFromId(String id, Category category, LocalDateTime expirationDate) {
+    public static ServiceProduct newFromId(String id, Category category, LocalDateTime expirationDate) throws IllegalArgumentException {
         int idNum = 0;
         
         if (id != null && id.length() > 0) {
