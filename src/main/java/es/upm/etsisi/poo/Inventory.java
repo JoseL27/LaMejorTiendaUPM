@@ -184,11 +184,6 @@ public class Inventory {
         return (nextProductId++) + 1;
     }
     
-    public boolean isTimedProduct(Product product) {
-        return product instanceof TimedProduct;
-    }
-    
-    
     private InventoryItem addItem(InventoryItem item) throws FullCollectionException, DuplicateItemException {
         if (this.items.size() >= MAX_PRODUCTS) {
             throw new FullCollectionException("Product inventory is full");
