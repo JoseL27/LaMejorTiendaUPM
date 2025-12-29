@@ -1,5 +1,7 @@
 package es.upm.etsisi.poo;
 
+import es.upm.etsisi.poo.exceptions.MissingItemException;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -7,55 +9,44 @@ import java.util.List;
 public class Cashier extends User implements Comparable<Cashier> {
     public static final String COMPANY_DOMAIN = "upm.es";
     private List<Ticket> createdTickets;
-    
-    /* Funcionalidades relacionadas que deberian implementar otras clases:
-     * -Dar de alta clientes: desde el lugar donde se creen se debe comprobar que existe el cajero y pasar su id al cliente
-     * -Operaciones de ticket (add, remove, print y close): El cajero no estara implicado en las operaciones,
-     *      unicamente se comprobara si el id que realiza la operacion es el mismo que lo creo
-     * -Comprobar si el id existe antes de crear el cajero
-     * -Comprobar si el id de ticket existe antes de crear un ticket (desde el comando)
-    */
-    
-    
+
     /**
      * Creates new cashier with the id, name and email given in the parameters
      */
-    public Cashier(String id, String name, String email) {
+    public Cashier(String id, String name, String email) throws IllegalArgumentException{
+        // Should handle: valid id format, valid upm email, none of the arguments is null
         super(id, name, email);
         createdTickets = new ArrayList<>();
-        
-        if (!isValidId(id)) 
-            throw new IllegalArgumentException("Invalid cashier id: " + id + ", please enter a valid one");
-        
-        if (!isCompanyEmail(email)) throw new IllegalArgumentException("Invalid company email "+email+", please enter a valid one");
+
+        if (!isValidId(id)) throw new IllegalArgumentException("Invalid cashier id: " + id);
+        else if (!isCompanyEmail(email)) throw new IllegalArgumentException("Invalid cashier email: " + email);
     }
-    
+
     /**
      * Creates a new ticket the id given in the parameter.
      */
-    public Ticket createTicket(int id){
+    public Ticket createTicket(int id) throws IllegalArgumentException{
         Ticket created = null;
-        if (id >= 0){
-			created = new Ticket(id);
-            createdTickets.add(created);
-        }
+        created = new Ticket(id);
+        createdTickets.add(created);
 		return created;
     }
-    
-	public Ticket findTicket(int ticketId) {
+
+	public Ticket findTicket(int ticketId) throws MissingItemException {
         Iterator<Ticket> iterator = createdTickets.iterator();
         Ticket result = null;
         Ticket currentTicket;
-        
+
         while (iterator.hasNext() && result == null){
             currentTicket = iterator.next();
             if (currentTicket.getId() == ticketId){
                 result = currentTicket;
             }
         }
+        if (result == null) throw new MissingItemException("The cashier does not own ticket with id " + ticketId);
 		return result;
 	}
-    
+
     /**
      * Returns a string representing the tickets created by this cashier
      * @return A string with the id and state of all the tickets created by this cashier, sorted by id
@@ -81,7 +72,7 @@ public class Cashier extends User implements Comparable<Cashier> {
         }
         return result.toString();
     }
-    
+
     /**
      * Returns array of Tickets created by this instance of Cashier
      * @return Array of tickets, zero length array if there are none
@@ -97,41 +88,47 @@ public class Cashier extends User implements Comparable<Cashier> {
             return new Ticket[0];
         }
     }
-    
+
     public int getCreatedTicketAmount() {
         return this.createdTickets.size();
     }
-    
+
     /**
      * Checks if email is a company email
-     * @return true if email contains a single @ and COMPANY_DOMAIN after it
+     * @return true if email is not null and contains a single @ and COMPANY_DOMAIN after it
      */
     public static boolean isCompanyEmail(String email){
         boolean result = true;
-        String[] splitEmail = email.split("@");
-        
-        if (splitEmail.length != 2 || !splitEmail[1].equals(COMPANY_DOMAIN)) {
-            result = false;
+
+        if (email == null){
+            result =  false;
+        }else {
+            String[] splitEmail = email.split("@");
+
+            if (splitEmail.length != 2 || !splitEmail[1].equals(COMPANY_DOMAIN)) {
+                result = false;
+            }
         }
         return result;
     }
-    
+
 	public static boolean isValidId(String id) {
-		return id.length() == 9 
+		return id != null
+            && id.length() == 9
 			&& Character.toUpperCase(id.charAt(0)) == 'U'
 			&& Character.toUpperCase(id.charAt(1)) == 'W'
 			&& (App.tryParseInt(id.substring(2)) != null);
 	}
-    
+
 	@Override
-        public int compareTo(Cashier c) {
+	public int compareTo(Cashier c) {
 		return this.getName().compareTo(c.getName());
 	}
-    
+
     @Override
-        public String toString() {
+    public String toString() {
 		return String.format("Cash{identifier='%s', name='%s', email='%s'}",
 							 this.getId(), this.getName(), this.getEmail());
 	}
-    
+
 }

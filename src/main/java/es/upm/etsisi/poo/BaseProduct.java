@@ -14,15 +14,15 @@ public class BaseProduct extends Product {
         CLOTHES	    (0.07f, 5),
         BOOK	   	(0.10f, 0),
         ELECTRONICS	(0.03f, 2);
-
+        
         public final float discountPercent;
         public final int maxPersonalizations;
-
+        
         private Category(float discountPercent, int maxPersonalizations) {
             this.discountPercent = discountPercent;
             this.maxPersonalizations = maxPersonalizations;
         }
-
+        
         public float getDiscountPercent() {
             return this.discountPercent;
         }
@@ -31,36 +31,36 @@ public class BaseProduct extends Product {
 			return this.maxPersonalizations;
 		}
     }
-
+    
     private Category category;
 	private int maxPersonalizations;
 	private boolean personalized;
-
+    
     public BaseProduct(int id, String name, double price, String category, int maxPersonalizations, boolean personalized) throws IllegalArgumentException{
         super(id, name, price);
         Category parsedCategory = Category.valueOf(category);
         if (maxPersonalizations < 0 || maxPersonalizations > parsedCategory.getMaxPersonalizations())
             throw new IllegalArgumentException("Expected a number between 0 and " + parsedCategory.getMaxPersonalizations() + " for max personalizations, got " + maxPersonalizations);
-
+        
         this.category = parsedCategory;
         this.maxPersonalizations = maxPersonalizations;
 		this.personalized = personalized;
     }
-
+    
 	public int getMaxPersonalizations() {
 		return this.maxPersonalizations;
 	}
     public Category getCategory() {
         return category;
     }
-
+    
     public void setCategory(String category) {
         this.category = Category.valueOf(category);
     }
     public boolean getPersonalized() {return this.personalized;}
-
+    
 	@Override
-    public String toString() {
+        public String toString() {
 		return toString(null);
 	}
 	
@@ -91,12 +91,10 @@ public class BaseProduct extends Product {
 		sb.append("}");
         return sb.toString();
     }
-
+    
 	// NOTE(enrique): Any BaseProduct is multiple of any product.
 	// Meaning there can be many instances of it in a ticket.
-
-	@Override
-	public boolean duplicateOf(Product product) {
+    public boolean duplicateOf(InventoryItem product) {
 		return false; 
 	}
 }

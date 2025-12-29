@@ -7,7 +7,7 @@ import es.upm.etsisi.poo.Cashier;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ClientTest extends BaseTest {
+public class ClientTest extends BaseTest { 
     
     public static final String[] VALID_NIFs = {
         "60860897E",

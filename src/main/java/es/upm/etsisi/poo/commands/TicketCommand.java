@@ -23,7 +23,7 @@ public class TicketCommand implements Command {
      *
      * @param params      The token stream to parse on each subcommand
      */
-    public void eval(String[] params) throws FailedCommandException {
+    public void eval(String[] params) throws FailedCommandException, DataException {
         // Parse
         if (!App.checkMinArgsCountWithPrint("ticket", params.length, 2)) return;
 
@@ -60,7 +60,7 @@ public class TicketCommand implements Command {
 		}
 		
 		String clientId = params[params.length - 1];
-		if (!Client.isValidId(clientId)) {
+		if (Client.isValidId(clientId)==null) {
             throw new FailedCommandException(String.format("ticket new: error: invalid client id '%s', please enter a valid NIF/NIE\n", clientId));
 		}
 
@@ -114,7 +114,7 @@ public class TicketCommand implements Command {
      * @param userManager Context
      * @param inventory   Context
      */
-    private void evalAdd(String[] params) throws FailedCommandException{
+    private void evalAdd(String[] params) throws FailedCommandException, DataException {
         // Parse
         if (!App.checkMinArgsCountWithPrint("ticket add", params.length, 4))
             return;
@@ -152,7 +152,7 @@ public class TicketCommand implements Command {
         }
 
         // Execute
-        Product productToAdd = Inventory.getInstance().readProduct(productId);
+        Product productToAdd = Inventory.getInstance().getProduct(productId);
 		if (ticketId < 0) {
 			throw new FailedCommandException(String.format("ticket add: error: ticket id '%d' is invalid, expected a positive number\n", ticketId));
 		}
@@ -160,9 +160,9 @@ public class TicketCommand implements Command {
 			throw new FailedCommandException(String.format("ticket add: error: could not find product with id %s\n", productId));
 		}
       
-    if (Inventory.getInstance().isTimedProduct(productToAdd)) {
-          TimedProduct timedProduct = (TimedProduct) productToAdd; //Cast before checking
-          if (LocalDateTime.now().isAfter(timedProduct.getExpirationDate())) {
+    if (productToAdd instanceof TimedProduct timedProduct) {
+        //Cast before checking
+        if (LocalDateTime.now().isAfter(timedProduct.getExpirationDate())) {
             throw new FailedCommandException(String.format("ticket add: error: not enough time to prepare, you need more than %s hours\n",
                       timedProduct.getType().getHoursForPreparing()));
           }

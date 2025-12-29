@@ -5,71 +5,56 @@ import es.upm.etsisi.poo.exceptions.DuplicateItemException;
 import es.upm.etsisi.poo.exceptions.FullCollectionException;
 import es.upm.etsisi.poo.exceptions.MissingItemException;
 
+import java.util.*;
 import java.time.LocalDateTime;
 
-/**
- * Manages Create Read Update Delete operations for Products using Array to store the products. Provides input
- * sanity checks for all operations.
- */
+class InventoryItemId { 
+    public int id;
+    public boolean isProduct;
+    
+    public InventoryItemId(int id, boolean isProduct) {
+        this.id = id;
+        this.isProduct = isProduct;
+    }
+    
+    @Override
+        public int hashCode() {
+        if (isProduct) {
+            return id;
+        } else {
+            return -id;
+        }
+    }
+    
+    @Override
+        public boolean equals(Object obj) {
+        return (obj != null && obj.getClass() == this.getClass() && this.hashCode() == obj.hashCode());
+    }
+}
+
 public class Inventory {
-
+    
     public static final int MAX_PRODUCTS = 200; // E1: no more than 200 products
-
-    private Product[] inventory; // List
-    private int productAmount;
-
-
+    
+    private Map<InventoryItemId, InventoryItem> items;
+    private int nextProductId;
+    private int nextServiceId;
+    
     private static Inventory instance = new Inventory();
-
+    
     public static Inventory getInstance() {
         if (instance == null) {
             instance = new Inventory();
         }
         return instance;
     }
-
+    
     private Inventory() {
-        this.inventory = new Product[MAX_PRODUCTS];
-        this.productAmount = 0;
+        this.items = new HashMap<>();
+        nextProductId = 0;
+        nextServiceId = 0;
     }
-
-    /**
-     * Attempts to find the product with the same ID, returning its position in the array
-     *
-     * @param id Product ID
-     * @return Product object's index in the array, -1 if not found or ID is invalid (ID < 0)
-     */
-    private int readProductIndex(int id) {
-        if (!Product.isValidId(id)) return -1;
-        int result = -1;
-        int i = 0;
-        while (result == -1 && i < this.productAmount) {
-            if (this.inventory[i].getId() == id)
-                result = i;
-            i++;
-        }
-        return result;
-    }
-
-    /**
-     * Attempts to find the product with the same ID
-     *
-     * @param id Product ID
-     * @return Product with the specified id, null if not found or ID is invalid (ID < 0)
-     */
-    public Product readProduct(int id) {
-        if (!Product.isValidId(id)) return null;
-        // Linear search for products with the same ID
-        Product result = null;
-        int i = 0;
-        while (result == null && i < this.productAmount) {
-            if (this.inventory[i].getId() == id)
-                result = this.inventory[i];
-            i++;
-        }
-        return result;
-    }
-
+    
     /**
      * Creates a product and adds it to the array
      *
@@ -80,46 +65,49 @@ public class Inventory {
      * @return true if the product is created correctly, false in other case
      */
     public BaseProduct createBaseProduct(int id, String name, String category, double price, int maxPers, boolean personalized) throws DataException{
-
-        // Check inventory full
-        if (this.productAmount >= MAX_PRODUCTS) return null;
-
-        Product selectedProduct = this.readProduct(id);
-        if (selectedProduct != null) throw new DuplicateItemException("Product with id " + id + " already exists");
-
+        BaseProduct prodToAdd = null;
         try {
-            BaseProduct prodToAdd = new BaseProduct(id, name, price, category, maxPers, personalized);
-            this.inventory[this.productAmount] = prodToAdd;
-            this.productAmount++;
-            return prodToAdd;
-        }catch (IllegalArgumentException ex){
-            throw new DataException("Error creating product: " + ex.getMessage());
+            prodToAdd = new BaseProduct(id, name, price, category, maxPers, personalized);
+        }catch (Exception ex){
+            throw new DataException("Failed to create product " + ex.getMessage());
         }
+        return (BaseProduct)addItem(prodToAdd);
     }
-
+    
     /**
      * Tries to create a new timed product with its attributes set to the values of the parameters
      *
      * @return The product that was created, or null if the creation failed
      */
     public TimedProduct createTimedProduct(int id, String name, double price, int people, String type, LocalDateTime expirationDate) throws DataException{
-        // Check inventory full
-        if (this.productAmount >= MAX_PRODUCTS) throw new FullCollectionException("No space left in inventory");
-
-        //Check if already exists
-        Product selectedProduct = this.readProduct(id);
-        if (selectedProduct != null) throw new DuplicateItemException("Product with id " + id + " already exists");
-
+        TimedProduct prodToAdd = null;
         try {
-            TimedProduct prodToAdd = new TimedProduct(id, name, price, people, type, expirationDate);
-            this.inventory[this.productAmount] = prodToAdd;
-            this.productAmount++;
-            return prodToAdd;
+            prodToAdd = new TimedProduct(id, name, price, people, type, expirationDate);
         }catch (IllegalArgumentException ex){
-            throw new DataException("Error creating product: " + ex.getMessage());
+            throw new DataException("Failed to create product: " + ex.getMessage());
         }
+        return (TimedProduct)addItem(prodToAdd);
     }
-
+    
+    
+    /**
+     * Tries to create a new service product
+     *
+     * @return The product that was created, or null if the creation failed
+     */
+    public ServiceProduct createServiceProduct(ServiceProduct.Category category, LocalDateTime expirationDate) throws DataException {
+        ServiceProduct service = null;
+        try {
+            int id = (nextServiceId++) + 1;
+            service = new ServiceProduct(id, category, expirationDate);
+        } catch (IllegalArgumentException e) {
+            nextServiceId--;
+            throw new DataException("Failed to create service " + e.getMessage());
+        }
+        return (ServiceProduct)addItem(service);
+    }
+    
+    
     /**
      * Updates a product's name specifying its product ID
      *
@@ -128,17 +116,15 @@ public class Inventory {
      * @return true if the product's name is updated correctly, false in other case
      */
     public Product updateProductName(int id, String name) throws DataException {
-        Product selectedProduct = this.readProduct(id);
-
-        if (selectedProduct == null) throw new MissingItemException("Product with id " + id + "does not exist");
+        Product selectedProduct = this.getProduct(id);
         try {
             selectedProduct.setName(name);
-        }catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex){
             throw new DataException("Unable to update name: " + ex.getMessage());
         }
         return selectedProduct;
     }
-
+    
     /**
      * Updates a product's price specifying its product ID
      *
@@ -147,9 +133,7 @@ public class Inventory {
      * @return true if the product's price is updated correctly, false in other case
      */
     public Product updateProductPrice(int id, double price) throws DataException{
-        Product selectedProduct = this.readProduct(id);
-
-        if (selectedProduct == null) throw new MissingItemException("Product with id " + id + "does not exist");
+        Product selectedProduct = this.getProduct(id);
         try{
             selectedProduct.setPrice(price);
         }catch (IllegalArgumentException ex){
@@ -157,7 +141,7 @@ public class Inventory {
         }
         return selectedProduct;
     }
-
+    
     /**
      * Updates a product's category specifying its product ID
      *
@@ -166,14 +150,7 @@ public class Inventory {
      * @return true if the product's category is updated correctly, false in other case
      */
     public BaseProduct updateProductCategory(int id, String category) throws DataException{
-        BaseProduct selectedProduct;
-        try { // stinky hack coming up
-             selectedProduct = (BaseProduct) this.readProduct(id);
-        } catch (ClassCastException ex) {
-            throw new DataException("The product with id " + id + " is not a base product");
-        }
-
-        if (selectedProduct == null) throw new MissingItemException("Product with id " + id + "does not exist");
+        BaseProduct selectedProduct = this.getBaseProduct(id);
         try {
             selectedProduct.setCategory(category);
         }catch (IllegalArgumentException ex){
@@ -181,58 +158,104 @@ public class Inventory {
         }
         return selectedProduct;
     }
-
+    
     /**
-     * Deletes a product specifying its product ID from the array
-     *
-     * @param id Product ID (must be a positive integer)
-     * @return true if the product is deleted correctly, false in other case
+     * @return the delete item
      */
-    public void deleteProduct(int id) throws MissingItemException{
-        int selectedProductIndex = this.readProductIndex(id);
-
-        if (selectedProductIndex == -1) throw new MissingItemException("Product with id " + id + " does not exist");
-        // Remove product from array
-        this.productAmount--;
-        for (int i = selectedProductIndex; i < this.productAmount; i++) {
-            this.inventory[i] = this.inventory[i + 1];
+    public InventoryItem deleteItem(int id) throws MissingItemException{
+        InventoryItem deleted = this.items.remove(new InventoryItemId(id, true));
+        if (deleted == null) {
+            deleted = this.items.remove(new InventoryItemId(id, false));
         }
-    }
-
-    /**
-     * Returns an array of all products added. Ordered by first added product to last added product.
-     *
-     * @return Array of products with length of total product amount in the catalogue. Null if the inventory is empty
-     */
-    public Product[] listProducts() {
-        if (this.productAmount == 0) return null;
-        Product[] arrayProducts = new Product[this.productAmount];
-        for (int i = 0; i < this.productAmount; i++) {
-            arrayProducts[i] = this.inventory[i];
+        if (deleted == null) {
+            throw MissingItemException.fromId("Product", id);
         }
-        return arrayProducts;
+        return deleted;
     }
-
+    
     /**
-     * Generates a unique id by finding the greatest id in the inventory and adding 1 to it
-     *
-     * @return a product id, valid and unique
+     * Returns an array of all products added.
      */
+    public Collection<InventoryItem> listItems() {
+        return this.items.values();
+    }
+    
     public int generateUniqueProductId() {
-        //Searches for the greatest id in all the products
-        int greatestId = 0;
-        for (Product product : inventory) {
-            if (product != null && product.getId() > greatestId) {
-                greatestId = product.getId();
-            }
+        return (nextProductId++) + 1;
+    }
+    
+    private InventoryItem addItem(InventoryItem item) throws FullCollectionException, DuplicateItemException {
+        if (this.items.size() >= MAX_PRODUCTS) {
+            throw new FullCollectionException("Product inventory is full");
         }
-
-        // Returns the id that is immediately next to the greatest id
-        return greatestId + 1;
+        
+        boolean isProduct = (item instanceof Product);
+        InventoryItemId id = new InventoryItemId(item.getId(), isProduct);
+        
+        InventoryItem duplicate = this.items.get(id);
+        if (duplicate != null) { 
+            throw DuplicateItemException.fromId("Product", item.getId());
+        }
+        
+        if (isProduct) {
+            nextProductId = item.getId()+1;
+        } else {
+            nextServiceId = item.getId()+1;
+        }
+        
+        this.items.put(id, item);
+        return item;
     }
-
-    public boolean isTimedProduct(Product product) {
-        return product instanceof TimedProduct;
+    
+    
+    public ServiceProduct getService(int id) throws DataException {
+        ServiceProduct result = null;
+        InventoryItemId itemId = new InventoryItemId(id, false);
+        InventoryItem service = this.items.get(itemId);
+        
+        if (service != null) {
+            if (service instanceof Product) {
+                result = (ServiceProduct)service;
+            } else {
+                throw new DataException("Product with id " + id + " is not a product");
+            }
+        } else {
+            throw MissingItemException.fromId("Product", id);
+        }
+        
+        return result;
     }
-
+    
+    public Product getProduct(int id) throws DataException {
+        Product result = null;
+        InventoryItemId itemId = new InventoryItemId(id, true);
+        InventoryItem prod = this.items.get(itemId);
+        
+        if (prod != null) {
+            if (prod instanceof Product) {
+                result = (Product)prod;
+            } else {
+                throw new DataException("Product with id " + id + " is not a product");
+            }
+        } else {
+            throw MissingItemException.fromId("Product", id);
+        }
+        
+        return result;
+    }
+    
+    
+    public BaseProduct getBaseProduct(int id) throws DataException {
+        Product prod = getProduct(id);
+        BaseProduct result = null;
+        
+        if (prod instanceof BaseProduct) {
+            result = (BaseProduct)prod;
+        } else {
+            throw new DataException("Product with id " + id + " is not a personalizable product");
+        }
+        
+        return result;
+    }
+    
 }
