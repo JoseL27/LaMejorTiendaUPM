@@ -7,7 +7,7 @@ import es.upm.etsisi.poo.*;
 import es.upm.etsisi.poo.exceptions.*;
 
 public class UserManagerTest extends BaseTest {
-	private final String testNIE = ClientTest.VALID_NIEs[0];
+	private final String testDNI = ClientTest.VALID_DNIs[0];
     
     @Test
         void normalAddCashier() {
@@ -80,7 +80,7 @@ public class UserManagerTest extends BaseTest {
         assertDoesNotThrow(() -> { 
                                UserManager.getInstance().addCashier("Cashier 0", "cashier0@upm.es");
                                Cashier cashier = UserManager.getInstance().findCashier("UW0000000");
-                               UserManager.getInstance().addClient(testNIE, "Client 0", "client1@example.com", "UW0000000"); 
+                               UserManager.getInstance().addClient(testDNI, "Client 0", "client1@example.com", "UW0000000"); 
                            });
     }
     
@@ -88,10 +88,10 @@ public class UserManagerTest extends BaseTest {
         void addClientSameId() {
         assertDoesNotThrow(() -> {
                                UserManager.getInstance().addCashier("Cashier 0", "cashier0@upm.es");
-                               UserManager.getInstance().addClient(testNIE, "Client 1", "client1@example.com", "UW0000000");
+                               UserManager.getInstance().addClient(testDNI, "Client 1", "client1@example.com", "UW0000000");
                            });
         assertThrows(DuplicateItemException.class, () -> {
-                         UserManager.getInstance().addClient(testNIE, "Client 2", "client2@example.com", "UW0000000");
+                         UserManager.getInstance().addClient(testDNI, "Client 2", "client2@example.com", "UW0000000");
                      });
     }
     
@@ -99,7 +99,7 @@ public class UserManagerTest extends BaseTest {
         void removeClient() {
         addOneClient();
         assertDoesNotThrow(() -> {
-                               UserManager.getInstance().removeClient(testNIE);
+                               UserManager.getInstance().removeClient(testDNI);
                            });
     }
     
@@ -122,8 +122,8 @@ public class UserManagerTest extends BaseTest {
         void findClient() {
         addOneClient();
         assertDoesNotThrow(() -> { 
-                               Client client = UserManager.getInstance().findClient(testNIE);
-                               assertEquals(testNIE, client.getId()); 
+                               Client client = UserManager.getInstance().findClient(testDNI);
+                               assertEquals(testDNI, client.getId()); 
                            });
     }
     

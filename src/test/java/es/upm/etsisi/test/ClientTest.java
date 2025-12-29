@@ -9,139 +9,136 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ClientTest extends BaseTest { 
     
+    public static final String[] VALID_DNIs = {
+        // DNI 
+        "57239779R",
+        "02923616V",
+        "25121976L",
+        "57473455C",
+        "91789240N",
+        "54739566A",
+        "79875974X",
+        "52570866L",
+        "18845721G",
+        "74801099Q",
+        
+        // NIE
+        "Z8360655E",
+        "Y3794022W",
+        "Y1255162C",
+        "Z0561282H",
+        "Z2991017X",
+        "X6590282T",
+        "Y3058924F",
+        "Z2280808H",
+        "Y0053726N",
+    };
+    
+    
+    public static final String[] INVALID_DNIs = {
+        // DNI
+        "5729779R",
+        "02923616H",
+        "25121176L",
+        "57473455D",
+        "91789840N",
+        "5473956S6A",
+        "798759788X",
+        "52570866B",
+        "18845721A",
+        "74801099G",
+        
+        // NIE
+        "A8360655E",
+        "Y3794022G",
+        "Y1255162D",
+        "Z0561282D",
+        "Z29910177X",
+        "X659028T",
+        "Y3058928F",
+        "Z2280845H",
+        "Y0053726Z",
+    };
+    
     public static final String[] VALID_NIFs = {
-        "60860897E",
-        "89650658Q",
-        "79631068P",
-        "10454534E",
-        "83597236X",
+        "P6377243H",
+        "E96771019",
+        "V53380069",
+        "E07092802",
+        "V30135057",
+        "C16481228",
+        "Q2988229G",
+        "H82048869",
     };
     
     public static final String[] INVALID_NIFs = {
-        "60860897F",
-        "89650658D",
-        "79631068C",
-        "10454534B",
-        "83597236A",
-    };
-    
-    
-    public static final String[] VALID_NIEs = {
-        "X0586929S",
-        "X9357778K",
-        "X4234859F",
-        "X3490423N",
-        "Z6949267Y",
-    };
-    
-    
-    public static final String[] INVALID_NIEs = {
-        "X0586929A",
-        "X9357778B",
-        "X4234859C",
-        "X3490423D",
-        "Z6949267E",
-    };
-    
-    public static final String[] VALID_CIFs = {
-        "A14155667",
-        "R6554800J",
-        "E80206790",
-        "W9785496B",
-        "Q5256608J",
-    };
-    
-    public static final String[] INVALID_CIFs = {
-        "Q5256608A",
-        "A1415566B",
-        "R6554800C",
-        "D80206790",
-        "W9785496F",
+        "HH6377243H",
+        "E9677101D",
+        "V5338006A",
+        "E07092803",
+        "V30135059",
+        "C164812219",
+        "Q298822G",
+        "H820488A9",
     };
     
     public static final Client VALID_CLIENT = 
         new Client(VALID_NIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
     
-    void testClientId(String id, String tag, boolean expected) {
-        if (Client.isValidId(id) != expected) {
-            String expStr = expected ? "valid" : "invalid";
-            String wasStr = !expected ? "valid" : "invalid";
-            fail(String.format("Expected '%s' to be %s %s, was %s\n", id, expStr, tag, wasStr));
+    void testClientId(String id, Client.IdType expectedIdType) {
+        Client.IdType idType = Client.getIdType(id);
+        if (idType != expectedIdType) {
+            String expStr = expectedIdType != null ? expectedIdType.toString() : "null";
+            fail(String.format("Expected '%s' to be a %s, was %s\n", id, expStr, idType.toString()));
         }
+    }
+    
+    @Test
+        void idValidationDNI() {
+        for (String id : VALID_DNIs) 
+            testClientId(id, Client.IdType.DNI);
+        
+        for (String id : INVALID_DNIs) 
+            testClientId(id, null);
     }
     
     @Test
         void idValidationNIF() {
         for (String id : VALID_NIFs) 
-            testClientId(id, "nif", true);
+            testClientId(id, Client.IdType.NIF);
         
         for (String id : INVALID_NIFs) 
-            testClientId(id, "nif", false);
-    }
-    
-    @Test
-        void idValidationNIE() {
-        for (String id : VALID_NIEs) 
-            testClientId(id, "nie", true);
-        
-        for (String id : INVALID_NIEs) 
-            testClientId(id, "nie", false);
-    }
-    
-    @Disabled // NOTE(erb): for future CompanyClients
-        @Test
-        void idValidationCIF() {
-        for (String id : VALID_CIFs) 
-            testClientId(id, "nie", true);
-        
-        for (String id : INVALID_CIFs) 
-            testClientId(id, "nie", false);
+            testClientId(id, null);
     }
     
     @Test
         void constructorRegular() {
         assertDoesNotThrow(() -> {
                                new Client(VALID_NIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
-                               
-                               new Client(VALID_NIEs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
-                               
-                               /* 
-                                new Client(VALID_CIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
-                                */
+                               new Client(VALID_DNIs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
                            });
     }
+    
+    @Test
+        void constructorFailIdDNI() { 
+        assertThrows(IllegalArgumentException.class, () -> {
+                         new Client(INVALID_DNIs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
+                     });
+        
+    }
+    
     
     @Test
         void constructorFailIdNIF() { 
         assertThrows(IllegalArgumentException.class, () -> {
                          new Client(INVALID_NIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
                      });
-        
-        
-    }
-    
-    @Test
-        void constructorFailIdNIE() { 
-        assertThrows(IllegalArgumentException.class, () -> {
-                         new Client(INVALID_NIEs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
-                     });
-        
-    }
-    
-    
-    @Disabled
-        @Test
-        void constructorFailIdCIF() { 
-        assertThrows(IllegalArgumentException.class, () -> {
-                         new Client(INVALID_CIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
-                     });
-        
     }
     
     @Test
         void constructorFailNullCashier() { 
         assertThrows(IllegalArgumentException.class, () -> {
-                         new Client(VALID_NIEs[0], "jose", "josqlito@correo.com", null);
+                         new Client(VALID_DNIs[0], "jose", "josqlito@correo.com", null);
                      });
         
     }

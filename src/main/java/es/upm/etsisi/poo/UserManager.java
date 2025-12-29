@@ -11,31 +11,31 @@ import java.util.*;
 public class UserManager {
 	// using hashmap here since it will make my life easier, also there is no explicit limit on the amount of users -jy
 	private Map<String, User> users;
-
+    
 	public static final int MIN_CASHIER_ID = 0;
 	public static final int MAX_CASHIER_ID = 9999999;
 	private int nextCashierId = MIN_CASHIER_ID;
-
+    
 	// Assuming ticket IDs are global and should be unique across all different Clients/Cashiers
 	public static final int MIN_TICKET_ID = 0;
 	public static final int MAX_TICKET_ID = 99999;
 	private int nextTicketId = MIN_TICKET_ID;
-
+    
 	private static UserManager instance = new UserManager();
-
+    
 	public static UserManager getInstance() {
 		if (instance == null) {
 			instance = new UserManager();
 		}
 		return instance;
 	}
-
+    
 	private UserManager() {
 		this.users = new HashMap<>();
 	}
-
+    
 	// Client related
-
+    
 	/**
 	 * Creates a client and adds it to the User set.
 	 * @param clientId DNI
@@ -44,22 +44,22 @@ public class UserManager {
 	 * @param assignedCashierId Cashier who is linked with the creation of this Client
 	 * @return The client that was created
 	 */
-	public Client addClient(String clientId, String name, String email, String assignedCashierId, Client.IdType IdType) throws DataException{
+	public Client addClient(String clientId, String name, String email, String assignedCashierId) throws DataException{
         try {
             // Make sure assignedCashierId exists within the Cashier set
             Cashier foundCashier = this.findCashier(assignedCashierId);
-            Client newClient = new Client(clientId, name, email, foundCashier, IdType);
-
+            Client newClient = new Client(clientId, name, email, foundCashier);
+            
             // Attempt to find the client with the same ID in the cashier set
             if (this.users.containsKey(clientId)) throw new DuplicateItemException("Client with id " + clientId + " already exists");
-
+            
             this.users.put(clientId, newClient);
             return newClient;
         }catch (IllegalArgumentException ex){
             throw new InvalidDataException("Error creating client: " + ex.getMessage());
         }
 	}
-
+    
 	/**
 	 * Removes a client from the User set.
 	 * @param clientId DNI
@@ -69,7 +69,7 @@ public class UserManager {
 		User removedClient = this.users.remove(clientId);
         if (removedClient == null) throw new MissingItemException("Client with id " + clientId + " not found");
 	}
-
+    
 	/**
 	 * Finds the specified Client with the specified ID.
 	 * @param clientId DNI
@@ -80,7 +80,7 @@ public class UserManager {
         if (result == null) throw new MissingItemException("Client with id " + clientId + " not found");
         return result;
 	}
-
+    
 	/**
 	 * Returns an array of Client instances currently stored in the set.
 	 * @return Array of Client, array of zero length if there are none
@@ -90,7 +90,7 @@ public class UserManager {
 			Iterator<User> userIterator = this.users.values().iterator();
 			List<Client> clientList = new ArrayList<>();
 			Client[] clientArray;
-
+            
 			// Gets the list with all the clients
 			while (userIterator.hasNext()) {
 				User user = userIterator.next();
@@ -98,28 +98,28 @@ public class UserManager {
 					clientList.add((Client)user);
 				}
 			}
-
+            
 			//Transforms the list to an array
 			clientArray = new Client[clientList.size()];
 			for (int i = 0; i < clientList.size(); i++){
 				clientArray[i] = clientList.get(i);
 			}
-
+            
 			return clientArray;
 		} else {
 			return new Client[0];
 		}
 	}
-
+    
 	/**
 	 * @return Client amount in User set
 	 */
 	public int getClientAmount() {
 		return this.listClients().length;
 	}
-
+    
 	// Cashier related
-
+    
 	/**
 	 * Creates a cashier specifying its ID and adds it to the User set.
 	 * @param workerId Cashier ID, must start with UW(7 numbers)
@@ -134,21 +134,21 @@ public class UserManager {
             int maximumCashierAmountLimitedById = UserManager.MAX_CASHIER_ID - UserManager.MIN_CASHIER_ID + 1;
             if (this.listCashiers().length >= maximumCashierAmountLimitedById)
                 throw new IdSpaceExhaustedException("All of the ids for cashiers have been already used");
-
+            
             // Attempt to find the cashier with the same ID in the cashier set
             if (this.users.containsKey(workerId)) throw new DuplicateItemException("Cashier with id " + workerId + " already exists");
-
+            
             // Update nextCashierId if needed for auto-increment
             String number = workerId.substring(2); // Remove 'UW'
             // If the id is all 0 the number=0
             if (number.matches("^0+$")) number = "0";
-                // All the leading 0 are eliminated
+            // All the leading 0 are eliminated
             else number = number.replaceAll("^0+", "");
-
+            
             int cashierIdValue = Integer.parseInt(number);
             if (cashierIdValue >= this.nextCashierId)
                 this.nextCashierId = cashierIdValue + 1;
-
+            
             // Add the cashier to the set
             Cashier newCashier = new Cashier(workerId, name, email);
             this.users.put(workerId, newCashier);
@@ -157,7 +157,7 @@ public class UserManager {
             throw new InvalidDataException("Error creating cashier: " + ex.getMessage());
         }
 	}
-
+    
 	/**
 	 * Creates a cashier and adds it to the User set, generating its ID automatically (auto-increment if possible, random if not).
 	 * @param name Cashier's name
@@ -169,7 +169,7 @@ public class UserManager {
 		String newCashierId = this.generateUniqueCashierId();
 		return this.addCashier(newCashierId, name, email);
 	}
-
+    
 	/**
 	 * Removes a cashier from the User set.
 	 * @param workerId Cashier's ID
@@ -179,7 +179,7 @@ public class UserManager {
 		User removedCashier = this.users.remove(workerId);
         if (removedCashier == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
 	}
-
+    
 	/**
 	 * Finds the specified Cashier with the specified ID.
 	 * @param workerId Cashier's ID
@@ -191,7 +191,7 @@ public class UserManager {
         if (result == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
 		return result;
 	}
-
+    
 	/**
 	 * Returns an array of Cashier instances currently stored in the set.
 	 * @return Array of Cashier, array of zero length if there are none
@@ -200,7 +200,7 @@ public class UserManager {
 		Iterator<User> userIterator = this.users.values().iterator();
 		List<Cashier> cashierList = new ArrayList<>();
 		Cashier[] cashierArray;
-
+        
 		// Gets the list with all the clients
 		while (userIterator.hasNext()) {
 			User user = userIterator.next();
@@ -208,16 +208,16 @@ public class UserManager {
 				cashierList.add((Cashier) user);
 			}
 		}
-
+        
 		//Transforms the list to an array
 		cashierArray = new Cashier[cashierList.size()];
 		for (int i = 0; i < cashierList.size(); i++){
 			cashierArray[i] = cashierList.get(i);
 		}
-
+        
 		return cashierArray;
 	}
-
+    
 	/**
 	 * Returns a list of all the tickets created by any cashier existing in the manager
 	 * @return ArrayList containing all the tickets in the system, the list will be empty if no tickets exist
@@ -229,7 +229,7 @@ public class UserManager {
 		}
 		return tickets;
 	}
-
+    
 	/**
 	 * Returns a list of Ticket instances created by the specified Cashier ID in String
 	 * @param workerId Cashier's ID
@@ -238,13 +238,13 @@ public class UserManager {
 	 */
 	public Ticket[] listCashierTicketsArray(String workerId) throws MissingItemException, IllegalArgumentException{
 		if (!Cashier.isValidId(workerId)) throw new IllegalArgumentException("Invalid cashier id: " + workerId);
-
+        
 		Cashier cashier = (Cashier)this.users.get(workerId);
         if (cashier == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
-
+        
         return cashier.getTickets();
 	}
-
+    
 	/**
 	 * Returns a list of tickets IDs created by the specified Cashier ID in String
 	 * @param workerId Cashier's ID
@@ -252,19 +252,19 @@ public class UserManager {
 	 */
 	public String listCashierTickets(String workerId) throws MissingItemException, IllegalArgumentException{
         if (!Cashier.isValidId(workerId)) throw new IllegalArgumentException("Invalid cashier id: " + workerId);
-
+        
 		Cashier cashier = (Cashier)this.users.get(workerId);
         if (cashier == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
         return cashier.getTicketsString();
 	}
-
+    
 	/**
 	 * @return Cashier amount in User set
 	 */
 	public int getCashierAmount() {
 		return this.listCashiers().length;
 	}
-
+    
 	/**
 	 * Loops through all cashier set and accessing their Tickets to see if given ID is already taken.
 	 * @param ticketId ticketId to test, must be a 5-digit number
@@ -289,7 +289,7 @@ public class UserManager {
 		} while (isUnique && i < cashiers.length);
 		return isUnique;
 	}
-
+    
 	/**
 	 * Loops through all cashiers and getting the amount of ticket created by them.
 	 * @return Amount of tickets created globally
@@ -301,7 +301,7 @@ public class UserManager {
 		}
 		return amount;
 	}
-
+    
 	/**
 	 * Returns either an auto-incremented or any worker ID available (starting from low to high) for tickets.
 	 * Auto-increment ID value takes priority, but will return any ID available if a Ticket with the highest possible
@@ -317,7 +317,7 @@ public class UserManager {
 		// int globalTicketAmount = this.getGlobalCashierTicketAmount();
 		// if (globalTicketAmount >= maximumTicketAmountLimitedById)
 		//	return -1;
-
+        
 		// Generate
 		if (this.nextTicketId <= MAX_TICKET_ID) { // auto-increment possible
 			return this.nextTicketId++;
@@ -333,7 +333,7 @@ public class UserManager {
             return candidate;
 		}
 	}
-
+    
 	/**
 	 * Returns either an auto-incremented or any worker ID available (starting from low to high) for cashier.
 	 * Auto-increment ID value takes priority, but will return any ID available if a Cashier with the highest possible
@@ -347,7 +347,7 @@ public class UserManager {
 		int maximumCashierAmountLimitedById = UserManager.MAX_CASHIER_ID - UserManager.MIN_CASHIER_ID + 1;
 		if (this.listCashiers().length >= maximumCashierAmountLimitedById)
             throw new IdSpaceExhaustedException("All of the ids for cashiers have already been used");
-
+        
 		// Generate
 		if (this.nextCashierId <= MAX_CASHIER_ID) { // auto-increment possible
         	return String.format("UW%07d", this.nextCashierId++);

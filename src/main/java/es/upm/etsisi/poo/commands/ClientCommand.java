@@ -13,7 +13,7 @@ import javax.xml.crypto.Data;
  * Command to manage clients (add, remove, list)
  */
 public class ClientCommand implements Command {
-
+    
 	/**
 	 * Evaluates client-related commands based on the provided parameters.
 	 * Supported subcommands:
@@ -28,9 +28,9 @@ public class ClientCommand implements Command {
 	 * @param manager     The {@link UserManager} instance for managing users.
 	 * @param dataManager The {@link Inventory} instance for managing inventory data.
 	 */
-
+    
 	@Override
-	public void eval(String[] params) throws FailedCommandException{
+        public void eval(String[] params) throws FailedCommandException{
         // Throw exception (invalid argument amount)
 		if(!App.checkArgsCountWithPrint("client", params.length, 2, 6)) { return; }
 		final String subcommand = params[1].toLowerCase();
@@ -41,7 +41,7 @@ public class ClientCommand implements Command {
 			default -> System.err.println("Subcommand not recognised");
 		}
 	}
-
+    
 	/**
 	 * Evaluates the "add client" command by validating the number of parameters and adding a new client
 	 * to the system using the provided user information and the creator cashier.
@@ -69,19 +69,19 @@ public class ClientCommand implements Command {
 		String clientEmail = params[4];
         String creatorId   = params[5];
 		UserManager userManager = UserManager.getInstance();
-
+        
         try {
-            Client addedClient = userManager.addClient(clientId, clientName, clientEmail, creatorId, Client.isValidId(clientId));
+            Client addedClient = userManager.addClient(clientId, clientName, clientEmail, creatorId);
             System.out.println(addedClient);
             System.out.println("client add: ok");
         }catch (DataException ex){
             throw new FailedCommandException("Cannot add the client: " + ex.getMessage());
         }
-
+        
 	}
-
+    
 	public void evalRemove(String[] params) throws FailedCommandException{
-
+        
         // Throw exception (invalid argument amount)
 		if (!App.checkArgsCountWithPrint("client remove", params.length, 3)) {
 			return;
@@ -94,7 +94,7 @@ public class ClientCommand implements Command {
         }
 		
 	}
-
+    
 	public void evalList() {
 		Client[] clients = UserManager.getInstance().listClients();
 		Arrays.sort(clients);
