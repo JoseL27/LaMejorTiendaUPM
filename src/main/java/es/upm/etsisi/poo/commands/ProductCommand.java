@@ -8,6 +8,7 @@ import es.upm.etsisi.poo.exceptions.MissingItemException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Collection;
 import java.util.Arrays;
 import java.util.List;
 /**
@@ -22,36 +23,59 @@ import java.util.List;
  */
 public class ProductCommand implements Command {
 	@Override
-	public void eval(String[] args) throws FailedCommandException {
+        public void eval(String[] args) throws FailedCommandException {
 		if (!App.checkArgsCountWithPrint("prod", args.length, 2, 7)) return;
-
+        
 		switch (args[1].toLowerCase()) {
-		case "addfood", "addmeeting" -> evalAddTimed(args);
-		case "add"	  -> evalAddBase(args);
-		case "list"	  -> evalList(args);
-		case "update" -> evalUpdate(args);
-		case "remove" -> evalRemove(args);
-		default       -> System.out.println("prod: invalid sub command");
+            case "addfood", "addmeeting" -> evalAddTimed(args);
+            case "add"	  -> evalAdd(args);
+            case "list"	  -> evalList(args);
+            case "update" -> evalUpdate(args);
+            case "remove" -> evalRemove(args);
+            default       -> System.out.println("prod: invalid sub command");
 		}
 	}
-
-
+    
+    
 	/**
 	 * Parses the 'add' variation of the 'product' command.
-	 * The function parses each field sequentially and short circuits if any fail.
 	 * FORMAT: prod add [<id>] "<name>" <category> <price> [<maxPers>]
-	 * @param parser The stream of tokens to parse
-	 * @return       The result of the parse. If every parse succedes a valid ProductCommand Add instance
-	 *               specifiying productId, productName, productCategory and productPrice,
-	 *               or null if it fails
+	 * FORMAT: prod add <expiration: yyyy-MM-dd > <category>
 	 */	
+    public void evalAdd(String[] params) throws FailedCommandException{
+        if (params.length == 4) {
+            evalAddService(params);
+        } else {
+            evalAddBase(params);
+        }
+    }
+    
+    // FORMAT: prod add <expiration: yyyy-MM-dd > <category>
+    public void evalAddService(String[] params) throws FailedCommandException{
+        if (!App.checkArgsCountWithPrint("prod add", params.length, 4)) return;
+        
+        String strId = params[2];
+        String category = params[3];
+        
+        try {
+            
+        } catch (Exception e) {
+            throw new FailedCommandException("Unable to add service");
+        }
+    }
+    
+    
+    // FORMAT: prod add [<id>] "<name>" <category> <price> [<maxPers>]
 	public void evalAddBase(String[] params) throws FailedCommandException{
 		// Parse
 		if (!App.checkArgsCountWithPrint("prod add", params.length, 5, 7)) return;
 		
 		// NOTE(enrique): Index to consume while parsing
 		int parseIndex = 2; 
-
+        
+        // NOTE(enrique): Check the 3rd argument:
+		//  - If parsing the int succeeds then we assume its the ID and the next token is the name string (advance parsing)
+		//  - If it fails then we assume its the name and no ID was supplied (dont advance parsing), next token is the category
 		String productIdOrName = params[parseIndex++];
 		String productName = null;
         int productId;
@@ -62,11 +86,7 @@ public class ProductCommand implements Command {
             productName = productIdOrName;
             productId = Inventory.getInstance().generateUniqueProductId();
         }
-
-		// NOTE(enrique): Check the 3rd argument:
-		//  - If parsing the int succeeds then we assume its the ID and the next token is the name string (advance parsing)
-		//  - If it fails then we assume its the name and no ID was supplied (dont advance parsing), next token is the category
-
+        
         BaseProduct.Category productCategory;
         int productPrice;
         int productMaxPers;
@@ -75,21 +95,21 @@ public class ProductCommand implements Command {
         try {
             productCategory = BaseProduct.Category.valueOf(productCategoryString.toUpperCase());
             productPrice = Integer.parseInt(productPriceString);
-
+            
             boolean specifiedMaxPers = false;
             productMaxPers = productCategory.getMaxPersonalizations();
             if (parseIndex < params.length) {
                 String productMaxPersString = params[parseIndex++];
-
+                
                 productMaxPers = Integer.parseInt(productMaxPersString);
                 specifiedMaxPers = true;
             }
-
+            
             // Execute
             Inventory inventory = Inventory.getInstance();
-
+            
             BaseProduct createdProduct = inventory.createBaseProduct(productId, productName, productCategoryString,
-                    productPrice, productMaxPers, specifiedMaxPers);
+                                                                     productPrice, productMaxPers, specifiedMaxPers);
             System.out.println(createdProduct);
             System.out.println("prod add: ok");
         }catch(DataException ex){
@@ -100,7 +120,7 @@ public class ProductCommand implements Command {
             throw new FailedCommandException(String.format("%s: error: invalid %s '%s', expected one of: %s\n","prod add", "category", productCategoryString, Arrays.toString(BaseProduct.Category.values())));
         }
 	}
-
+    
 	/**
 	 * Checks if the arguments are valid and tries to create a new timed product (food/meeting) from them
 	 * @param params The arguments (user input) to consider for the command
@@ -111,7 +131,7 @@ public class ProductCommand implements Command {
 		if (params.length != 6 && params.length != 7){
 			throw new FailedCommandException("prod " + params[1] + ": invalid number of parameters, got " + params.length + ", expected 6 or 7");
 		}
-
+        
 		int id;
 		String name;
 		double price;
@@ -119,14 +139,14 @@ public class ProductCommand implements Command {
 		int maxPeople;
 		TimedProduct.TimedType type;
         int parseIndex = 1;
-
+        
         // Parsing
         Inventory inventory = Inventory.getInstance();
         String typeArgument = params[parseIndex++];
-
+        
         try {
             type = TimedProduct.TimedType.valueOf(typeArgument.replaceAll("add", "").toUpperCase());
-
+            
 			if (params.length == 6){
 				name = params[parseIndex++];
 				id = inventory.generateUniqueProductId();
@@ -134,18 +154,18 @@ public class ProductCommand implements Command {
 				id = Integer.parseInt(params[parseIndex++]);
 				name = params[parseIndex++];
 			}
-
+            
 			price = Double.parseDouble(params[parseIndex++]);
 			expirationDate = LocalDate.parse(params[parseIndex++]).atStartOfDay();
 			maxPeople = Integer.parseInt(params[parseIndex]);
-
+            
 			// Execution
 			LocalDateTime prepDoneTime = LocalDateTime.now().plusHours(type.getHoursForPreparing());
 			if (prepDoneTime.isAfter(expirationDate)) {
 				throw new FailedCommandException(String.format("prod add: error: you need at least %d hours to prepare for this %s\n",
-								   type.getHoursForPreparing(), type.toString().toLowerCase()));
+                                                               type.getHoursForPreparing(), type.toString().toLowerCase()));
 			}
-
+            
 			Product addedProduct = inventory.createTimedProduct(id, name, price, maxPeople, typeArgument, expirationDate);
 			System.out.println(addedProduct);
 			System.out.printf("prod %s: ok\n", typeArgument);
@@ -157,7 +177,7 @@ public class ProductCommand implements Command {
             throw new FailedCommandException("Unable to add product: " + ex.getMessage());
         }catch (IllegalArgumentException ex) {
             throw new FailedCommandException(String.format("%s: error: invalid %s '%s', expected one of: %s\n"
-                    ,"prod add", "category", typeArgument, Arrays.toString(TimedProduct.TimedType.values())));
+                                                           ,"prod add", "category", typeArgument, Arrays.toString(TimedProduct.TimedType.values())));
         }
 	}
 	
@@ -176,15 +196,15 @@ public class ProductCommand implements Command {
 	 */		
 	public void evalUpdate(String[] params) throws FailedCommandException{
 		if (!App.checkArgsCountWithPrint("prod update", params.length, 5)) return;
-
+        
         int productId;
 		Inventory inventory = Inventory.getInstance();
 		Product updatedProduct = null;
 		String fieldName = params[3].toLowerCase();
-
+        
         try {
             productId = Integer.parseInt(params[2]);
-
+            
             switch (fieldName) {
                 case "name" -> {
                     String productName = params[4];
@@ -211,7 +231,7 @@ public class ProductCommand implements Command {
             throw new FailedCommandException("Unable to update product: invalid integer value in arguments");
         }
 	}
-
+    
 	/**
 	 * Parses the 'remove' variation of the 'product' command.
 	 * The function only parses and 'id'.
@@ -221,37 +241,43 @@ public class ProductCommand implements Command {
 	 *               ProductCommand Remove instance or null
 	 */			
 	public void evalRemove(String[] params) throws FailedCommandException{
-		 if (!App.checkArgsCountWithPrint("prod remove", params.length, 3)) return;
-         int productId;
-         try {
-             productId = Integer.parseInt(params[2]);
-         }catch (NumberFormatException ex){
-             throw new FailedCommandException("Unable to remove product, " + params[2] + " is not a valid integer");
-         }
-		 Inventory inventory = Inventory.getInstance();
-
-		 Product productToRemove = inventory.readProduct(productId);
-		 if (productToRemove == null) {
-             throw new FailedCommandException("Unable to remove product, product with id " + productId + " not found");
-		 }
-        // Retrieves the active tickets from the system (Products should not be removed from closed tickets)
-        List<Ticket> tickets = UserManager.getInstance().getAllTickets();
-
-        for (Ticket ticket: tickets) {
-            if (ticket.isOpen()) {
-                ticket.removeProduct(productToRemove.getId());
-            }
-        }
-
+        if (!App.checkArgsCountWithPrint("prod remove", params.length, 3)) return;
+        int productId;
         try {
-            inventory.deleteProduct(productId);
-            System.out.println(productToRemove);
+            productId = Integer.parseInt(params[2]);
+        }catch (NumberFormatException ex){
+            throw new FailedCommandException("Unable to remove product, " + params[2] + " is not a valid integer");
+        }
+        
+        Inventory inventory = Inventory.getInstance();
+        InventoryItem item = null; 
+        
+        try {
+            item = inventory.deleteItem(productId);
+            
+            
+            // NOTE(erb): this only removes 'Products' from tickets and NOT service products
+            // TODO(erb): update this to remove service products
+            if (item instanceof Product) {
+                Product productToRemove = (Product)item;
+                
+                // Retrieves the active tickets from the system (Products should not be removed from closed tickets)
+                List<Ticket> tickets = UserManager.getInstance().getAllTickets();
+                
+                for (Ticket ticket: tickets) {
+                    if (ticket.isOpen()) {
+                        ticket.removeProduct(productToRemove.getId());
+                    }
+                }
+            }
+            
+            System.out.println(item);
             System.out.println("prod remove: ok");
-        }catch (MissingItemException ex){
-            throw new FailedCommandException("Unable to remove product, " + ex.getMessage());
+        } catch (DataException e) {
+            throw new FailedCommandException("Unable to remove product " + e.getMessage());
         }
 	}
-
+    
 	/**
 	 * Parses the 'list' variation of the 'product' command.
 	 * This function does not actual parsing besides checking the number of arguments and
@@ -263,14 +289,12 @@ public class ProductCommand implements Command {
 	 */
 	public void evalList(String[] params) {
 		if (!App.checkArgsCountWithPrint("prod list", params.length, 2)) return;
-
-		Product[] products = Inventory.getInstance().listProducts();
-
+        
+		Collection<InventoryItem> items = Inventory.getInstance().listItems();
+        
 		System.out.println("Catalog:");
-		if (products != null) {
-			for (Product p : products) {
-				System.out.println("  "+p.toString());
-			}
+        for (InventoryItem i : items) {
+            System.out.println("  "+i.toString());
 		}
 		System.out.println("prod list: ok");
 	}
