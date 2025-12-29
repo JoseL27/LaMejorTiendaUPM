@@ -23,7 +23,7 @@ public class TicketCommand implements Command {
      *
      * @param params      The token stream to parse on each subcommand
      */
-    public void eval(String[] params) throws FailedCommandException {
+    public void eval(String[] params) throws FailedCommandException, DataException {
         // Parse
         if (!App.checkMinArgsCountWithPrint("ticket", params.length, 2)) return;
 
@@ -114,7 +114,7 @@ public class TicketCommand implements Command {
      * @param userManager Context
      * @param inventory   Context
      */
-    private void evalAdd(String[] params) throws FailedCommandException{
+    private void evalAdd(String[] params) throws FailedCommandException, DataException {
         // Parse
         if (!App.checkMinArgsCountWithPrint("ticket add", params.length, 4))
             return;
@@ -152,7 +152,7 @@ public class TicketCommand implements Command {
         }
 
         // Execute
-        Product productToAdd = Inventory.getInstance().readProduct(productId);
+        Product productToAdd = Inventory.getInstance().getProduct(productId);
 		if (ticketId < 0) {
 			throw new FailedCommandException(String.format("ticket add: error: ticket id '%d' is invalid, expected a positive number\n", ticketId));
 		}
