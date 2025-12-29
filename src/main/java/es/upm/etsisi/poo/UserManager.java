@@ -44,11 +44,11 @@ public class UserManager {
 	 * @param assignedCashierId Cashier who is linked with the creation of this Client
 	 * @return The client that was created
 	 */
-	public Client addClient(String clientId, String name, String email, String assignedCashierId) throws DataException{
+	public Client addClient(String clientId, String name, String email, String assignedCashierId, Client.IdType IdType) throws DataException{
         try {
             // Make sure assignedCashierId exists within the Cashier set
             Cashier foundCashier = this.findCashier(assignedCashierId);
-            Client newClient = new Client(clientId, name, email, foundCashier);
+            Client newClient = new Client(clientId, name, email, foundCashier, IdType);
 
             // Attempt to find the client with the same ID in the cashier set
             if (this.users.containsKey(clientId)) throw new DuplicateItemException("Client with id " + clientId + " already exists");

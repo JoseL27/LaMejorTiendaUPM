@@ -125,8 +125,7 @@ public class Ticket implements Comparable<Ticket> {
     public void tryClose() {
         for (ProductInfo productInfo : productInfos) {
             Product product = productInfo.getProduct(); //Get the product
-            if (Inventory.getInstance().isTimedProduct(product)) {
-                TimedProduct timedProduct = (TimedProduct) product;
+            if (product instanceof TimedProduct timedProduct) {
                 if (LocalDateTime.now().isAfter(timedProduct.getExpirationDate())) {
                     throw new DateTimeException(String.format("Product %s is past its expiration date", product));
                 }
@@ -164,9 +163,8 @@ public class Ticket implements Comparable<Ticket> {
 
         ProductInfo duplicate = findDuplicateProductInfo(newProductInfo);
         if (duplicate == null) {
-            if (Inventory.getInstance().isTimedProduct(product)) {
+            if (product instanceof TimedProduct timedProduct) {
                 // First time adding TimedProduct, a TimedProduct counts as 1 item regardless of participant amount
-                TimedProduct timedProduct = (TimedProduct) product;
                 if (amount <= timedProduct.getMaxParticipants()) {
                     appendProductInfo(newProductInfo);
                     this.totalAmount++;
@@ -176,7 +174,7 @@ public class Ticket implements Comparable<Ticket> {
                 this.totalAmount += newProductInfo.getAmount();
             }
         } else {
-            if (Inventory.getInstance().isTimedProduct(product)) // Adding the same TimedProduct again should fail
+            if (product instanceof TimedProduct timedProduct) // Adding the same TimedProduct again should fail
                 throw new DuplicateItemException("This timed product already exists in ticket");
             else {
                 if ((this.totalAmount + amount) <= MAX_PRODUCTS) { // Adding the same BaseProduct should increment amount
@@ -212,7 +210,7 @@ public class Ticket implements Comparable<Ticket> {
         if (foundProductInfo != null) {
             Product removed = foundProductInfo.getProduct();
 
-            if (Inventory.getInstance().isTimedProduct(removed)) {
+            if (removed instanceof TimedProduct) {
                 this.totalAmount--;
             } else {
                 this.totalAmount -= foundProductInfo.getAmount();
@@ -237,8 +235,7 @@ public class Ticket implements Comparable<Ticket> {
         for (ProductInfo info : productInfos) {
             Product product = info.getProduct();
             // NOTE(enrique): Think of a more OOP way to do this.
-            if (!Inventory.getInstance().isTimedProduct(product)) {
-                BaseProduct baseProduct = (BaseProduct) product;
+            if (product instanceof BaseProduct baseProduct) {
                 int categoryIndex = (int) baseProduct.getCategory().ordinal();
                 categoriesProductCount[categoryIndex] += info.getAmount();
             }
@@ -281,8 +278,7 @@ public class Ticket implements Comparable<Ticket> {
 
             double effectivePrice = product.getPrice();
 
-            if (!Inventory.getInstance().isTimedProduct(product)) {
-                BaseProduct baseProduct = (BaseProduct) product;
+            if (product instanceof BaseProduct baseProduct) {
 
                 String[] pers = productInfo.getPersonalizations();
                 if (pers != null && pers.length > 0) {
@@ -310,8 +306,7 @@ public class Ticket implements Comparable<Ticket> {
                     totalDiscount += discount * productInfo.getAmount();
                 }
 
-            } else if (Inventory.getInstance().isTimedProduct(product)) {
-                TimedProduct timedProduct = (TimedProduct) product;
+            } else if (product instanceof TimedProduct timedProduct) {
                 sb.append("  ")
                         .append(timedProduct.toString(productInfo.getAmount()))
                         .append('\n');
@@ -361,7 +356,7 @@ public class Ticket implements Comparable<Ticket> {
      */
     private void appendProductInfo(ProductInfo productInfo) throws FullCollectionException{
         Product product = productInfo.getProduct();
-        if (Inventory.getInstance().isTimedProduct(product)) {
+        if (product instanceof TimedProduct) {
             if ((this.totalAmount + 1) > MAX_PRODUCTS) throw new FullCollectionException("Ticket is already full");
             productInfos.add(productInfo);
         } else {
@@ -390,8 +385,7 @@ public class Ticket implements Comparable<Ticket> {
 
           // New instance of every single object
           Product oldProduct = productInfo.getProduct();
-          if(Inventory.getInstance().isTimedProduct(oldProduct)){
-              TimedProduct oldProductAux = (TimedProduct) oldProduct;
+          if(oldProduct instanceof TimedProduct oldProductAux){
               // New TimedObject
               TimedProduct timedProductAux = new TimedProduct(oldProduct.getId(),oldProduct.getName(),oldProduct.getPrice(),
                       oldProductAux.getMaxParticipants(),oldProductAux.getType().toString(),oldProductAux.getExpirationDate());

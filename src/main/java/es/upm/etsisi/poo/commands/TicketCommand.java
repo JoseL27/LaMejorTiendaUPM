@@ -60,7 +60,7 @@ public class TicketCommand implements Command {
 		}
 		
 		String clientId = params[params.length - 1];
-		if (!Client.isValidId(clientId)) {
+		if (Client.isValidId(clientId)==null) {
             throw new FailedCommandException(String.format("ticket new: error: invalid client id '%s', please enter a valid NIF/NIE\n", clientId));
 		}
 
@@ -160,9 +160,9 @@ public class TicketCommand implements Command {
 			throw new FailedCommandException(String.format("ticket add: error: could not find product with id %s\n", productId));
 		}
       
-    if (Inventory.getInstance().isTimedProduct(productToAdd)) {
-          TimedProduct timedProduct = (TimedProduct) productToAdd; //Cast before checking
-          if (LocalDateTime.now().isAfter(timedProduct.getExpirationDate())) {
+    if (productToAdd instanceof TimedProduct timedProduct) {
+        //Cast before checking
+        if (LocalDateTime.now().isAfter(timedProduct.getExpirationDate())) {
             throw new FailedCommandException(String.format("ticket add: error: not enough time to prepare, you need more than %s hours\n",
                       timedProduct.getType().getHoursForPreparing()));
           }
