@@ -95,7 +95,7 @@ public class Inventory {
      *
      * @return The product that was created, or null if the creation failed
      */
-    public ServiceProduct createServiceProduct(ServiceProduct.Category category, LocalDateTime expirationDate) throws DataException {
+    public ServiceProduct createServiceProduct(ServiceProduct.ServiceCategory category, LocalDateTime expirationDate) throws DataException {
         ServiceProduct service = null;
         try {
             int id = (nextServiceId++) + 1;

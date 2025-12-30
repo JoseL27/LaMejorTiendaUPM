@@ -9,15 +9,15 @@ public class ServiceProduct extends InventoryItem {
     public static final float SERVICE_DISCOUNT = 0.15f;
     public static final DateTimeFormatter EXPIRATION_DATE_FORMAT = DateTimeFormatter.ofPattern("EEE LLL HH:mm:ss zzz yyyy");
     
-    public enum Category {
+    public enum ServiceCategory {
         TRANSPORT, SHOW, INSURANCE,
     }
     
-    private Category category;
+    private ServiceCategory category;
     private LocalDateTime expirationDate;
     
     
-    public ServiceProduct(int id, Category category, LocalDateTime expirationDate) {
+    public ServiceProduct(int id, ServiceCategory category, LocalDateTime expirationDate) {
         super(id);
         
         if (id <= 0) throw new IllegalArgumentException("Service id must be greater or equal to one, got " + id);
@@ -31,7 +31,7 @@ public class ServiceProduct extends InventoryItem {
     }
     
     
-    public static ServiceProduct newFromId(String id, Category category, LocalDateTime expirationDate) throws IllegalArgumentException {
+    public static ServiceProduct newFromId(String id, ServiceCategory category, LocalDateTime expirationDate) throws IllegalArgumentException {
         int idNum = 0;
         
         if (id != null && id.length() > 0) {
@@ -52,7 +52,7 @@ public class ServiceProduct extends InventoryItem {
         return new ServiceProduct(idNum, category, expirationDate);
     }
     
-    public Category getCategory() {
+    public ServiceCategory getCategory() {
         return this.category;
     }
     

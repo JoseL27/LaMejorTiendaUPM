@@ -20,19 +20,44 @@ class App {
   -{static}checkArgsCountWithPrint(String, int, int): boolean
 }
 
-abstract class Product {
+abstract class InventoryItem{
+ - id: int
+
+ + InventoryItem(int)
+ + getId(): int
+ + duplicateOf(InventoryItem): boolean
+ + toString(): String
+ + isValidId(int): boolean
+}
+abstract class Product extends InventoryItem{
   + {static} PRODUCT_MAX_NAME_LENGTH: int
-  - id: int
   - name: String
   - price: double
 
   + Product(int, String, double):
-  + getId(): int
   + getName(): String
   + getPrice(): Double
   + setName(String)
   + setPrice(Double)
   + {abstract} duplicateOf(Product): boolean
+}
+
+enum ServiceCategory{
+ + TRANSPORT
+ + SHOW
+ + INSURANCE
+}
+class ServiceProduct extends InventoryItem{
+ + {static} SERVICE_DISCOUNT: float
+ + {static} EXPIRATION_DATE_FORMAT: DateTimeFormatter
+
+ - expirationDate: LocalDateTime
+ - category: ServiceCategory
+
+ + ServiceProduct(int,ServiceCategory,LocalDateTime)
+ + {static} newFromId(String, ServiceCategory, LocalDateTime): ServiceProduct
+ + getCategory(): ServiceCategory
+ + getExpirationDate(): LocalDateTime
 }
 
 enum Category {
@@ -41,7 +66,7 @@ enum Category {
   + STATIONERY 	0.05, false
   + BOOK	   	0.10, false
   + ELECTRONICS	0.03, false
-  
+
   + getDiscountPercent(): float
   + getMaxPersonalizations(): int
 }
@@ -158,11 +183,30 @@ Abstract class User {
   + equals(Object): boolean
 }
 
+enum IdType{
+ + DNI
+ + NIF
+}
+
 class Client extends User{
+ + {static} MOD23_LUT: String
+ + {static} NIF_CONTROL_LETTERS: String
+ + {static} NIF_NUMERIC_ONLY: String
+ + {static} NIF_LETTER_ONLY: String
+ + {static} NIF_EITHER: String
+ + managedBy: Cashier
+ + ticketIds: List<Integer>
+ + idType: IdType
+
  + Client(String, String, String, Cashier)
  + addTicket(String)
- + {static} isValidId(String): boolean
- + compareTo(Client): boolean
+ + getIdType(String): IdType
+ - {static}isValidDni(String): boolean
+ - {static}isValidNif(String): boolean
+ - {static}computeNifControlDigit(String): int
+ - {static}matchesNifControl(char,char,int,char): boolean
+ - {static}normalize(String): String
+ + compareTo(Client): int
  + toString(): String
 }
 
@@ -197,7 +241,7 @@ class UserManager {
   + findClient(String): Client
   + listClients(): Client[]
   + getClientAmount(): int
-  
+
   + addCashier(String, String, String): boolean
   + addCashier(String, String): boolean
   + removeCashier(String): boolean
@@ -248,14 +292,15 @@ class ProductCommand implements Command {
   - evalList(String[], UserManager, Inventory)
 }
 
-Inventory *--> Product
+Inventory *--> InventoryItem
 
 App --> Inventory
-ProductInfo o--> Product
+ProductInfo o--> InventoryItem
 Ticket *--> ProductInfo
 Ticket ..> Product
 Ticket ..> TimedProduct
 Ticket ..> BaseProduct
+Ticket ..> InventoryItem
 
 UserManager *--> User
 UserManager ..> Client
