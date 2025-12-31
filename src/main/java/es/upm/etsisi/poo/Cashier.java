@@ -9,7 +9,7 @@ import java.util.List;
 public class Cashier extends User implements Comparable<Cashier> {
     public static final String COMPANY_DOMAIN = "upm.es";
     private List<Ticket> createdTickets;
-
+	
     /**
      * Creates new cashier with the id, name and email given in the parameters
      */
@@ -17,26 +17,26 @@ public class Cashier extends User implements Comparable<Cashier> {
         // Should handle: valid id format, valid upm email, none of the arguments is null
         super(id, name, email);
         createdTickets = new ArrayList<>();
-
+		
         if (!isValidId(id)) throw new IllegalArgumentException("Invalid cashier id: " + id);
         else if (!isCompanyEmail(email)) throw new IllegalArgumentException("Invalid cashier email: " + email);
     }
-
+	
     /**
      * Creates a new ticket the id given in the parameter.
      */
     public Ticket createTicket(int id) throws IllegalArgumentException{
         Ticket created = null;
-        created = new Ticket(id);
+        created = new ProductTicket(id);
         createdTickets.add(created);
 		return created;
     }
-
+	
 	public Ticket findTicket(int ticketId) throws MissingItemException {
         Iterator<Ticket> iterator = createdTickets.iterator();
         Ticket result = null;
         Ticket currentTicket;
-
+		
         while (iterator.hasNext() && result == null){
             currentTicket = iterator.next();
             if (currentTicket.getId() == ticketId){
@@ -46,7 +46,7 @@ public class Cashier extends User implements Comparable<Cashier> {
         if (result == null) throw new MissingItemException("The cashier does not own ticket with id " + ticketId);
 		return result;
 	}
-
+	
     /**
      * Returns a string representing the tickets created by this cashier
      * @return A string with the id and state of all the tickets created by this cashier, sorted by id
@@ -72,7 +72,7 @@ public class Cashier extends User implements Comparable<Cashier> {
         }
         return result.toString();
     }
-
+	
     /**
      * Returns array of Tickets created by this instance of Cashier
      * @return Array of tickets, zero length array if there are none
@@ -88,30 +88,30 @@ public class Cashier extends User implements Comparable<Cashier> {
             return new Ticket[0];
         }
     }
-
+	
     public int getCreatedTicketAmount() {
         return this.createdTickets.size();
     }
-
+	
     /**
      * Checks if email is a company email
      * @return true if email is not null and contains a single @ and COMPANY_DOMAIN after it
      */
     public static boolean isCompanyEmail(String email){
         boolean result = true;
-
+		
         if (email == null){
             result =  false;
         }else {
             String[] splitEmail = email.split("@");
-
+			
             if (splitEmail.length != 2 || !splitEmail[1].equals(COMPANY_DOMAIN)) {
                 result = false;
             }
         }
         return result;
     }
-
+	
 	public static boolean isValidId(String id) {
 		return id != null
             && id.length() == 9
@@ -119,16 +119,16 @@ public class Cashier extends User implements Comparable<Cashier> {
 			&& Character.toUpperCase(id.charAt(1)) == 'W'
 			&& (App.tryParseInt(id.substring(2)) != null);
 	}
-
+	
 	@Override
-	public int compareTo(Cashier c) {
+		public int compareTo(Cashier c) {
 		return this.getName().compareTo(c.getName());
 	}
-
+	
     @Override
-    public String toString() {
+		public String toString() {
 		return String.format("Cash{identifier='%s', name='%s', email='%s'}",
 							 this.getId(), this.getName(), this.getEmail());
 	}
-
+	
 }
