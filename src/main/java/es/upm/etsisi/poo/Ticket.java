@@ -1,11 +1,11 @@
 package es.upm.etsisi.poo;
 
-import es.upm.etsisi.poo.exceptions.DuplicateItemException;
-import es.upm.etsisi.poo.exceptions.FullCollectionException;
+import es.upm.etsisi.poo.exceptions.*;
 
 import java.time.DateTimeException;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.text.DecimalFormat;
@@ -28,10 +28,10 @@ public abstract class Ticket implements Comparable<Ticket> {
      */
 	public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.0###");
 	
-	protected ArrayList<ProductInfo> productInfos;
+	protected ArrayList<TicketItem> ticketItems;
 	
     /**
-     * The total summed amount of all productInfo's amount
+     * The total summed amount of all ticketItems
      */
 	protected int totalAmount;
 	
@@ -54,7 +54,7 @@ public abstract class Ticket implements Comparable<Ticket> {
      */
     public Ticket(int id) throws IllegalArgumentException {
         if (id < 0) throw new IllegalArgumentException("Ticket id should be a not negative number");
-        resetProductInfos();
+		this.ticketItems = new ArrayList<TicketItem>();
         this.id = id;
         this.isOpen = true;
 		
@@ -95,33 +95,36 @@ public abstract class Ticket implements Comparable<Ticket> {
     }
 	
     public boolean isEmpty() {
-        return this.productInfos.isEmpty();
+        return this.ticketItems.isEmpty();
     }
 	
-    /**
-     * Resets the Ticket resources
-     */
-    public void resetProductInfos() {
-        this.productInfos = new ArrayList<ProductInfo>();
-    }
+	/**
+     * Validate the item kind to add
+*/
+	public abstract boolean validateItemKind(InventoryItem item);
+	
+	/**
+     * Get a summary string of the current ticket products associated with an amount and discount.
+     * Sorts the productInfos array on product name string comparison (alfabetically).
+*/
+	public abstract String summaryString();
 	
     public void close() throws DateTimeException {
 		if (this.isOpen) {
-            for (ProductInfo productInfo : productInfos) {
-				Product product = productInfo.getProduct(); //Get the product
-				if (product instanceof TimedProduct timedProduct) {
-					if (App.now().isAfter(timedProduct.getExpirationDate())) {
-						throw new DateTimeException(String.format("Product %s is past its expiration date", product));
-					}
-				}
+			
+			ArrayList<TicketItem> aux = new ArrayList<>(this.ticketItems.size());
+			for (TicketItem tItem : this.ticketItems) {
+				
+				// New valid instance of every single object
+				tItem.validate();
+				aux.add(tItem.copy());
 			}
-			this.productInfos = finalProductInfo();
+			
+			this.ticketItems = aux;
 			this.isOpen = false;
             this.dateClosed = App.now();
         }
     }
-	
-	public abstract void addProduct(Product product, int amount, String[] personalizations) throws DuplicateItemException, FullCollectionException;
 	
     /**
      * Search and remove the product with the corresponding id.
@@ -132,120 +135,75 @@ public abstract class Ticket implements Comparable<Ticket> {
      * @param id the id of the product to attempt to remove
      * @return the removed product if it was found or null if it wasn't
      */
-    public boolean removeProduct(int id) {
-        boolean result = false;
-        ProductInfo foundProductInfo = null;
-        ProductInfo currentProductInfo = null;
-        Iterator<ProductInfo> iterator = productInfos.iterator();
+    public void removeItem(int id) throws MissingItemException {
+		TicketItem foundInfo = null;
+		TicketItem currentInfo = null;
 		
-        while (foundProductInfo == null && iterator.hasNext()) {
-            currentProductInfo = iterator.next();
-            if (id == currentProductInfo.getProduct().getId()) {
-                foundProductInfo = currentProductInfo;
+        Iterator<TicketItem> iterator = ticketItems.iterator();
+        while (foundInfo == null && iterator.hasNext()) {
+			currentInfo = iterator.next();
+            if (id == currentInfo.getItem().getId()) {
+                foundInfo = currentInfo;
             }
         }
 		
-        if (foundProductInfo != null) {
-            Product removed = foundProductInfo.getProduct();
-			
-            if (removed instanceof TimedProduct) {
-                this.totalAmount--;
-            } else {
-                this.totalAmount -= foundProductInfo.getAmount();
-            }
-			
-            result = productInfos.remove(foundProductInfo);
-        }
-		
-        return result;
+        if (foundInfo != null) {
+			iterator.remove();
+			this.totalAmount -= foundInfo.getAmount();
+            //result = productInfos.remove(foundProductInfo);
+        } else {
+			throw new MissingItemException("Ticket does not contain item with id " + id);
+		}
     }
 	
-	
-	/**
-     * Get a summary string of the current ticket products associated with an amount and discount.
-     * Sorts the productInfos array on product name string comparison (alfabetically).
-*/
-	public abstract String summaryString();
-	
-    /**
-     * Searches for a duplicate product info to the product info parameter.
-     * A duplicate product info constitutes one that has the same 'representation'. Meaning:
-     * - A BaseProduct is duplicate of another BaseProduct if it has the same id AND the same personalizations
-     * - A TimedProduct is duplicate of another TimedProduct if it has the same id. Meaning you can only add a
-     * TimedProduct once to a ticket.
-     *
-     * @param productInfo the product info to search with
-     * @return the duplicate product info found or null
-     */
-	protected ProductInfo findDuplicateProductInfo(ProductInfo productInfo) {
-        ProductInfo result = null;
-        ProductInfo currentProductInfo = null;
-        Iterator<ProductInfo> iterator = productInfos.iterator();
+	private TicketItem findDuplicateItem(TicketItem searchItem) {
+		TicketItem result = null;
+		TicketItem currentInfo = null;
+        Iterator<TicketItem> iterator = ticketItems.iterator();
 		
         while (result == null && iterator.hasNext()) {
-            currentProductInfo = iterator.next();
-            if (productInfo.equalProductInfo(currentProductInfo)) {
-                result = currentProductInfo;
-            }
+            currentInfo = iterator.next();
+			if (currentInfo.equals(searchItem)) {
+				result = currentInfo;
+			}
         }
         return result;
     }
 	
-    /**
-     * Helper to get a append a productInfo in the product info array.
-     * Standard array append checking the max length
-     *
-     * @param productInfo the productInfo to add at the end
-     * @return false if 'count == productInfos.length'
-     */
-	protected void appendProductInfo(ProductInfo productInfo) throws FullCollectionException{
-        Product product = productInfo.getProduct();
-        if (product instanceof TimedProduct) {
-            if ((this.totalAmount + 1) > MAX_PRODUCTS) throw new FullCollectionException("Ticket is already full");
-            productInfos.add(productInfo);
-        } else {
-            if ((productInfo.getAmount() + totalAmount) > MAX_PRODUCTS) throw new FullCollectionException("Ticket is already full");
-            productInfos.add(productInfo);
-        }
+    public void addItem(InventoryItem item, int amount, String[] personalizations) throws DataException, IllegalArgumentException, DateTimeException {
+		
+		if (!this.validateItemKind(item)) {
+			throw new IllegalArgumentException("This Ticket only accepts products");
+		}
+		
+		TicketItem infoToAdd = item.getTicketItem(amount, personalizations);
+		infoToAdd.validate();
+		TicketItem duplicate = this.findDuplicateItem(infoToAdd);
+		
+		if (duplicate != null) {
+			if (item.isInstanceUnique()) {
+				throw new DuplicateItemException("This product already exists in the ticket");
+			}
+			
+			if (this.totalAmount + amount <= MAX_PRODUCTS) {
+				duplicate.addAmount(amount);
+				this.totalAmount += amount;
+			} else {
+				throw new FullCollectionException("Ticket is full");
+			}
+			
+		} else {
+			if (infoToAdd.getAmount() + totalAmount <= MAX_PRODUCTS) {
+				this.ticketItems.add(infoToAdd);
+				this.totalAmount += infoToAdd.getAmount();
+			} else {
+				throw new FullCollectionException("Ticket is full");
+			}
+		}
     }
 	
     public int compareTo(Ticket ticket) {
         return this.id - ticket.id;
     }
 	
-    /**
-     * This function made a new ProductInfo with new instances when the ticket is close
-     * to prevent the modification of the objects by refereen
-     * @return the new array
-     */
-    private ArrayList<ProductInfo> finalProductInfo() {
-		ArrayList<ProductInfo> aux=new ArrayList<>(this.productInfos.size());
-		for (ProductInfo productInfo : this.productInfos) {
-			// New array with the personalizations
-			String[] persAux=new String[productInfo.getPersonalizations().length];
-			for (int i = 0; i < persAux.length; i++) { //Copy
-				persAux[i]=productInfo.getPersonalizations()[i];
-			}
-			
-			// New instance of every single object
-			Product oldProduct = productInfo.getProduct();
-			if(oldProduct instanceof TimedProduct oldProductAux){
-				// New TimedObject
-				TimedProduct timedProductAux = new TimedProduct(oldProduct.getId(),oldProduct.getName(),oldProduct.getPrice(),
-																oldProductAux.getMaxParticipants(),oldProductAux.getType().toString(),oldProductAux.getExpirationDate());
-				//New instance
-				ProductInfo info= new ProductInfo(timedProductAux,productInfo.getAmount(),persAux);
-				aux.add(info);
-			}else{
-				BaseProduct oldProductAux = (BaseProduct) oldProduct;
-				// New TimedObject
-				BaseProduct BaseProductAux = new BaseProduct(oldProduct.getId(),oldProduct.getName(),oldProduct.getPrice(),
-															 oldProductAux.getCategory().toString(),oldProductAux.getMaxPersonalizations(),oldProductAux.getPersonalized());
-				//New instance
-				ProductInfo info= new ProductInfo(BaseProductAux,productInfo.getAmount(),persAux);
-				aux.add(info);
-			}
-		}
-		return aux;
-	}
 }
