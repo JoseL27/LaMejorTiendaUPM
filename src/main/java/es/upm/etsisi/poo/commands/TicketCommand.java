@@ -158,7 +158,7 @@ public class TicketCommand implements Command {
         
         if (productToAdd instanceof TimedProduct timedProduct) {
             //Cast before checking
-            if (LocalDateTime.now().isAfter(timedProduct.getExpirationDate())) {
+            if (App.now().isAfter(timedProduct.getExpirationDate())) {
                 throw new FailedCommandException(String.format("ticket add: error: not enough time to prepare, you need more than %s hours\n",
                                                                timedProduct.getType().getHoursForPreparing()));
             }
@@ -272,7 +272,7 @@ public class TicketCommand implements Command {
         try {
             Cashier cashier = UserManager.getInstance().findCashier(cashierId);
             Ticket ticket = cashier.findTicket(ticketId);
-            ticket.tryClose();
+            ticket.close();
             System.out.print(ticket.summaryString());
             System.out.println("ticket print: ok");
         }catch (MissingItemException ex){

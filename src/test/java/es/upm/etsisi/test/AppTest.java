@@ -11,11 +11,21 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.Iterator;
 import java.lang.StringBuilder;
+import java.lang.reflect.Field;
+import java.time.LocalDateTime;
+import java.time.Clock;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.Instant;
+import java.time.Duration;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AppTest extends BaseTest {
+	
+	public static final LocalDateTime E2_TEST_DATE = LocalDateTime.of(25, 11, 14, 18, 21);
+    
 	private PrintStream systemOut;
 	private ByteArrayOutputStream testOut;
 	private App testApp;
@@ -39,7 +49,72 @@ public class AppTest extends BaseTest {
         void restoreTestOutput() {
 		System.setOut(systemOut);		
 	}
+	
+	App timeInjectedApp(LocalDateTime time) {
+		App app = new App();
+		
+		try {
+			Clock fixedClock = Clock.fixed(time.toInstant(ZoneOffset.UTC), ZoneId.ofOffset("", ZoneOffset.UTC));
+			Clock clock = Clock.tick(fixedClock, Duration.ZERO);
+			
+			Field f = App.class.getDeclaredField("clock");
+			f.setAccessible(true);
+			f.set(null, clock);
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+		
+		return app;
+	}
+	
+	void fullAppTest(LocalDateTime time, String inPath, String outPath) {
+        try {
+            Scanner testInScanner = new Scanner(new File(inPath));
+            App app = timeInjectedApp(time);
+            app.run(testInScanner, true);
+            assertEqualOutputsByLine(Paths.get(outPath));
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+	}
     
+    void runCommand(LocalDateTime time, String inputString, String expectedOutput) {
+		App app = timeInjectedApp(time);
+		app.run(new Scanner(inputString));
+		assertEqualOutputsByLine(expectedOutput);
+	}
+    
+    void runCommand(LocalDateTime time, String inputString[], String expectedOutput) {
+        runCommand(time, String.join(System.lineSeparator(), inputString), expectedOutput);
+	}
+    
+    void runCommand(LocalDateTime time, String inputString[], String expectedOutput[]) {
+        runCommand(time, inputString, String.join(System.lineSeparator(), expectedOutput));
+	}
+    
+	// ======================================================================
+	// FULL APP TESTS
+	// ======================================================================
+    
+	@Test
+        @Disabled
+        void fullAppE2() throws IOException {
+        fullAppTest(E2_TEST_DATE, "test-io/e2/in.txt", "test-io/e2/out.txt");
+	}
+    
+	@Test
+        @Disabled
+        void fullAppE3() throws IOException {
+        fullAppTest(E2_TEST_DATE, "test-io/e3/in.txt", "test-io/e3/out.txt");
+	}
+    
+    // NOTE(erb): test all commands through runCommand()
+	
+	
+	// ======================================================================
+	// UTILS
+	// ======================================================================
+	
 	void assertEqualOutputs(String expectedOutput) {
 		assertEquals(expectedOutput, testOut.toString());
 	}
@@ -85,46 +160,4 @@ public class AppTest extends BaseTest {
 		}
 	}
     
-    void fullAppTest(String inPath, String outPath) {
-        try {
-            Scanner testInScanner = new Scanner(new File(inPath));
-            App app = new App();
-            app.run(testInScanner, true);
-            assertEqualOutputsByLine(Paths.get(outPath));
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
-	}
-    
-    void runCommand(String inputString, String expectedOutput) {
-		App app = new App();
-		app.run(new Scanner(inputString));
-		assertEqualOutputsByLine(expectedOutput);
-	}
-    
-    void runCommand(String inputString[], String expectedOutput) {
-        runCommand(String.join(System.lineSeparator(), inputString), expectedOutput);
-	}
-    
-    void runCommand(String inputString[], String expectedOutput[]) {
-        runCommand(inputString, String.join(System.lineSeparator(), expectedOutput));
-	}
-    
-	// ======================================================================
-	// FULL APP TESTS
-	// ======================================================================
-    
-	@Test
-        @Disabled
-        void fullAppE2() throws IOException {
-        fullAppTest("test-io/e2/in.txt", "test-io/e2/out.txt");
-	}
-    
-	@Test
-        @Disabled
-        void fullAppE3() throws IOException {
-        fullAppTest("test-io/e3/in.txt", "test-io/e3/out.txt");
-	}
-    
-    // NOTE(erb): test all commands through runCommand()
 }

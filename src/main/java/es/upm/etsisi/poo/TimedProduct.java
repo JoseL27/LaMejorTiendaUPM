@@ -7,7 +7,7 @@ public class TimedProduct extends Product {
 	public static final DateTimeFormatter EXPIRATION_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     
     // The times for preparing should be compared by using
-    // LocalDateTime.now().plusHours(productYouAreChecking.getType().getHoursForPreparing()).compareTo(productYouAreChecking.getExpirationDate())
+    // App.now().plusHours(productYouAreChecking.getType().getHoursForPreparing()).compareTo(productYouAreChecking.getExpirationDate())
     // Refer to the java documentation for further instructions
     public enum TimedType {
         MEETING(12), //12h

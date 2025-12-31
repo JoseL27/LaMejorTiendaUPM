@@ -23,7 +23,7 @@ public class ServiceProduct extends InventoryItem {
         if (id <= 0) throw new IllegalArgumentException("Service id must be greater or equal to one, got " + id);
         if (category == null) throw new IllegalArgumentException("Category can not be null");
         if (expirationDate == null) throw new IllegalArgumentException("Expiration can not be null");
-        if (expirationDate.isBefore(LocalDateTime.now())) 
+        if (expirationDate.isBefore(App.now())) 
             throw new IllegalArgumentException("Expiration can not be in the past, got " + expirationDate.format(EXPIRATION_DATE_FORMAT));
         
         this.category = category;
