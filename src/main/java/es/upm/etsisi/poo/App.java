@@ -164,7 +164,7 @@ public class App {
 		
         BaseProduct.Category[] categoryValues = BaseProduct.Category.values();
         for (int i = 0; i < categoryValues.length; i++) {
-            System.out.printf("%s %.0f%%", categoryValues[i].name(), categoryValues[i].getDiscountPercent() * 100);
+            System.out.printf("%s %.0f%%", categoryValues[i].name(), categoryValues[i].discountPercent * 100);
             if (i < categoryValues.length - 1) {
                 System.out.print(", ");
             }

@@ -50,9 +50,7 @@ public class AppTest extends BaseTest {
 		System.setOut(systemOut);		
 	}
 	
-	App timeInjectedApp(LocalDateTime time) {
-		App app = new App();
-		
+	static void setAppTime(LocalDateTime time) {
 		try {
 			Clock fixedClock = Clock.fixed(time.toInstant(ZoneOffset.UTC), ZoneId.ofOffset("", ZoneOffset.UTC));
 			Clock clock = Clock.tick(fixedClock, Duration.ZERO);
@@ -63,14 +61,13 @@ public class AppTest extends BaseTest {
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
-		
-		return app;
 	}
 	
 	void fullAppTest(LocalDateTime time, String inPath, String outPath) {
         try {
             Scanner testInScanner = new Scanner(new File(inPath));
-            App app = timeInjectedApp(time);
+            App app = new App();
+			setAppTime(time);
             app.run(testInScanner, true);
             assertEqualOutputsByLine(Paths.get(outPath));
         } catch (IOException e) {
@@ -79,7 +76,8 @@ public class AppTest extends BaseTest {
 	}
     
     void runCommand(LocalDateTime time, String inputString, String expectedOutput) {
-		App app = timeInjectedApp(time);
+		App app = new App();
+		setAppTime(time);
 		app.run(new Scanner(inputString));
 		assertEqualOutputsByLine(expectedOutput);
 	}
