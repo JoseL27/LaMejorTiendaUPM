@@ -41,7 +41,15 @@ class ServiceTicketItem extends TicketItem implements Comparable<TicketItem> {
 		public String toString() {
 		return super.item.toString();
 	}
-	
+
+    @Override
+    public int compareTo(TicketItem ticketItem){
+       int result = -1;
+       if (ticketItem != null && ticketItem.getItem() instanceof ServiceProduct){
+           result = this.item.getId() - ticketItem.getItem().getId();
+       }
+       return result;
+    }
 }
 
 
@@ -111,7 +119,7 @@ public class ServiceProduct extends InventoryItem {
 	
     @Override
         public String toString() {
-        return String.format("{class:ProductService, id:%d, category:INSURANCE, expiration:%s}",
+        return String.format("{class:ProductService, id:%d, category:%s, expiration:%s}",
                              this.id, category.toString(), this.expirationDate.format(EXPIRATION_DATE_FORMAT));
     }
 	

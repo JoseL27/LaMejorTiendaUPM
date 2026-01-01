@@ -8,11 +8,26 @@ public class ServiceTicket extends Ticket {
 	
 	@Override
 		public boolean validateItemKind(InventoryItem item) {
-		return false;
+		return item instanceof ServiceProduct;
 	}
 	
 	@Override
 		public String summaryString() {
-		return "";
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("Ticket : ")
+                .append(this.getComposedId())
+                .append("\n")
+                .append("Services Included:\n");
+
+        this.ticketItems.sort(null);
+
+        for(TicketItem item: ticketItems){
+            builder.append("\t")
+                    .append(item.toString())
+                    .append("\n");
+        }
+
+		return builder.toString();
 	}
 }
