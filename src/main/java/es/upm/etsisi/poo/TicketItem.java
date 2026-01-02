@@ -34,10 +34,6 @@ public abstract class TicketItem implements Comparable<TicketItem> {
 		this.amount += more; 
 	}
 	
-	public void validate() throws DateTimeException {
-		// NOTE(erb): does nothing by default
-	}
-	
 	public boolean equals(TicketItem other) {
 		return (other != null && 
 				this.item.getId() == other.getItem().getId());
@@ -60,6 +56,7 @@ public abstract class TicketItem implements Comparable<TicketItem> {
 		return -1;
 	}
 	
+	public abstract void validate() throws DateTimeException;
 	public abstract String toString();
 	public abstract double getPrice();
 	public abstract TicketItem copy();

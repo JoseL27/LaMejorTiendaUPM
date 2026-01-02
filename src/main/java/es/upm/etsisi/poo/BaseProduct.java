@@ -1,6 +1,7 @@
 package es.upm.etsisi.poo;
 
 import java.util.Arrays;
+import java.time.DateTimeException;
 
 class BaseTicketItem extends TicketItem implements Comparable<TicketItem> {
 	private BaseProduct baseProduct;
@@ -34,6 +35,11 @@ class BaseTicketItem extends TicketItem implements Comparable<TicketItem> {
 			result = this.baseProduct.getName().compareTo(otherProduct.getName());
 		}
 		return result;
+	}
+	
+	@Override
+		public void validate() throws DateTimeException {
+		// NOTE(erb): do nothing at validation
 	}
 	
 	@Override
