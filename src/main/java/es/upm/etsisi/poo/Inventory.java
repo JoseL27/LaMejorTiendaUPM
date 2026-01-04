@@ -51,7 +51,7 @@ public class Inventory {
     
     private Inventory() {
         this.items = new HashMap<>();
-        nextProductId = 0;
+        nextProductId = 1;
         nextServiceId = 0;
     }
     
@@ -207,6 +207,24 @@ public class Inventory {
         return item;
     }
     
+	public InventoryItem getItemFromStringId(String strId) throws DataException, NumberFormatException {
+		
+		boolean isProduct = false;
+		if (ServiceProduct.isIdString(strId)) {
+			strId = strId.substring(0, strId.length() - 1);
+			isProduct = true;
+		}
+		int idNum = Integer.parseInt(strId);
+		
+		InventoryItemId itemId = new InventoryItemId(idNum, isProduct);
+        InventoryItem item = this.items.get(itemId);
+		
+		if (item == null) {
+			throw MissingItemException.fromId("Item", idNum);
+		} 
+		
+		return item;
+	}
     
     public ServiceProduct getService(int id) throws DataException {
         ServiceProduct result = null;
@@ -257,5 +275,6 @@ public class Inventory {
         
         return result;
     }
+	
     
 }

@@ -2,25 +2,67 @@ package es.upm.etsisi.poo;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.DateTimeException;
+import es.upm.etsisi.poo.exceptions.*;
+
+class TimedTicketItem extends TicketItem implements Comparable<TicketItem> {
+	private TimedProduct timedProduct;
+	private int peopleAmount;
+	
+	public TimedTicketItem(TimedProduct product, int amount) throws IllegalArgumentException {
+		super(product, 1);
+		this.timedProduct = product;
+		this.peopleAmount = amount;
+	}
+	
+	@Override
+		public double getPrice() {
+		return this.timedProduct.getPrice() * this.peopleAmount;
+	}
+	
+	@Override
+		public void validate() throws DateTimeException {
+		if (this.timedProduct.getExpirationDate().isBefore(App.now())) {
+			throw new DateTimeException(String.format("Product %s is past its expiration date", this.timedProduct.toString()));
+		}
+	}
+	
+	@Override
+		public int compareTo(TicketItem other) {
+		int result = -1;
+		if (other != null && (other.getItem() instanceof Product otherProduct)) {
+			result = this.timedProduct.getName().compareTo(otherProduct.getName());
+		}
+		return result;
+	}
+	
+	@Override
+		public TicketItem copy() {
+		return new TimedTicketItem((TimedProduct)this.timedProduct.copy(), super.amount);
+	}
+	
+	@Override 
+		public String toString() {
+		return this.timedProduct.toString(super.amount);
+	}
+}
+
 
 public class TimedProduct extends Product {
 	public static final DateTimeFormatter EXPIRATION_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     
     // The times for preparing should be compared by using
-    // LocalDateTime.now().plusHours(productYouAreChecking.getType().getHoursForPreparing()).compareTo(productYouAreChecking.getExpirationDate())
+    // App.now().plusHours(productYouAreChecking.getType().getHoursForPreparing()).compareTo(productYouAreChecking.getExpirationDate())
     // Refer to the java documentation for further instructions
     public enum TimedType {
         MEETING(12), //12h
         FOOD(72); //72h
         
-        private int hoursForPreparing;
         
+		public final int hoursForPreparing;
+		
         private TimedType(int hoursForPreparing) {
             this.hoursForPreparing = hoursForPreparing;
-        }
-        
-        public int getHoursForPreparing(){
-            return hoursForPreparing;
         }
     }
     
@@ -29,17 +71,22 @@ public class TimedProduct extends Product {
     private TimedType type;
     private int maxParticipants;
     private LocalDateTime expirationDate;
+	
+	
+	public TimedProduct(int id, String name, double individualPrice, int maxParticipants, String type, LocalDateTime expirationDate) throws IllegalArgumentException{ 
+		this(id, name, individualPrice, maxParticipants, TimedType.valueOf(type), expirationDate);
+	}
     
     // It is assumed that all the parameters are valid, this should be handled before creating the object
-    public TimedProduct(int id, String name, double individualPrice, int maxParticipants, String type, LocalDateTime expirationDate) throws IllegalArgumentException{
+    public TimedProduct(int id, String name, double individualPrice, int maxParticipants, TimedType type, LocalDateTime expirationDate) throws IllegalArgumentException{
         super(id, name, individualPrice);
         if (maxParticipants < 0 || maxParticipants > TIMED_PRODUCT_MAX_PEOPLE)
             throw new IllegalArgumentException("Max participants for a timed product should be between 0 and " + TIMED_PRODUCT_MAX_PEOPLE);
-        this.type = TimedType.valueOf(type);
+        this.type = type;
         this.maxParticipants = maxParticipants;
         this.expirationDate = expirationDate;
     }
-    
+	
     public TimedType getType() {
         return this.type;
     }
@@ -51,14 +98,34 @@ public class TimedProduct extends Product {
     public LocalDateTime getExpirationDate() {
         return this.expirationDate.minusHours(type.hoursForPreparing);
     }
-    
-    @Override
-        public boolean duplicateOf(InventoryItem product) {
-        return (product != null)
-            && product.getClass() == this.getClass()
-            && product.getId() != this.getId();
-    }
-    
+	
+	
+	@Override
+		public TicketItem getTicketItem(int amount, String[] personalizations) throws IllegalArgumentException {
+		if (personalizations == null || personalizations.length != 0) {
+			throw new IllegalArgumentException("Timed products can't be personalized");
+		}
+		if (amount >= maxParticipants) {
+			throw new IllegalArgumentException("Timed products amount can't be greater than the max participants");
+		}
+		return new TimedTicketItem(this, amount);
+	}
+	
+	@Override
+		public InventoryItemId getInventoryId() {
+		return new InventoryItemId(id, true);
+	}
+	
+	@Override
+		public boolean isInstanceUnique() {
+		return true; 
+	}
+	
+	@Override
+		public InventoryItem copy() {
+        return new TimedProduct(super.id, super.name, super.price, maxParticipants, type, expirationDate);
+	}
+	
     @Override
         public String toString() {
         return toString(0);
@@ -66,17 +133,16 @@ public class TimedProduct extends Product {
     
     public String toString(int amount) {
         String typeWord = this.type.toString().charAt(0) + this.type.toString().substring(1).toLowerCase();
-        
         // NOTE(enrique): expected output indicates that this should the price being payed.
         // So for example, when printing it as a product listing, it should be 0;
-        double effectivePrice = super.getPrice();
+        double effectivePrice = super.price;
         if (amount > 0) {
             effectivePrice = effectivePrice * amount;
         }
         
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("{class:%s, id:%d, name:'%s', price:%.1f, date of Event:%s, max people allowed:%d",
-                                typeWord, super.getId(), super.getName(), effectivePrice,
+                                typeWord, super.id, super.name, effectivePrice,
                                 this.expirationDate.format(EXPIRATION_DATE_FORMAT), this.getMaxParticipants()));
         if (amount > 0) {
             sb.append(String.format(", actual people in event:%d", amount));

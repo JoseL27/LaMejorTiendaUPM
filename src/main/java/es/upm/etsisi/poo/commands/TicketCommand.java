@@ -115,63 +115,30 @@ public class TicketCommand implements Command {
         if (!App.checkMinArgsCountWithPrint("ticket add", params.length, 4))
             return;
         
-        int ticketId;
-        String cashierId = params[3];
-        int productId;
-        int amount;
-        String[] personalizations = null;
-        
         try {
-            ticketId = Integer.parseInt(params[2]);
-        }catch (NumberFormatException ex){
-            throw new FailedCommandException("Unable to add product to ticket, " + params[2] + " is not a valid integer");
-        }
-        
-		if (!Cashier.isValidId(cashierId)) {
-			throw new FailedCommandException(String.format("ticket add: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId));
-		}
-        
-        try {
-            productId = Integer.parseInt(params[4]);
-        }catch(NumberFormatException ex){
-            throw new FailedCommandException("Unable to add product to ticket, " + params[4] + " is not a valid integer");
-        }
-        
-        try {
-            amount = Integer.parseInt(params[5]);
-        }catch(NumberFormatException ex){
-            throw new FailedCommandException("Unable to add product to ticket, " + params[5] + " is not a valid integer");
-        }
-        
-        if (params.length > 6) {
-            personalizations = parsePersonalizations(6, params);
-        }
-        
-        // Execute
-        Product productToAdd = Inventory.getInstance().getProduct(productId);
-		if (ticketId < 0) {
-			throw new FailedCommandException(String.format("ticket add: error: ticket id '%d' is invalid, expected a positive number\n", ticketId));
-		}
-		if (productToAdd == null) {
-			throw new FailedCommandException(String.format("ticket add: error: could not find product with id %s\n", productId));
-		}
-        
-        if (productToAdd instanceof TimedProduct timedProduct) {
-            //Cast before checking
-            if (LocalDateTime.now().isAfter(timedProduct.getExpirationDate())) {
-                throw new FailedCommandException(String.format("ticket add: error: not enough time to prepare, you need more than %s hours\n",
-                                                               timedProduct.getType().getHoursForPreparing()));
-            }
-        }
-        
-        try {
+			int ticketId = Integer.parseInt(params[2]);
+			String cashierId = params[3];
+			String itemId = params[4];
+            int amount = Integer.parseInt(params[5]);
+			
+			String[] personalizations = null;
+			if (params.length > 6) {
+				personalizations = parsePersonalizations(6, params);
+			}
+			
+			InventoryItem itemToAdd = Inventory.getInstance().getItemFromStringId(itemId);
             Cashier cashier = UserManager.getInstance().findCashier(cashierId);
+			
             Ticket ticket = cashier.findTicket(ticketId);
-            ticket.addProduct(productToAdd, amount, personalizations);
+            ticket.addItem(itemToAdd, amount, personalizations);
+			
             System.out.print(ticket.summaryString());
             System.out.println("ticket add: ok");
-        }catch (DataException ex){
-            throw new FailedCommandException("Unable to add product to ticket, " + ex.getMessage());
+			
+        } catch(NumberFormatException ex){
+            throw new FailedCommandException("ticket add: error: invalid integer");
+        } catch (DataException ex){
+            throw new FailedCommandException("ticket add: error:" + ex.getMessage());
         }
     }
     
@@ -191,49 +158,24 @@ public class TicketCommand implements Command {
         if (!App.checkArgsCountWithPrint("ticket remove", params.length, 5))
             return;
         
-        int ticketId;
-        String cashierId = params[3];
-        
         try {
-            ticketId = Integer.parseInt(params[2]);
-        }catch(NumberFormatException ex) {
-            throw new FailedCommandException("Unable to remove product from ticket, " + params[2] + " is not a valid integer");
-        }
-        
-        if (!Cashier.isValidId(cashierId)) {
-            throw new FailedCommandException(String.format("ticket remove: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId));
-        }
-        
-        int productId;
-        try {
-            productId = Integer.parseInt(params[4]);
-        }catch(NumberFormatException ex) {
-            throw new FailedCommandException("Unable to remove product from ticket, " + params[4] + " is not a valid integer");
-        }
-        
-        // Execute
-        if (ticketId < 0) {
-            throw new FailedCommandException(String.format("ticket remove: error: ticket id '%d' is invalid, expected a positive number", ticketId));
-        }
-        if (!Product.isValidId(productId)) {
-            throw new FailedCommandException(("ticket remove: error: expected product id greater or equal than zero"));
-        }
-        
-        Cashier cashier;
-        Ticket ticket;
-        try {
-            cashier = UserManager.getInstance().findCashier(cashierId);
-            ticket = cashier.findTicket(ticketId);
-        }catch(MissingItemException ex){
-            throw new FailedCommandException("Unable to remove product from ticket, " + ex.getMessage());
-        }
-        
-        if (ticket.removeProduct(productId)) {
-            System.out.print(ticket.summaryString());
+			String cashierId = params[3];
+            int ticketId = Integer.parseInt(params[2]);
+            int itemId = Integer.parseInt(params[4]);
+			
+			// Execute
+            Cashier cashier = UserManager.getInstance().findCashier(cashierId);
+            Ticket ticket = cashier.findTicket(ticketId);
+			
+			ticket.removeItem(itemId);
+			System.out.print(ticket.summaryString());
             System.out.println("ticket remove: ok");
-        } else {
-            throw new FailedCommandException(("ticket remove: error: failed to remove product"));
-        }
+			
+        } catch(NumberFormatException ex) {
+			throw new FailedCommandException("ticket remove: error: invalid integer");
+		} catch(MissingItemException ex){
+            throw new FailedCommandException("ticket remove: error: failed to remove product: " + ex.getMessage());
+        } 
     }
     
     /**
@@ -272,7 +214,7 @@ public class TicketCommand implements Command {
         try {
             Cashier cashier = UserManager.getInstance().findCashier(cashierId);
             Ticket ticket = cashier.findTicket(ticketId);
-            ticket.tryClose();
+            ticket.close();
             System.out.print(ticket.summaryString());
             System.out.println("ticket print: ok");
         }catch (MissingItemException ex){
@@ -319,7 +261,7 @@ public class TicketCommand implements Command {
         }
         
         if (!result) {
-            return null;
+            return new String[0];
         }
         return pers;
     }

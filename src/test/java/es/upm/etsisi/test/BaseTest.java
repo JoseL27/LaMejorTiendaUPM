@@ -5,13 +5,13 @@ import es.upm.etsisi.poo.UserManager;
 import es.upm.etsisi.poo.Inventory;
 
 import java.util.Locale;
+import java.time.LocalDateTime;
 import java.lang.reflect.Field;
 
 import org.junit.jupiter.api.*;
 
 public class BaseTest { 
-    
-    // DICTATOR LOCALE 
+	// DICTATOR LOCALE 
     @BeforeAll
         private static void setEnUSLocale() {
         Locale.setDefault(new Locale("en", "US"));

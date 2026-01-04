@@ -15,14 +15,13 @@ public abstract class InventoryItem {
         return this.id;
     }
     
-	public abstract boolean duplicateOf(InventoryItem product);
-    
-    public abstract String toString();
-    
-    //public abstract InventoryItem clone();
+	public abstract boolean isInstanceUnique();
+	public abstract String toString();
+    public abstract InventoryItem copy();
+	public abstract TicketItem getTicketItem(int amount, String[] personalization) throws IllegalArgumentException;
+	public abstract InventoryItemId getInventoryId();
     
     public static boolean isValidId(int idToCheck) {
         return idToCheck >= 0;
     }
-    
 }

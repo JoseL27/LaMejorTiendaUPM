@@ -4,8 +4,8 @@ public abstract class Product extends InventoryItem {
     
     public static final int PRODUCT_MAX_NAME_LENGTH = 100; // E1: product name contains no more than 100 characters
     
-    private String name;
-    private double price;
+	protected String name;
+	protected double price;
     // constructor
     
     protected Product(int id, String name, double price) throws IllegalArgumentException{
@@ -38,5 +38,4 @@ public abstract class Product extends InventoryItem {
         if (!isValidPrice(price)) throw new IllegalArgumentException(price + " is not a valid product price");
         this.price = price;
     }
-    
 }

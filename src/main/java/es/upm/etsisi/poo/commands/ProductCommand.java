@@ -97,7 +97,7 @@ public class ProductCommand implements Command {
             productPrice = Integer.parseInt(productPriceString);
             
             boolean specifiedMaxPers = false;
-            productMaxPers = productCategory.getMaxPersonalizations();
+            productMaxPers = productCategory.maxPersonalizations;
             if (parseIndex < params.length) {
                 String productMaxPersString = params[parseIndex++];
                 
@@ -160,10 +160,10 @@ public class ProductCommand implements Command {
 			maxPeople = Integer.parseInt(params[parseIndex]);
             
 			// Execution
-			LocalDateTime prepDoneTime = LocalDateTime.now().plusHours(type.getHoursForPreparing());
+			LocalDateTime prepDoneTime = App.now().plusHours(type.hoursForPreparing);
 			if (prepDoneTime.isAfter(expirationDate)) {
 				throw new FailedCommandException(String.format("prod add: error: you need at least %d hours to prepare for this %s\n",
-                                                               type.getHoursForPreparing(), type.toString().toLowerCase()));
+                                                               type.hoursForPreparing, type.toString().toLowerCase()));
 			}
             
 			Product addedProduct = inventory.createTimedProduct(id, name, price, maxPeople, typeArgument, expirationDate);
@@ -266,7 +266,7 @@ public class ProductCommand implements Command {
                 
                 for (Ticket ticket: tickets) {
                     if (ticket.isOpen()) {
-                        ticket.removeProduct(productToRemove.getId());
+                        ticket.removeItem(productToRemove.getId());
                     }
                 }
             }
