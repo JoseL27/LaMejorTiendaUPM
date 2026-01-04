@@ -211,7 +211,7 @@ public class Inventory {
 		
 		boolean isProduct = false;
 		if (ServiceProduct.isIdString(strId)) {
-			strId = strId.substring(strId.length() - 1);
+			strId = strId.substring(0, strId.length() - 1);
 			isProduct = true;
 		}
 		int idNum = Integer.parseInt(strId);
