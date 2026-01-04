@@ -42,21 +42,22 @@ public class CombinedTicket extends Ticket {
 		// Products (BaseProduct, TimedProduct)
 		sb.append("Product Included\n");
 		for (TicketItem info : ticketItems) {
-			double price = info.getPrice();
-			double itemDiscount = info.getItemDiscount(categoriesCount);
+			if (info.getItem() instanceof Product) {
+				double price = info.getPrice();
+				double itemDiscount = info.getItemDiscount(categoriesCount);
 
-			totalPrice += price * info.getAmount();
-			productItemDiscount += itemDiscount * info.getAmount();
+				totalPrice += price * info.getAmount();
+				productItemDiscount += itemDiscount * info.getAmount();
 
-			int printRepeatAmount = info instanceof TimedTicketItem ? 1 : info.getAmount();
-			for (int i = 0; i < printRepeatAmount; i++) {
-				sb.append("  ").append(info.toString());
-				if (itemDiscount > 0) {
-					sb.append(" **discount -").append(Ticket.DECIMAL_FORMAT.format(itemDiscount));
+				int printRepeatAmount = info instanceof TimedTicketItem ? 1 : info.getAmount();
+				for (int i = 0; i < printRepeatAmount; i++) {
+					sb.append("  ").append(info.toString());
+					if (itemDiscount > 0) {
+						sb.append(" **discount -").append(Ticket.DECIMAL_FORMAT.format(itemDiscount));
+					}
+					sb.append('\n');
 				}
-				sb.append('\n');
 			}
-
 		}
 		
 		double serviceDiscount = (totalPrice - productItemDiscount) * globalServiceDiscountPercentage;
