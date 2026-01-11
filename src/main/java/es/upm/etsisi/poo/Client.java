@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class Client extends User implements Comparable<Client> {
+public class Client extends User {
     
     public enum IdType {DNI, NIF,};
     
@@ -163,15 +163,15 @@ public class Client extends User implements Comparable<Client> {
         //Locale ROOT es para evitar alfabetos extraños
     }
     
-    
-    @Override
-        public int compareTo(Client c) {
-        return this.getName().compareTo(c.getName());
-    }
-    
     @Override
         public String toString() {
-        return String.format("Client{identifier='%s', name='%s', email='%s', cash=%s}",
-                             this.getId(), this.getName(), this.getEmail(), this.managedBy.getId());
+		String labelStr = switch (idType) {
+			case DNI -> "USER";
+			case NIF -> "COMPANY";
+			default -> "Client";
+		};
+		
+        return String.format("%s{identifier='%s', name='%s', email='%s', cash=%s}",
+                             labelStr, this.getId(), this.getName(), this.getEmail(), this.managedBy.getId());
     }
 }
