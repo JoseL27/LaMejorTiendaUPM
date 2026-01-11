@@ -3,16 +3,19 @@ package es.upm.etsisi.poo;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.DateTimeException;
+
+import java.util.Arrays;
+
 import es.upm.etsisi.poo.exceptions.*;
 
 class TimedTicketItem extends TicketItem implements Comparable<TicketItem> {
 	private TimedProduct timedProduct;
 	private int peopleAmount;
 	
-	public TimedTicketItem(TimedProduct product, int amount) throws IllegalArgumentException {
+	public TimedTicketItem(TimedProduct product, int peopleAmount) throws IllegalArgumentException {
 		super(product, 1);
 		this.timedProduct = product;
-		this.peopleAmount = amount;
+		this.peopleAmount = peopleAmount;
 	}
 	
 	@Override
@@ -38,12 +41,12 @@ class TimedTicketItem extends TicketItem implements Comparable<TicketItem> {
 	
 	@Override
 		public TicketItem copy() {
-		return new TimedTicketItem((TimedProduct)this.timedProduct.copy(), super.amount);
+		return new TimedTicketItem((TimedProduct)this.timedProduct.copy(), this.peopleAmount);
 	}
 	
 	@Override 
 		public String toString() {
-		return this.timedProduct.toString(super.amount);
+		return this.timedProduct.toString(this.peopleAmount);
 	}
 }
 
@@ -73,8 +76,21 @@ public class TimedProduct extends Product {
     private LocalDateTime expirationDate;
 	
 	
-	public TimedProduct(int id, String name, double individualPrice, int maxParticipants, String type, LocalDateTime expirationDate) throws IllegalArgumentException{ 
-		this(id, name, individualPrice, maxParticipants, TimedType.valueOf(type), expirationDate);
+	public TimedProduct(int id, String name, double individualPrice, int maxParticipants, String typeString, LocalDateTime expirationDate) throws IllegalArgumentException{ 
+		super(id, name, individualPrice);
+		
+		if (maxParticipants < 0 || maxParticipants > TIMED_PRODUCT_MAX_PEOPLE)
+			throw new IllegalArgumentException("Max participants for a timed product should be between 0 and " + TIMED_PRODUCT_MAX_PEOPLE);
+        
+		try {
+			TimedType type = TimedType.valueOf(typeString);
+			this.type = type;
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException(String.format("Timed type is one of %s", Arrays.toString(TimedType.values())));
+		}
+		
+		this.maxParticipants = maxParticipants;
+		this.expirationDate = expirationDate;
 	}
     
     // It is assumed that all the parameters are valid, this should be handled before creating the object
