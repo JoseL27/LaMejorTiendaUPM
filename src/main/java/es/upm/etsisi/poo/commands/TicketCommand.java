@@ -54,33 +54,69 @@ public class TicketCommand implements Command {
         if (!App.checkArgsCountWithPrint("ticket new", params.length, 4, 6))
             return;
 
-        String cashierId = params[params.length - 2];
-        if (!Cashier.isValidId(cashierId)) {
-            throw new FailedCommandException(String.format("ticket new: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId));
-        }
-
-        String clientId = params[params.length - 1];
-        UserManager userManager = UserManager.getInstance();
-
-        // Execution
-        boolean isCustomId = (params.length == 5);
         try {
-            Cashier cashier = userManager.findCashier(cashierId);
-            Client client = userManager.findClient(clientId);
+            UserManager userManager = UserManager.getInstance();
+            int ticketId = 0;
+            String cashierId = "";
+            String clientId = "";
+            char tickeType = 'p';
+            boolean isIdCustom = false;
 
-            int ticketId;
-            if (isCustomId) {
-                String ticketIdStr = params[2];
-                ticketId = Integer.parseInt(ticketIdStr);
-
-                if (!userManager.isTicketIdUnique(ticketIdStr)) {
-                    throw new FailedCommandException("ticket new: id already exists");
-                }
-            } else {
+            if (params.length == 4) {
+                cashierId = params[2];
+                clientId = params[3];
                 ticketId = userManager.generateUniqueTicketId();
+
+            } else if (params.length == 6) {
+                ticketId = Integer.parseInt(params[2]);
+                cashierId = params[3];
+                clientId = params[4];
+                tickeType = params[5].charAt(0);
+                isIdCustom = true;
+            } else {
+                char aux = params[4].charAt(0);
+                if (params[4].length() == 1 && (aux == 'c' || aux == 'p' || aux == 's')) {
+                    ticketId = userManager.generateUniqueTicketId();
+                    cashierId = params[2];
+                    clientId = params[3];
+                    tickeType = aux;
+                } else if (params[4].length() != 1) {
+                    ticketId = Integer.parseInt(params[2]);
+                    isIdCustom = true;
+                    cashierId = params[3];
+                    clientId = params[4];
+                }
             }
 
-            Ticket created = cashier.createTicket(ticketId, isCustomId);
+            if (!Cashier.isValidId(cashierId)) {
+                throw new FailedCommandException(String.format("ticket new: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId));
+            }
+
+            String aux = ticketId + "";
+            if (!userManager.isTicketIdUnique(aux)) {
+                throw new FailedCommandException("ticket new: id already exists");
+            }
+
+            Client.IdType idType = Client.getIdType(clientId);
+            if (idType == null) {
+                throw new FailedCommandException("ticket new: id not valid");
+            }
+            Cashier cashier = userManager.findCashier(cashierId);
+            Client client = userManager.findClient(clientId);
+            Ticket created = null;
+
+
+            if (tickeType == 'p') {
+                created = (ProductTicket) cashier.createTicket(ticketId, isIdCustom);
+
+            } else if (tickeType == 's' && idType == Client.IdType.NIF) {
+                created = (ServiceTicket) cashier.createTicket(ticketId, isIdCustom);
+            } else if (tickeType == 'c' && idType == Client.IdType.NIF) {
+                created = (CombinedTicket) cashier.createTicket(ticketId, isIdCustom);
+            } else {
+                throw new FailedCommandException("ticket new: id and ticket type don't match");
+            }
+
             client.addTicket(ticketId);
             System.out.print(created.summaryString());
             System.out.println("ticket new: ok");
