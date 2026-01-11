@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AppTest extends BaseTest {
 	
 	public static final LocalDateTime E2_TEST_DATE = LocalDateTime.of(25, 11, 14, 18, 21);
+    public static final LocalDateTime E3_TEST_DATE = LocalDateTime.of(25, 12,  7, 22, 32);
     
 	private PrintStream systemOut;
 	private ByteArrayOutputStream testOut;
@@ -101,13 +102,11 @@ public class AppTest extends BaseTest {
 	}
     
 	@Test
-        @Disabled
         void fullAppE3() throws IOException {
-        fullAppTest(E2_TEST_DATE, "test-io/e3/in.txt", "test-io/e3/out.txt");
+        fullAppTest(E3_TEST_DATE, "test-io/e3/in.txt", "test-io/e3/out.txt");
 	}
     
-    // NOTE(erb): test all commands through runCommand()
-	
+    // TODO(erb): test all commands through runCommand()
 	
 	// ======================================================================
 	// UTILS

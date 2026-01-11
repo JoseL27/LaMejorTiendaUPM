@@ -148,7 +148,7 @@ public class ClientTest extends BaseTest {
         Cashier cs = new Cashier("UW9999999", "andres", "andres@upm.es");
         Client cl = new Client("X0586929S", "jose", "josqlito@correo.com", cs);
         
-        String expected = String.format("Client{identifier='%s', name='%s', email='%s', cash=%s}",
+        String expected = String.format("USER{identifier='%s', name='%s', email='%s', cash=%s}",
                                         cl.getId(), cl.getName(), cl.getEmail(), cs.getId());
         assertEquals(expected, cl.toString());
     }
