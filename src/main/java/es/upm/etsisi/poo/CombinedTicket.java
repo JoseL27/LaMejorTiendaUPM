@@ -3,27 +3,27 @@ package es.upm.etsisi.poo;
 
 
 public class CombinedTicket extends Ticket {
-	public CombinedTicket(int id) {
-		super(id);
+	public CombinedTicket(int id, boolean isCustomId) {
+		super(id, isCustomId);
 	}
 	
 	@Override
-	public boolean validateItemKind(InventoryItem item) {
+		public boolean validateItemKind(InventoryItem item) {
 		return (item instanceof Product || item instanceof ServiceProduct); // or just true
 	}
 	
 	@Override
-	public String summaryString() {
+		public String summaryString() {
 		StringBuilder sb = new StringBuilder();
-
+		
 		sb.append("Ticket : ")
-				.append(getComposedId())
-				.append("\n");
-
+			.append(getComposedId())
+			.append("\n");
+		
 		double totalPrice = 0;
 		double productItemDiscount = 0;
 		double globalServiceDiscountPercentage = 0;
-
+		
 		ticketItems.sort(null);
 		int[] categoriesCount = categoriesProductCount();
 		int serviceCount = 0;
@@ -32,23 +32,23 @@ public class CombinedTicket extends Ticket {
 		for (TicketItem info : ticketItems) {
 			if (info.getItem() instanceof ServiceProduct) {
 				sb.append("  ")
-						.append(info.toString())
-						.append('\n');
+					.append(info.toString())
+					.append('\n');
 				serviceCount++;
 			}
 		}
 		globalServiceDiscountPercentage = Math.min(ServiceProduct.SERVICE_DISCOUNT * serviceCount, 1); // Clamp to 100%
-
+		
 		// Products (BaseProduct, TimedProduct)
 		sb.append("Product Included\n");
 		for (TicketItem info : ticketItems) {
 			if (info.getItem() instanceof Product) {
 				double price = info.getPrice();
 				double itemDiscount = info.getItemDiscount(categoriesCount);
-
+				
 				totalPrice += price * info.getAmount();
 				productItemDiscount += itemDiscount * info.getAmount();
-
+				
 				int printRepeatAmount = info instanceof TimedTicketItem ? 1 : info.getAmount();
 				for (int i = 0; i < printRepeatAmount; i++) {
 					sb.append("  ").append(info.toString());
@@ -68,7 +68,7 @@ public class CombinedTicket extends Ticket {
 		sb.append("  Final Price: ").append(DECIMAL_FORMAT.format(finalPrice)).append("\n");
 		return sb.toString();
 	}
-
+	
 	/**
 	 * @return array table of the amount of products in each.
 	 * <p>
@@ -79,14 +79,14 @@ public class CombinedTicket extends Ticket {
 		// Yoink
 		int[] table = new int[BaseProduct.Category.values().length];
 		for (TicketItem info : ticketItems) {
-
+			
 			// TODO(enrique): Think of a more OOP way to do this.
 			if (info.getItem() instanceof BaseProduct baseProduct) {
 				int index = (int)baseProduct.getCategory().ordinal();
 				table[index] += info.getAmount();
 			}
 		}
-
+		
 		return table;
 	}
 }
