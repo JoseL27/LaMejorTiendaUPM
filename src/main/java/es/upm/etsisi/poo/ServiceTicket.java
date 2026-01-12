@@ -17,16 +17,19 @@ public class ServiceTicket extends Ticket {
 		
         builder.append("Ticket : ")
 			.append(this.getComposedId())
-			.append("\n")
-			.append("Services Included:\n");
+			.append("\n");
 		
-        this.ticketItems.sort(null);
-		
-        for(TicketItem item: ticketItems){
-            builder.append("\t")
-				.append(item.toString())
-				.append("\n");
-        }
+		if (!ticketItems.isEmpty()) {
+			builder.append("Services Included: \n");
+			
+			this.ticketItems.sort(null);
+			
+			for(TicketItem item: ticketItems){
+				builder.append("  ")
+					.append(item.toString())
+					.append("\n");
+			}
+		}
 		
 		return builder.toString();
 	}

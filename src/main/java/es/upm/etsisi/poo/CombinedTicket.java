@@ -26,46 +26,66 @@ public class CombinedTicket extends Ticket {
 		
 		ticketItems.sort(null);
 		int[] categoriesCount = categoriesProductCount();
+		
+		
 		int serviceCount = 0;
-		// Services
-		sb.append("Services included:\n");
+		int productCount = 0;
 		for (TicketItem info : ticketItems) {
 			if (info.getItem() instanceof ServiceProduct) {
-				sb.append("  ")
-					.append(info.toString())
-					.append('\n');
 				serviceCount++;
+			} else if (info.getItem() instanceof Product) {
+				productCount++;
 			}
 		}
+		
 		globalServiceDiscountPercentage = Math.min(ServiceProduct.SERVICE_DISCOUNT * serviceCount, 1); // Clamp to 100%
 		
-		// Products (BaseProduct, TimedProduct)
-		sb.append("Product Included\n");
-		for (TicketItem info : ticketItems) {
-			if (info.getItem() instanceof Product) {
-				double price = info.getPrice();
-				double itemDiscount = info.getItemDiscount(categoriesCount);
-				
-				totalPrice += price * info.getAmount();
-				productItemDiscount += itemDiscount * info.getAmount();
-				
-				int printRepeatAmount = info instanceof TimedTicketItem ? 1 : info.getAmount();
-				for (int i = 0; i < printRepeatAmount; i++) {
-					sb.append("  ").append(info.toString());
-					if (itemDiscount > 0) {
-						sb.append(" **discount -").append(Ticket.DECIMAL_FORMAT.format(itemDiscount));
+		// Services
+		if (!ticketItems.isEmpty()) {
+			if (serviceCount > 0) {
+				sb.append("Services Included: \n");
+				for (TicketItem info : ticketItems) {
+					if (info.getItem() instanceof ServiceProduct) {
+						sb.append("  ")
+							.append(info.toString())
+							.append('\n');
 					}
-					sb.append('\n');
 				}
+			}
+			
+			// Products (BaseProduct, TimedProduct)
+			if (productCount > 0) {
+				sb.append("Product Included\n");
+				for (TicketItem info : ticketItems) {
+					if (info.getItem() instanceof Product) {
+						double price = info.getPrice();
+						double itemDiscount = info.getItemDiscount(categoriesCount);
+						
+						totalPrice += price * info.getAmount();
+						productItemDiscount += itemDiscount * info.getAmount();
+						
+						int printRepeatAmount = info instanceof TimedTicketItem ? 1 : info.getAmount();
+						for (int i = 0; i < printRepeatAmount; i++) {
+							sb.append("  ").append(info.toString());
+							if (itemDiscount > 0) {
+								sb.append(" **discount -").append(Ticket.DECIMAL_FORMAT.format(itemDiscount));
+							}
+							sb.append('\n');
+						}
+					}
+				}
+				
+				double serviceDiscount = (totalPrice - productItemDiscount) * globalServiceDiscountPercentage;
+				String serviceDiscountFmt = DECIMAL_FORMAT.format(serviceDiscount);
+				double finalPrice = (totalPrice - productItemDiscount) * (1 - globalServiceDiscountPercentage);
+				
+				sb.append("  Total price: ").append(DECIMAL_FORMAT.format(totalPrice)).append("\n");
+				sb.append(String.format("  Extra Discount from services:%s **discount -%s%n", serviceDiscountFmt, serviceDiscountFmt));
+				sb.append("  Total discount: ").append(DECIMAL_FORMAT.format(productItemDiscount + serviceDiscount)).append("\n");
+				sb.append("  Final Price: ").append(DECIMAL_FORMAT.format(finalPrice)).append("\n");
 			}
 		}
 		
-		double serviceDiscount = (totalPrice - productItemDiscount) * globalServiceDiscountPercentage;
-		double finalPrice = (totalPrice - productItemDiscount) * (1 - globalServiceDiscountPercentage);
-		sb.append("  Total price: ").append(DECIMAL_FORMAT.format(totalPrice)).append("\n");
-		sb.append("  Extra Discount from services: ").append(DECIMAL_FORMAT.format(serviceDiscount)).append("\n");
-		sb.append("  Total discount: ").append(DECIMAL_FORMAT.format(productItemDiscount + serviceDiscount)).append("\n");
-		sb.append("  Final Price: ").append(DECIMAL_FORMAT.format(finalPrice)).append("\n");
 		return sb.toString();
 	}
 	
