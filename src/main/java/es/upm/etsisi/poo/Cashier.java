@@ -27,10 +27,8 @@ public class Cashier extends User {
     /**
      * Creates a new ticket the id given in the parameter.
      */
-    public Ticket createTicket(int id, boolean isCustomId) throws IllegalArgumentException {
-        Ticket created = new ProductTicket(id, isCustomId);
-        this.tickets.put(created.getComposedId(), created);
-		return created;
+    public void addTicket(Ticket ticketToAdd) throws IllegalArgumentException {
+        this.tickets.put(ticketToAdd.getComposedId(), ticketToAdd);
     }
 	
 	public Ticket findTicket(String ticketId) throws MissingItemException {

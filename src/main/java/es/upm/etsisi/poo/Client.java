@@ -19,7 +19,7 @@ public class Client extends User {
         
         this.managedBy = cashier;
         this.ticketIds = new ArrayList<>();
-        this.idType = getIdType(id);
+        this.idType = idTypeFromString(id);
         
         if (idType == null)
             throw new IllegalArgumentException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
@@ -31,6 +31,10 @@ public class Client extends User {
         
         ticketIds.add(ticketId);
     }
+	
+	public IdType getIdType() {
+		return this.idType;
+	}
     
     
     // Control DNI/NIE (mod 23)
@@ -46,7 +50,7 @@ public class Client extends User {
     /**
      * Si es DNI o NIE válido => devuelve DNI. Si no, si es NIF jurídica válido => NIF. Si no => null.
      */
-    public static IdType getIdType(String input) {
+    public static IdType idTypeFromString(String input) {
         String s = normalize(input);
         if (s == null) return null;
         
