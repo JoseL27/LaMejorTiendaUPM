@@ -162,7 +162,7 @@ public class BaseProduct extends Product {
 		
 		if (this.personalized) {
 			sb.append(String.format(", maxPersonal:%d", this.maxPersonalizations));
-			if (personalizations != null) {
+			if (personalizations != null && personalizations.length > 0) {
 				sb.append(", personalizationList:");
 				sb.append(Arrays.toString(personalizations));
 			}
