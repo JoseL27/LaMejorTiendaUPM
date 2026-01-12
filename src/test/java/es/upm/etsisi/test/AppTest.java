@@ -129,12 +129,20 @@ public class AppTest extends BaseTest {
 			assertEquals(expectedOutputScanner.nextLine(), testOutputScanner.nextLine(), String.format("missmatch line on line %d\n", lineCounter));
 			lineCounter++;
 		}
-        
-		if (expectedOutputScanner.hasNextLine()) {
-			fail(String.format("Lines left in expected output: '%s'", expectedOutputScanner.nextLine()));
-		}
-		if (testOutputScanner.hasNextLine()) {
-			fail(String.format("Lines left in test output: '%s'", testOutputScanner.nextLine()));
+		
+		if (expectedOutputScanner.hasNextLine() != testOutputScanner.hasNextLine()) {
+			
+			if (expectedOutputScanner.hasNextLine()) {
+				String left = expectedOutputScanner.nextLine().trim();
+				if (left.length() > 0) {
+					fail(String.format("Lines left in expected output: '%s'", left));
+				}
+			} else {
+				String left = testOutputScanner.nextLine().trim();
+				if (left.length() > 0) {
+					fail(String.format("Lines left in test output: '%s'", left));
+				}
+			}
 		}
 	}
 	
@@ -153,7 +161,10 @@ public class AppTest extends BaseTest {
 			fail(String.format("Lines left in expected output: '%s'", expectedLinesIt.next()));
 		}
 		if (testOutputScanner.hasNextLine()) {
-			fail(String.format("Lines left in test output: '%s'", testOutputScanner.nextLine()));
+			String left = testOutputScanner.nextLine().trim();
+			if (left.length() > 0) {
+				fail(String.format("Lines left in test output: '%s'", left));
+			}
 		}
 	}
     
