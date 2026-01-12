@@ -2,6 +2,7 @@ package es.upm.etsisi.poo;
 
 import es.upm.etsisi.poo.exceptions.*;
 
+import java.io.Serializable;
 import java.time.DateTimeException;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.text.DecimalFormat;
  *
  * @see Product
  */
-public abstract class Ticket implements Comparable<Ticket> {
+public abstract class Ticket implements Comparable<Ticket>, Serializable {
 	public static final int MAX_PRODUCTS = 100;
 	
     /**

@@ -5,10 +5,11 @@ import es.upm.etsisi.poo.exceptions.DuplicateItemException;
 import es.upm.etsisi.poo.exceptions.FullCollectionException;
 import es.upm.etsisi.poo.exceptions.MissingItemException;
 
+import java.io.Serializable;
 import java.util.*;
 import java.time.LocalDateTime;
 
-class InventoryItemId { 
+class InventoryItemId implements Serializable {
     public int id;
     public boolean isProduct;
     
@@ -32,7 +33,7 @@ class InventoryItemId {
     }
 }
 
-public class Inventory {
+public class Inventory implements Serializable {
     
     public static final int MAX_PRODUCTS = 200; // E1: no more than 200 products
     
@@ -40,11 +41,16 @@ public class Inventory {
     private int nextProductId;
     private int nextServiceId;
     
-    private static Inventory instance = new Inventory();
+    public static Inventory instance;
     
     public static Inventory getInstance() {
         if (instance == null) {
-            instance = new Inventory();
+            if (Serialize.dataStore.containsKey("Inventory")) {
+                instance = (Inventory) Serialize.dataStore.get("Inventory");
+            } else {
+                instance = new Inventory();
+                Serialize.dataStore.put("Inventory", instance);
+            }
         }
         return instance;
     }
@@ -209,10 +215,10 @@ public class Inventory {
     
 	public InventoryItem getItemFromStringId(String strId) throws DataException, NumberFormatException {
 		
-		boolean isProduct = false;
+		boolean isProduct = true;
 		if (ServiceProduct.isIdString(strId)) {
 			strId = strId.substring(0, strId.length() - 1);
-			isProduct = true;
+			isProduct = false;
 		}
 		int idNum = Integer.parseInt(strId);
 		

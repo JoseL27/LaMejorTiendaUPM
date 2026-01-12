@@ -1,10 +1,11 @@
 package es.upm.etsisi.poo;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.time.DateTimeException;
 import es.upm.etsisi.poo.exceptions.*;
 
-public abstract class TicketItem implements Comparable<TicketItem> {
+public abstract class TicketItem implements Comparable<TicketItem>, Serializable {
 	/**
 	 * ProductInfo struct-like holder as a Product pair.
 	 * Has basic constructors and getters.

@@ -2,6 +2,7 @@ package es.upm.etsisi.poo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.Clock;
 import java.util.Scanner;
@@ -38,7 +39,17 @@ public class App {
 		
         System.out.println("Welcome to the ticket module App.");
         System.out.println("Ticket module. Type 'help' to see commands.");
-		
+
+        File saveFile = new File("tienda.upm");
+        if (saveFile.exists()) {
+            try {
+                Serialize.load(saveFile);
+            } catch (Exception e) {
+                System.out.println("Error: unable to load previous data.");
+                System.out.println(e.getMessage());
+            }
+        }
+
         String input;
         do {
             System.out.print("tUPM> ");
@@ -54,6 +65,13 @@ public class App {
             }
             System.out.println();
         } while (!input.equals("exit"));
+
+        try {
+            Serialize.save(saveFile);
+        } catch (IOException e) {
+            System.out.println("Error: unable to save data.");
+            System.out.println(e.getMessage());
+        }
     }
 	
     /**

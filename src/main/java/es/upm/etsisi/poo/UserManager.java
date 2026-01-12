@@ -2,13 +2,14 @@ package es.upm.etsisi.poo;
 
 import es.upm.etsisi.poo.exceptions.*;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * UserManager creates and stores a set of Clients and Cashiers (both are Users), and provides methods to perform
  * Add/Remove/Find operations on the Client/Cashier set.
  */
-public class UserManager {
+public class UserManager implements Serializable {
 	// using hashmap here since it will make my life easier, also there is no explicit limit on the amount of users -jy
 	private Map<String, User> users;
     
@@ -21,11 +22,16 @@ public class UserManager {
 	public static final int MAX_TICKET_ID = 99999;
 	private int nextTicketId = MIN_TICKET_ID;
     
-	private static UserManager instance = new UserManager();
+	private static UserManager instance;
     
 	public static UserManager getInstance() {
 		if (instance == null) {
-			instance = new UserManager();
+			if (Serialize.dataStore.containsKey("UserManager")) {
+				instance = (UserManager) Serialize.dataStore.get("UserManager");
+			} else {
+				instance = new UserManager();
+				Serialize.dataStore.put("UserManager", instance);
+			}
 		}
 		return instance;
 	}

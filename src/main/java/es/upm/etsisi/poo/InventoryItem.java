@@ -2,7 +2,9 @@
 
 package es.upm.etsisi.poo;
 
-public abstract class InventoryItem {
+import java.io.Serializable;
+
+public abstract class InventoryItem implements Serializable {
     
     protected final int id;
     
