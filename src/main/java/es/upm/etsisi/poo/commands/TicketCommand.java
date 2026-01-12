@@ -121,10 +121,7 @@ public class TicketCommand implements Command {
 			String itemId = params[4];
             int amount = Integer.parseInt(params[5]);
 			
-			String[] personalizations = null;
-			if (params.length > 6) {
-				personalizations = parsePersonalizations(6, params);
-			}
+			String[] personalizations = parsePersonalizations(6, params);
 			
 			InventoryItem itemToAdd = Inventory.getInstance().getItemFromStringId(itemId);
             Cashier cashier = UserManager.getInstance().findCashier(cashierId);
