@@ -142,10 +142,10 @@ public class ProductCommand implements Command {
         
         // Parsing
         Inventory inventory = Inventory.getInstance();
-        String typeArgument = params[parseIndex++];
+        String typeArgument = params[parseIndex++].replaceAll("add", "").toUpperCase();
         
         try {
-            type = TimedProduct.TimedType.valueOf(typeArgument.replaceAll("add", "").toUpperCase());
+            type = TimedProduct.TimedType.valueOf(typeArgument);
             
 			if (params.length == 6){
 				name = params[parseIndex++];
