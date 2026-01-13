@@ -170,7 +170,7 @@ public class Inventory {
     /**
      * Returns an array of all products added.
      */
-    public Collection<InventoryItem> listItems() {
+    public Collection<InventoryItem> getItems() {
         return this.items.values();
     }
     

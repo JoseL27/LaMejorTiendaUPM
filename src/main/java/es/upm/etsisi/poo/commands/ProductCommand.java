@@ -291,7 +291,7 @@ public class ProductCommand implements Command {
 	public void evalList(String[] params) {
 		if (!App.checkArgsCountWithPrint("prod list", params.length, 2)) return;
 		
-		ArrayList<InventoryItem> items = new ArrayList(Inventory.getInstance().listItems());
+		ArrayList<InventoryItem> items = new ArrayList(Inventory.getInstance().getItems());
 		items.sort((i1, i2) -> i1.getId() - i2.getId());
 		
 		System.out.println("Catalog:");

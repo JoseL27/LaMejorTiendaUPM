@@ -86,20 +86,14 @@ public class UserManager {
 	 * @return Array of Client, array of zero length if there are none
 	 */
 	public ArrayList<Client> getClients() {
-		ArrayList<Client> result = new ArrayList<>();
+		Collection<User> allUsers = this.users.values();
+		ArrayList<Client> result = new ArrayList<>(allUsers.size() / 2);
 		
-		if (!this.users.isEmpty()) {
-			Iterator<User> userIterator = this.users.values().iterator();
-			
-			// Gets the list with all the clients
-			while (userIterator.hasNext()) {
-				User user = userIterator.next();
-				if (user instanceof Client){
-					result.add((Client)user);
-				}
+		for (User user : allUsers) {
+			if (user instanceof Client){
+				result.add((Client)user);
 			}
-            
-		} 
+		}
 		
 		return result;
 	}
@@ -173,17 +167,15 @@ public class UserManager {
 	 * @return Array of Cashier, array of zero length if there are none
 	 */
 	public ArrayList<Cashier> getCashiers() {
-		Iterator<User> userIterator = this.users.values().iterator();
-		ArrayList<Cashier> result = new ArrayList<>();
+		Collection<User> allUsers = this.users.values();
+		ArrayList<Cashier> result = new ArrayList<>(allUsers.size() / 2);
 		
-		// Gets the list with all the clients
-		while (userIterator.hasNext()) {
-			User user = userIterator.next();
+		for (User user : allUsers) {
 			if (user instanceof Cashier){
 				result.add((Cashier) user);
 			}
 		}
-        
+		
 		return result;
 	}
     
@@ -192,29 +184,16 @@ public class UserManager {
 	 * @return ArrayList containing all the tickets in the system, the list will be empty if no tickets exist
 	 */
 	public ArrayList<Ticket> getAllTickets(){
-		ArrayList<Ticket> tickets = new ArrayList<>();
-		ArrayList<Cashier> cashiers = this.getCashiers();
+		ArrayList<Ticket> result = new ArrayList<>();
 		
-		for (Cashier cash: cashiers){
-			tickets.addAll(cash.getTickets());
+		Collection<User> allUsers = this.users.values();
+		for (User user : allUsers) {
+			if (user instanceof Cashier cash){
+				result.addAll(cash.getTickets());
+			}
 		}
 		
-		return tickets;
-	}
-    
-	/**
-	 * Returns a list of Ticket instances created by the specified Cashier ID in String
-	 * @param workerId Cashier's ID
-	 * @return Array of Ticket instances created by the specified Cashier, if the cashier has no tickets this will
-	 * return zero length array, but if the cashier does not exist, this will return null instead
-	 */
-	public Collection<Ticket> getCashierTickets(String workerId) throws MissingItemException, IllegalArgumentException{
-		if (!Cashier.isValidId(workerId)) throw new IllegalArgumentException("Invalid cashier id: " + workerId);
-        
-		Cashier cashier = (Cashier)this.users.get(workerId);
-        if (cashier == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
-        
-        return cashier.getTickets();
+		return result;
 	}
     
 	/**
@@ -225,12 +204,10 @@ public class UserManager {
 	public boolean isTicketIdUnique(String ticketId) {
 		boolean isUnique = true;
 		List<Cashier> cashiers = this.getCashiers();
-		Iterator<Cashier> it = cashiers.iterator();
 		
-		while (isUnique && it.hasNext()) {
-			Cashier cashier = it.next();
+		for (Cashier cash : cashiers) {
 			try {
-				cashier.findTicket(ticketId);
+				cash.findTicket(ticketId);
 				isUnique = false;
 			} catch (MissingItemException e) {
 				isUnique = true;
