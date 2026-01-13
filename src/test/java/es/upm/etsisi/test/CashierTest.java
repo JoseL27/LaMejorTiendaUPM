@@ -38,26 +38,24 @@ public class CashierTest extends BaseTest {
     public static final Cashier VALID_CASHIER = 
         new Cashier(VALID_WORKER_IDs[0], "persona", VALID_COMPANY_EMAILs[0]);
     
-    @Disabled
-        @Test
+	@Test
         void validateId() {
         for (String id : VALID_WORKER_IDs) 
             assertTrue(Cashier.isValidId(id), String.format("Expected %s to be a valid worker id, was invalid", id));
         
         for (String id : INVALID_WORKER_IDs) 
-            assertTrue(Cashier.isValidId(id), String.format("Expected %s to be a invalid worker id, was valid", id));
+            assertFalse(Cashier.isValidId(id), String.format("Expected %s to be a invalid worker id, was valid", id));
     }
     
-    @Disabled
-        @Test
+	@Test
         void validateCompanyEmail() {
         for (String e : VALID_COMPANY_EMAILs) 
             assertTrue(Cashier.isCompanyEmail(e), 
                        String.format("Expected %s to be a valid company email, was invalid", e));
         
         for (String e : INVALID_COMPANY_EMAILs) 
-            assertTrue(Cashier.isCompanyEmail(e), 
-                       String.format("Expected %s to be a invalid company email, was valid", e));
+            assertFalse(Cashier.isCompanyEmail(e), 
+						String.format("Expected %s to be a invalid company email, was valid", e));
     }
     
     @Test

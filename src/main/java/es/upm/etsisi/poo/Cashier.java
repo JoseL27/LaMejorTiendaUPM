@@ -54,16 +54,15 @@ public class Cashier extends User {
      * @return true if email is not null and contains a single @ and COMPANY_DOMAIN after it
      */
     public static boolean isCompanyEmail(String email){
-        boolean result = true;
+        boolean result = false;
 		
-        if (email == null){
-            result =  false;
-        }else {
+        if (email != null) {
             String[] splitEmail = email.split("@");
 			
-            if (splitEmail.length != 2 || !splitEmail[1].equals(COMPANY_DOMAIN)) {
-                result = false;
-            }
+			if (splitEmail.length == 2) {
+				result = splitEmail[0].length() > 0 && 
+					splitEmail[1].equals(COMPANY_DOMAIN);
+			}
         }
         return result;
     }

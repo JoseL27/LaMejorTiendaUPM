@@ -132,8 +132,8 @@ public class CashCommand implements Command {
 			
             System.out.println("cash tickets: ok");
 			
-        }catch (MissingItemException ex){
-            throw new FailedCommandException("Cannot list the tickets for cashier " + cashierId +": " + ex.getMessage());
+        } catch (MissingItemException ex){
+            throw new FailedCommandException(ex.getMessage());
         }
     }
 }
