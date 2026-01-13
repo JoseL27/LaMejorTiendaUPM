@@ -16,14 +16,15 @@ public class Client extends User {
     
     public Client(String id, String name, String email, Cashier cashier) throws IllegalArgumentException {
         super(id, name, email);
-        
+		
+		if (cashier == null) throw new IllegalArgumentException("Cashier can't be null");
+		
         this.managedBy = cashier;
         this.ticketIds = new ArrayList<>();
         this.idType = idTypeFromString(id);
-        
-        if (idType == null)
+		
+		if (idType == null)
             throw new IllegalArgumentException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
-        if (cashier == null) throw new IllegalArgumentException("Client needs an assigned cashier to be created");
     }
     
     public void addTicket(int ticketId) throws DuplicateItemException {
@@ -112,7 +113,12 @@ public class Client extends User {
         if (type == 'K' || type == 'L' || type == 'M') return false;
         
         String digits = s.substring(1, 8);
-        if (App.tryParseInt(digits) == null) return false;
+		
+		try {
+			Integer.parseInt(digits);
+		} catch (NumberFormatException e) {
+			return false;
+		}
         
         char control = s.charAt(8);
         if (!Character.isLetterOrDigit(control)) return false;

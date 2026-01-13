@@ -10,7 +10,7 @@ public abstract class Product extends InventoryItem {
     
     protected Product(int id, String name, double price) throws IllegalArgumentException{
         super(id);
-        if (name == null) throw new IllegalArgumentException("Product name can not be null");
+        assert name != null : "Product name can not be null";
         if (!isValidName(name)) throw new IllegalArgumentException(name + " is not a valid product name");
         if (!isValidPrice(price)) throw new IllegalArgumentException(price + " is not a valid product price");
         this.name = name;

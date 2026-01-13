@@ -15,8 +15,8 @@ public abstract class TicketItem implements Comparable<TicketItem> {
 	protected int amount;
 	
 	protected TicketItem(InventoryItem item, int amount) {
-        if (item == null) throw new IllegalArgumentException("Can not create a info from a null item");
-        if (amount < 0) throw new IllegalArgumentException("Expected a positive amount, got " + amount);
+		assert item != null : "Ticket item's item can't be null";
+		assert amount >= 0 : "Ticket item amount has to be positive";
         
 		this.item = item;
 		this.amount = amount;

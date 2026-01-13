@@ -68,11 +68,21 @@ public class Cashier extends User {
     }
 	
 	public static boolean isValidId(String id) {
-		return id != null
-            && id.length() == 9
-			&& Character.toUpperCase(id.charAt(0)) == 'U'
-			&& Character.toUpperCase(id.charAt(1)) == 'W'
-			&& (App.tryParseInt(id.substring(2)) != null);
+		boolean result = (id != null
+						  && id.length() == 9
+						  && Character.toUpperCase(id.charAt(0)) == 'U'
+						  && Character.toUpperCase(id.charAt(1)) == 'W');
+		
+		if (result) {
+			try {
+				Integer.parseInt(id.substring(2));
+			} catch (NumberFormatException e) {
+				result = false;
+			}
+		}
+		
+		return result;
+		
 	}
 	
     @Override
