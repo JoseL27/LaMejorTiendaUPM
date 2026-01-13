@@ -39,17 +39,7 @@ public class App {
 		
         System.out.println("Welcome to the ticket module App.");
         System.out.println("Ticket module. Type 'help' to see commands.");
-
-        File saveFile = new File("tienda.upm");
-        if (saveFile.exists()) {
-            try {
-                Serialize.load(saveFile);
-            } catch (Exception e) {
-                System.out.println("Error: unable to load previous data.");
-                System.out.println(e.getMessage());
-            }
-        }
-
+		
         String input;
         do {
             System.out.print("tUPM> ");
@@ -65,13 +55,7 @@ public class App {
             }
             System.out.println();
         } while (!input.equals("exit"));
-
-        try {
-            Serialize.save(saveFile);
-        } catch (IOException e) {
-            System.out.println("Error: unable to save data.");
-            System.out.println(e.getMessage());
-        }
+		
     }
 	
     /**
@@ -85,6 +69,16 @@ public class App {
         App app = new App();
         Scanner sc;
 		
+		File saveFile = new File("tienda.upm");
+		if (saveFile.exists()) {
+			try {
+				Serialize.load(saveFile);
+			} catch (Exception e) {
+				System.out.println("Error: unable to load previous data.");
+				System.out.println(e.getMessage());
+			}
+		}
+		
         if (args.length == 0) {
             sc = new Scanner(System.in);
             app.run(sc);
@@ -92,6 +86,7 @@ public class App {
 			
             String fileName = args[0];
             try {
+				
                 sc = new Scanner(new File(fileName));
                 app.run(sc, true);
             } catch (FileNotFoundException e) {
@@ -99,6 +94,13 @@ public class App {
             } catch (Exception e) {
                 throw e;
             }
+        }
+		
+        try {
+            Serialize.save(saveFile);
+        } catch (IOException e) {
+            System.out.println("Error: unable to save data.");
+            System.out.println(e.getMessage());
         }
     }
 	
