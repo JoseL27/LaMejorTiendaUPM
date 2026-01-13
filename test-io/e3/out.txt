@@ -14,14 +14,14 @@ Commands:
   ticket remove <ticketId><cashId> <prodId> 
   ticket print <ticketId> <cashId> 
   ticket list
-  prod add ([<id>] "<name>" <category> <price> [<maxPers>]) || ("<name>" <category> )
+  prod add ([<id>] "<name>" <category> <price> [<maxPers>]) || (<expiration: yyyy-MM-dd> <category>)
   prod update <id> NAME|CATEGORY|PRICE <value>
   prod addFood [<id>] "<name>" <price> <expiration:yyyy-MM-dd> <max_people>
   prod addMeeting [<id>] "<name>" <price> <expiration:yyyy-MM-dd> <max_people>
   prod list
   prod remove <id>
   help
-  echo “<text>” 
+  echo "<text>"
   exit
 
 Categories: MERCH, STATIONERY, CLOTHES, BOOK, ELECTRONICS
@@ -87,7 +87,7 @@ Cash{identifier='UW1234567', name='pepecurro3', email='pepe0@upm.es'}
 cash add: ok
 
 tUPM> cash add "pepecurro2" pepe0@upm.es
-Cash{identifier='UW9121937', name='pepecurro2', email='pepe0@upm.es'}
+Cash{identifier='UW1234568', name='pepecurro2', email='pepe0@upm.es'}
 cash add: ok
 
 tUPM> echo "Creo tres cliente listo borro uno y listo"
@@ -131,7 +131,7 @@ cash add: ok
 tUPM> cash list
 Cash:
   Cash{identifier='UW1234569', name='pepecurro1', email='pepe0@upm.es'}
-  Cash{identifier='UW9121937', name='pepecurro2', email='pepe0@upm.es'}
+  Cash{identifier='UW1234568', name='pepecurro2', email='pepe0@upm.es'}
   Cash{identifier='UW1234567', name='pepecurro3', email='pepe0@upm.es'}
 cash list: ok
 
@@ -140,7 +140,7 @@ cash remove: ok
 
 tUPM> cash list
 Cash:
-  Cash{identifier='UW9121937', name='pepecurro2', email='pepe0@upm.es'}
+  Cash{identifier='UW1234568', name='pepecurro2', email='pepe0@upm.es'}
   Cash{identifier='UW1234567', name='pepecurro3', email='pepe0@upm.es'}
 cash list: ok
 
@@ -152,7 +152,7 @@ Tickets:
 cash tickets: ok
 
 tUPM> ticket new UW1234567 55630667S
-Ticket : 25-12-07-22:32-47570
+Ticket : 25-12-07-22:32-00000
   Total price: 0.0
   Total discount: 0.0
   Final Price: 0.0
@@ -160,7 +160,7 @@ ticket new: ok
 
 tUPM> cash tickets UW1234567
 Tickets: 
-  25-12-07-22:32-47570->EMPTY
+  25-12-07-22:32-00000 - EMPTY
 cash tickets: ok
 
 tUPM> echo "creo un ticket con ID"
@@ -205,7 +205,7 @@ ticket add: ok
 
 tUPM> ticket list
 Ticket List:
-  25-12-07-22:32-47570 - EMPTY
+  25-12-07-22:32-00000 - EMPTY
   212121 - OPEN
 ticket list: ok
 
@@ -238,7 +238,7 @@ ticket print: ok
 
 tUPM> ticket list
 Ticket List:
-  25-12-07-22:32-47570 - EMPTY
+  25-12-07-22:32-00000 - EMPTY
   212121-25-12-07-22:32 - CLOSE
 ticket list: ok
 
@@ -366,7 +366,7 @@ ticket add: ok
 
 tUPM> ticket list
 Ticket List:
-  25-12-07-22:32-47570 - EMPTY
+  25-12-07-22:32-00000 - EMPTY
   212123 - OPEN
   212121-25-12-07-22:32 - CLOSE
 ticket list: ok
@@ -403,7 +403,7 @@ ticket print: ok
 
 tUPM> ticket list
 Ticket List:
-  25-12-07-22:32-47570 - EMPTY
+  25-12-07-22:32-00000 - EMPTY
   212123-25-12-07-22:32 - CLOSE
   212121-25-12-07-22:32 - CLOSE
 ticket list: ok
@@ -420,7 +420,7 @@ tUPM> prod addMeeting 23457 "Graduacion ETSISI" 40 2025-12-21 30
 prod addMeeting: ok
 
 tUPM> prod addFood 23458 "Cafeteria ETSISI" 5 2025-12-21 300
-Error processing ->prod addFood ->Error adding product
+Unable to add product: Max participants for a timed product should be between 0 and 100
 
 tUPM> prod addFood 23459 "Restaurante Asador" 50 2025-12-21 40
 {class:Food, id:23459, name:'Restaurante Asador', price:50.0, date of Event:2025-12-21, max people allowed:40}
@@ -458,7 +458,7 @@ Ticket : 212127
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
   {class:Meeting, id:23456, name:'Reunion Rotonda', price:240.0, date of Event:2025-12-21, max people allowed:100, actual people in event:20}
   Total price: 285.0
-  Total discount: 3.1499999
+  Total discount: 3.15
   Final Price: 281.85
 ticket add: ok
 
@@ -469,14 +469,14 @@ Ticket : 212127-25-12-07-22:32
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0} **discount -1.05
   {class:Meeting, id:23456, name:'Reunion Rotonda', price:240.0, date of Event:2025-12-21, max people allowed:100, actual people in event:20}
   Total price: 285.0
-  Total discount: 3.1499999
+  Total discount: 3.15
   Final Price: 281.85
 ticket print: ok
 
 tUPM> ticket list
 Ticket List:
   212127-25-12-07-22:32 - CLOSE
-  25-12-07-22:32-47570 - EMPTY
+  25-12-07-22:32-00000 - EMPTY
   212123-25-12-07-22:32 - CLOSE
   212121-25-12-07-22:32 - CLOSE
 ticket list: ok
@@ -528,7 +528,7 @@ Ticket : 212128
   {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:19.5, maxPersonal:3, personalizationList:[red, blue, green]} **discount -1.365
   {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:19.5, maxPersonal:3, personalizationList:[red, blue, green]} **discount -1.365
   Total price: 145.5
-  Total discount: 10.184999
+  Total discount: 10.185
   Final Price: 135.315
 ticket add: ok
 
@@ -542,7 +542,7 @@ Ticket : 212128-25-12-07-22:32
   {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:19.5, maxPersonal:3, personalizationList:[red, blue, green]} **discount -1.365
   {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:19.5, maxPersonal:3, personalizationList:[red, blue, green]} **discount -1.365
   Total price: 145.5
-  Total discount: 10.184999
+  Total discount: 10.185
   Final Price: 135.315
 ticket print: ok
 

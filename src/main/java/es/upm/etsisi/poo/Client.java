@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class Client extends User implements Comparable<Client> {
+public class Client extends User {
     
     public enum IdType {DNI, NIF,};
     
@@ -19,7 +19,7 @@ public class Client extends User implements Comparable<Client> {
         
         this.managedBy = cashier;
         this.ticketIds = new ArrayList<>();
-        this.idType = getIdType(id);
+        this.idType = idTypeFromString(id);
         
         if (idType == null)
             throw new IllegalArgumentException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
@@ -31,6 +31,10 @@ public class Client extends User implements Comparable<Client> {
         
         ticketIds.add(ticketId);
     }
+	
+	public IdType getIdType() {
+		return this.idType;
+	}
     
     
     // Control DNI/NIE (mod 23)
@@ -46,7 +50,7 @@ public class Client extends User implements Comparable<Client> {
     /**
      * Si es DNI o NIE válido => devuelve DNI. Si no, si es NIF jurídica válido => NIF. Si no => null.
      */
-    public static IdType getIdType(String input) {
+    public static IdType idTypeFromString(String input) {
         String s = normalize(input);
         if (s == null) return null;
         
@@ -163,15 +167,15 @@ public class Client extends User implements Comparable<Client> {
         //Locale ROOT es para evitar alfabetos extraños
     }
     
-    
-    @Override
-        public int compareTo(Client c) {
-        return this.getName().compareTo(c.getName());
-    }
-    
     @Override
         public String toString() {
-        return String.format("Client{identifier='%s', name='%s', email='%s', cash=%s}",
-                             this.getId(), this.getName(), this.getEmail(), this.managedBy.getId());
+		String labelStr = switch (idType) {
+			case DNI -> "USER";
+			case NIF -> "COMPANY";
+			default -> "Client";
+		};
+		
+        return String.format("%s{identifier='%s', name='%s', email='%s', cash=%s}",
+                             labelStr, this.getId(), this.getName(), this.getEmail(), this.managedBy.getId());
     }
 }

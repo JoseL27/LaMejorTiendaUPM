@@ -86,7 +86,7 @@ public class ClientTest extends BaseTest {
         new Client(VALID_NIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
     
     void testClientId(String id, Client.IdType expectedIdType) {
-        Client.IdType idType = Client.getIdType(id);
+        Client.IdType idType = Client.idTypeFromString(id);
         if (idType != expectedIdType) {
             String expStr = expectedIdType != null ? expectedIdType.toString() : "null";
             fail(String.format("Expected '%s' to be a %s, was %s\n", id, expStr, idType.toString()));
@@ -148,7 +148,7 @@ public class ClientTest extends BaseTest {
         Cashier cs = new Cashier("UW9999999", "andres", "andres@upm.es");
         Client cl = new Client("X0586929S", "jose", "josqlito@correo.com", cs);
         
-        String expected = String.format("Client{identifier='%s', name='%s', email='%s', cash=%s}",
+        String expected = String.format("USER{identifier='%s', name='%s', email='%s', cash=%s}",
                                         cl.getId(), cl.getName(), cl.getEmail(), cs.getId());
         assertEquals(expected, cl.toString());
     }

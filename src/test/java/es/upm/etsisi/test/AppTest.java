@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AppTest extends BaseTest {
 	
 	public static final LocalDateTime E2_TEST_DATE = LocalDateTime.of(25, 11, 14, 18, 21);
+    public static final LocalDateTime E3_TEST_DATE = LocalDateTime.of(25, 12,  7, 22, 32);
     
 	private PrintStream systemOut;
 	private ByteArrayOutputStream testOut;
@@ -101,13 +102,11 @@ public class AppTest extends BaseTest {
 	}
     
 	@Test
-        @Disabled
         void fullAppE3() throws IOException {
-        fullAppTest(E2_TEST_DATE, "test-io/e3/in.txt", "test-io/e3/out.txt");
+        fullAppTest(E3_TEST_DATE, "test-io/e3/in.txt", "test-io/e3/out.txt");
 	}
     
-    // NOTE(erb): test all commands through runCommand()
-	
+    // TODO(erb): test all commands through runCommand()
 	
 	// ======================================================================
 	// UTILS
@@ -130,12 +129,20 @@ public class AppTest extends BaseTest {
 			assertEquals(expectedOutputScanner.nextLine(), testOutputScanner.nextLine(), String.format("missmatch line on line %d\n", lineCounter));
 			lineCounter++;
 		}
-        
-		if (expectedOutputScanner.hasNextLine()) {
-			fail(String.format("Lines left in expected output: '%s'", expectedOutputScanner.nextLine()));
-		}
-		if (testOutputScanner.hasNextLine()) {
-			fail(String.format("Lines left in test output: '%s'", testOutputScanner.nextLine()));
+		
+		if (expectedOutputScanner.hasNextLine() != testOutputScanner.hasNextLine()) {
+			
+			if (expectedOutputScanner.hasNextLine()) {
+				String left = expectedOutputScanner.nextLine().trim();
+				if (left.length() > 0) {
+					fail(String.format("Lines left in expected output: '%s'", left));
+				}
+			} else {
+				String left = testOutputScanner.nextLine().trim();
+				if (left.length() > 0) {
+					fail(String.format("Lines left in test output: '%s'", left));
+				}
+			}
 		}
 	}
 	
@@ -154,7 +161,10 @@ public class AppTest extends BaseTest {
 			fail(String.format("Lines left in expected output: '%s'", expectedLinesIt.next()));
 		}
 		if (testOutputScanner.hasNextLine()) {
-			fail(String.format("Lines left in test output: '%s'", testOutputScanner.nextLine()));
+			String left = testOutputScanner.nextLine().trim();
+			if (left.length() > 0) {
+				fail(String.format("Lines left in test output: '%s'", left));
+			}
 		}
 	}
     

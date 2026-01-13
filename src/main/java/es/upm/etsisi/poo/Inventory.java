@@ -1,16 +1,13 @@
 package es.upm.etsisi.poo;
 
-import es.upm.etsisi.poo.exceptions.DataException;
-import es.upm.etsisi.poo.exceptions.DuplicateItemException;
-import es.upm.etsisi.poo.exceptions.FullCollectionException;
-import es.upm.etsisi.poo.exceptions.MissingItemException;
+import es.upm.etsisi.poo.exceptions.*;
 
 import java.util.*;
 import java.time.LocalDateTime;
 
 class InventoryItemId { 
-    public int id;
-    public boolean isProduct;
+    public final int id;
+    public final boolean isProduct;
     
     public InventoryItemId(int id, boolean isProduct) {
         this.id = id;
@@ -36,7 +33,7 @@ public class Inventory {
     
     public static final int MAX_PRODUCTS = 200; // E1: no more than 200 products
     
-    private Map<InventoryItemId, InventoryItem> items;
+    private HashMap<InventoryItemId, InventoryItem> items;
     private int nextProductId;
     private int nextServiceId;
     
@@ -51,8 +48,8 @@ public class Inventory {
     
     private Inventory() {
         this.items = new HashMap<>();
-        nextProductId = 1;
-        nextServiceId = 0;
+        nextProductId = 0;
+        nextServiceId = 1;
     }
     
     /**
@@ -79,31 +76,28 @@ public class Inventory {
      *
      * @return The product that was created, or null if the creation failed
      */
-    public TimedProduct createTimedProduct(int id, String name, double price, int people, String type, LocalDateTime expirationDate) throws DataException{
-        TimedProduct prodToAdd = null;
-        try {
-            prodToAdd = new TimedProduct(id, name, price, people, type, expirationDate);
-        }catch (IllegalArgumentException ex){
-            throw new DataException("Failed to create product: " + ex.getMessage());
-        }
+    public TimedProduct createTimedProduct(int id, String name, double price, int people, String typeStr, LocalDateTime expirationDate) throws DataException, IllegalArgumentException {
+		if (expirationDate.isBefore(App.now())) {
+			throw new IllegalArgumentException("Expiration can not be in the past, got " + 
+											   expirationDate.format(TimedProduct.EXPIRATION_DATE_FORMAT));
+		}
+		
+        TimedProduct prodToAdd = new TimedProduct(id, name, price, people, typeStr, expirationDate);
         return (TimedProduct)addItem(prodToAdd);
     }
-    
     
     /**
      * Tries to create a new service product
      *
      * @return The product that was created, or null if the creation failed
      */
-    public ServiceProduct createServiceProduct(ServiceProduct.ServiceCategory category, LocalDateTime expirationDate) throws DataException {
-        ServiceProduct service = null;
-        try {
-            int id = (nextServiceId++) + 1;
-            service = new ServiceProduct(id, category, expirationDate);
-        } catch (IllegalArgumentException e) {
-            nextServiceId--;
-            throw new DataException("Failed to create service " + e.getMessage());
-        }
+    public ServiceProduct createServiceProduct(String categoryStr, LocalDateTime expirationDate) throws DataException, IllegalArgumentException {
+		if (expirationDate.isBefore(App.now())) {
+			throw new IllegalArgumentException("Expiration can not be in the past, got " + 
+											   expirationDate.format(ServiceProduct.EXPIRATION_DATE_FORMAT));
+		}
+		
+		ServiceProduct service = new ServiceProduct(nextServiceId++, categoryStr, expirationDate);
         return (ServiceProduct)addItem(service);
     }
     
@@ -180,8 +174,21 @@ public class Inventory {
         return this.items.values();
     }
     
-    public int generateUniqueProductId() {
-        return (nextProductId++) + 1;
+    public int generateUniqueProductId() throws IdSpaceExhaustedException {
+        int idQuery = nextProductId;
+		boolean foundId = false;
+		while (!foundId) {
+			InventoryItem prod = this.items.get(new InventoryItemId(idQuery, false));
+			foundId = (prod == null);
+		}
+		
+		if (foundId) {
+			nextProductId = idQuery;
+		} else {
+			throw new IdSpaceExhaustedException("No more left ids in inventory");
+		}
+		
+		return idQuery;
     }
     
     private InventoryItem addItem(InventoryItem item) throws FullCollectionException, DuplicateItemException {
@@ -189,30 +196,23 @@ public class Inventory {
             throw new FullCollectionException("Product inventory is full");
         }
         
-        boolean isProduct = (item instanceof Product);
-        InventoryItemId id = new InventoryItemId(item.getId(), isProduct);
+        InventoryItemId invId = item.getInventoryId();
         
-        InventoryItem duplicate = this.items.get(id);
+        InventoryItem duplicate = this.items.get(invId);
         if (duplicate != null) { 
             throw DuplicateItemException.fromId("Product", item.getId());
         }
         
-        if (isProduct) {
-            nextProductId = item.getId()+1;
-        } else {
-            nextServiceId = item.getId()+1;
-        }
-        
-        this.items.put(id, item);
+        this.items.put(invId, item);
         return item;
     }
     
 	public InventoryItem getItemFromStringId(String strId) throws DataException, NumberFormatException {
 		
-		boolean isProduct = false;
+		boolean isProduct = true;
 		if (ServiceProduct.isIdString(strId)) {
 			strId = strId.substring(0, strId.length() - 1);
-			isProduct = true;
+			isProduct = false;
 		}
 		int idNum = Integer.parseInt(strId);
 		

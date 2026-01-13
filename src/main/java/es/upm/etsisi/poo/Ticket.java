@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
  *
  * @see Product
  */
-public abstract class Ticket implements Comparable<Ticket> {
+public abstract class Ticket {
 	public static final int MAX_PRODUCTS = 100;
 	
     /**
@@ -36,9 +36,14 @@ public abstract class Ticket implements Comparable<Ticket> {
 	protected int totalAmount;
 	
     /**
-     * The number part of the ticket. 5 digit number (between 0 and 99999)
+     * The number part of the ticket id. 5 digit number (between 0 and 99999)
      */
-	private int id;
+	private final int id;
+	
+	/**
+     * The full ticket id
+     */
+	private String composedId;
 	
     private LocalDateTime dateOpened;
 	
@@ -52,14 +57,20 @@ public abstract class Ticket implements Comparable<Ticket> {
      * To create a ticket with a "random id" use randomId() function
      * then check if the id is unique in the store and create it using this constructor.
      */
-    public Ticket(int id) throws IllegalArgumentException {
+    public Ticket(int id, boolean isIdCustom) throws IllegalArgumentException {
         if (id < 0) throw new IllegalArgumentException("Ticket id should be a not negative number");
 		this.ticketItems = new ArrayList<TicketItem>();
         this.id = id;
         this.isOpen = true;
-		
         this.dateOpened = App.now();
         this.dateClosed = null;
+		
+		if (isIdCustom) {
+			this.composedId = String.format("%05d", this.id);
+		} else {
+			this.composedId = String.format("%s-%05d", 
+											this.dateOpened.format(ID_DATE_FORMAT), this.id);
+		}
     }
 	
     public int getId() {
@@ -75,19 +86,7 @@ public abstract class Ticket implements Comparable<Ticket> {
     }
 	
     public String getComposedId() {
-        StringBuilder sb = new StringBuilder();
-		
-        if (this.isOpen) {
-            sb.append(this.dateOpened.format(ID_DATE_FORMAT)).append("-");
-        }
-		
-        sb.append(String.format("%05d", this.id));
-		
-        if (!this.isOpen && this.dateClosed != null) {
-            sb.append("-").append(this.dateClosed.format(ID_DATE_FORMAT));
-        }
-		
-        return sb.toString();
+		return composedId;
     }
 	
     public boolean isOpen() {
@@ -97,6 +96,23 @@ public abstract class Ticket implements Comparable<Ticket> {
     public boolean isEmpty() {
         return this.ticketItems.isEmpty();
     }
+	
+	@Override
+		public String toString() {
+		
+		String status = null;
+		
+		if (isEmpty()) {
+			status = "EMPTY";
+		} else if (isOpen){
+			status = "OPEN";
+		} else {
+			status = "CLOSE";
+		}
+		
+		String result = String.format("%s - %s", composedId, status);
+		return result;
+	}
 	
 	/**
      * Validate the item kind to add
@@ -123,6 +139,8 @@ public abstract class Ticket implements Comparable<Ticket> {
 			this.ticketItems = aux;
 			this.isOpen = false;
             this.dateClosed = App.now();
+			
+			this.composedId = String.format("%s-%s", composedId, dateClosed.format(ID_DATE_FORMAT));
         }
     }
 	
@@ -200,10 +218,6 @@ public abstract class Ticket implements Comparable<Ticket> {
 				throw new FullCollectionException("Ticket is full");
 			}
 		}
-    }
-	
-    public int compareTo(Ticket ticket) {
-        return this.id - ticket.id;
     }
 	
 }
