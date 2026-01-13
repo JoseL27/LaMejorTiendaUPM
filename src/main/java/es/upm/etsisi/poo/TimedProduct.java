@@ -3,16 +3,19 @@ package es.upm.etsisi.poo;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.DateTimeException;
+
+import java.util.Arrays;
+
 import es.upm.etsisi.poo.exceptions.*;
 
-class TimedTicketItem extends TicketItem implements Comparable<TicketItem> {
+class TimedTicketItem extends TicketItem {
 	private TimedProduct timedProduct;
 	private int peopleAmount;
 	
-	public TimedTicketItem(TimedProduct product, int amount) throws IllegalArgumentException {
+	public TimedTicketItem(TimedProduct product, int peopleAmount) {
 		super(product, 1);
 		this.timedProduct = product;
-		this.peopleAmount = amount;
+		this.peopleAmount = peopleAmount;
 	}
 	
 	@Override
@@ -38,12 +41,12 @@ class TimedTicketItem extends TicketItem implements Comparable<TicketItem> {
 	
 	@Override
 		public TicketItem copy() {
-		return new TimedTicketItem((TimedProduct)this.timedProduct.copy(), super.amount);
+		return new TimedTicketItem((TimedProduct)this.timedProduct.copy(), this.peopleAmount);
 	}
 	
 	@Override 
 		public String toString() {
-		return this.timedProduct.toString(super.amount);
+		return this.timedProduct.toString(this.peopleAmount);
 	}
 }
 
@@ -73,15 +76,28 @@ public class TimedProduct extends Product {
     private LocalDateTime expirationDate;
 	
 	
-	public TimedProduct(int id, String name, double individualPrice, int maxParticipants, String type, LocalDateTime expirationDate) throws IllegalArgumentException{ 
-		this(id, name, individualPrice, maxParticipants, TimedType.valueOf(type), expirationDate);
+	public TimedProduct(int id, String name, double individualPrice, int maxParticipants, String typeString, LocalDateTime expirationDate) throws InvalidDataException { 
+		super(id, name, individualPrice);
+		
+		if (maxParticipants < 0 || maxParticipants > TIMED_PRODUCT_MAX_PEOPLE)
+			throw new InvalidDataException("Max participants for a timed product should be between 0 and " + TIMED_PRODUCT_MAX_PEOPLE);
+        
+		try {
+			TimedType type = TimedType.valueOf(typeString);
+			this.type = type;
+		} catch (IllegalArgumentException e) {
+			throw new InvalidDataException(String.format("Timed type is one of %s", Arrays.toString(TimedType.values())));
+		}
+		
+		this.maxParticipants = maxParticipants;
+		this.expirationDate = expirationDate;
 	}
     
     // It is assumed that all the parameters are valid, this should be handled before creating the object
-    public TimedProduct(int id, String name, double individualPrice, int maxParticipants, TimedType type, LocalDateTime expirationDate) throws IllegalArgumentException{
+    public TimedProduct(int id, String name, double individualPrice, int maxParticipants, TimedType type, LocalDateTime expirationDate) throws InvalidDataException {
         super(id, name, individualPrice);
         if (maxParticipants < 0 || maxParticipants > TIMED_PRODUCT_MAX_PEOPLE)
-            throw new IllegalArgumentException("Max participants for a timed product should be between 0 and " + TIMED_PRODUCT_MAX_PEOPLE);
+            throw new InvalidDataException("Max participants for a timed product should be between 0 and " + TIMED_PRODUCT_MAX_PEOPLE);
         this.type = type;
         this.maxParticipants = maxParticipants;
         this.expirationDate = expirationDate;
@@ -101,12 +117,12 @@ public class TimedProduct extends Product {
 	
 	
 	@Override
-		public TicketItem getTicketItem(int amount, String[] personalizations) throws IllegalArgumentException {
-		if (personalizations == null || personalizations.length != 0) {
-			throw new IllegalArgumentException("Timed products can't be personalized");
+		public TicketItem getTicketItem(int amount, String[] personalizations) throws InvalidDataException {
+		if (personalizations != null && personalizations.length != 0) {
+			throw new InvalidDataException("Timed products can't be personalized");
 		}
 		if (amount >= maxParticipants) {
-			throw new IllegalArgumentException("Timed products amount can't be greater than the max participants");
+			throw new InvalidDataException ("Timed products amount can't be greater than the max participants");
 		}
 		return new TimedTicketItem(this, amount);
 	}
@@ -123,7 +139,11 @@ public class TimedProduct extends Product {
 	
 	@Override
 		public InventoryItem copy() {
-        return new TimedProduct(super.id, super.name, super.price, maxParticipants, type, expirationDate);
+		try {
+			return new TimedProduct(super.id, super.name, super.price, maxParticipants, type, expirationDate);
+		} catch (InvalidDataException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 	
     @Override

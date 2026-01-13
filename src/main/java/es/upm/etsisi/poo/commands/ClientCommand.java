@@ -1,6 +1,6 @@
 package es.upm.etsisi.poo.commands;
 
-import java.util.Arrays;
+import java.util.List;
 
 import es.upm.etsisi.poo.*;
 import es.upm.etsisi.poo.exceptions.DataException;
@@ -96,16 +96,13 @@ public class ClientCommand implements Command {
 	}
     
 	public void evalList() {
-		Client[] clients = UserManager.getInstance().listClients();
-		Arrays.sort(clients);
-		if (clients.length == 0) {
-			System.out.println("client list: no clients.");
-		} else {
-			System.out.println("Client:");
-			for (Client client : clients) {
-				System.out.println("  "+client.toString());
-			}
-			System.out.println("client list: ok");
+		List<Client> clients = UserManager.getInstance().getClients();
+		clients.sort((c1, c2) -> c1.getName().compareTo(c2.getName()));
+		
+		System.out.println("Client:");
+		for (Client client : clients) {
+			System.out.println("  "+client.toString());
 		}
+		System.out.println("client list: ok");
 	}
 }

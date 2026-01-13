@@ -27,9 +27,9 @@ public class InventoryTest extends BaseTest {
     
 	@Test
         void updateProductNameTest() {
-        final BaseProduct prod = new BaseProduct(1, "Libro POO", 25, "BOOK", 0, false);
 		
         assertDoesNotThrow(() -> {
+							   BaseProduct prod = new BaseProduct(1, "Libro POO", 25, "BOOK", 0, false);
                                Inventory inventory = Inventory.getInstance();
                                
                                inventory.createBaseProduct(prod.getId(), 
@@ -49,8 +49,8 @@ public class InventoryTest extends BaseTest {
     
 	@Test
         void updateProductPriceTest() {
-        final BaseProduct prod = new BaseProduct(1, "Libro POO", 25, "BOOK", 0, false);
         assertDoesNotThrow(() -> {
+							   BaseProduct prod = new BaseProduct(1, "Libro POO", 25, "BOOK", 0, false);
                                Inventory inventory = Inventory.getInstance();
                                
                                inventory.createBaseProduct(prod.getId(), 
@@ -136,7 +136,7 @@ public class InventoryTest extends BaseTest {
 	}
     
 	@Test
-        void updateInvalidNameLengthTest() {
+        void updateInvalidNameLengthTest() throws InvalidDataException {
         final Inventory inventory = Inventory.getInstance();
 		final BaseProduct prod = new BaseProduct(1, "Libro POO",  25, "BOOK", 0, false);
         assertDoesNotThrow(() -> {
@@ -157,7 +157,7 @@ public class InventoryTest extends BaseTest {
 	}
     
 	@Test
-        void updateInvalidPriceTest() {
+        void updateInvalidPriceTest() throws InvalidDataException {
         final Inventory inventory = Inventory.getInstance();
 		final BaseProduct prod = new BaseProduct(1, "Libro POO",  25, "BOOK", 0, false);
         assertDoesNotThrow(() -> {

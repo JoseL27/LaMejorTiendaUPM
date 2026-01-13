@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import es.upm.etsisi.poo.Cashier;
+import es.upm.etsisi.poo.exceptions.*;
 
 public class CashierTest extends BaseTest {
     
@@ -35,29 +36,34 @@ public class CashierTest extends BaseTest {
         "@upm.es",
     };
     
-    public static final Cashier VALID_CASHIER = 
-        new Cashier(VALID_WORKER_IDs[0], "persona", VALID_COMPANY_EMAILs[0]);
+    public static final Cashier VALID_CASHIER = createValidCashier();
+	
+	private static Cashier createValidCashier() {
+		try {
+			return new Cashier(VALID_WORKER_IDs[0], "persona", VALID_COMPANY_EMAILs[0]);
+		} catch (InvalidDataException e) {
+			throw new Error(e);
+		}
+	}
     
-    @Disabled
-        @Test
+	@Test
         void validateId() {
         for (String id : VALID_WORKER_IDs) 
             assertTrue(Cashier.isValidId(id), String.format("Expected %s to be a valid worker id, was invalid", id));
         
         for (String id : INVALID_WORKER_IDs) 
-            assertTrue(Cashier.isValidId(id), String.format("Expected %s to be a invalid worker id, was valid", id));
+            assertFalse(Cashier.isValidId(id), String.format("Expected %s to be a invalid worker id, was valid", id));
     }
     
-    @Disabled
-        @Test
+	@Test
         void validateCompanyEmail() {
         for (String e : VALID_COMPANY_EMAILs) 
             assertTrue(Cashier.isCompanyEmail(e), 
                        String.format("Expected %s to be a valid company email, was invalid", e));
         
         for (String e : INVALID_COMPANY_EMAILs) 
-            assertTrue(Cashier.isCompanyEmail(e), 
-                       String.format("Expected %s to be a invalid company email, was valid", e));
+            assertFalse(Cashier.isCompanyEmail(e), 
+						String.format("Expected %s to be a invalid company email, was valid", e));
     }
     
     @Test
@@ -69,14 +75,14 @@ public class CashierTest extends BaseTest {
     
     @Test
         void constructorFailId() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidDataException.class, () -> {
                          new Cashier(INVALID_WORKER_IDs[0], "fernando", VALID_COMPANY_EMAILs[0]);
                      });
     }
     
     @Test
         void constructorFailEmail() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidDataException.class, () -> {
                          new Cashier(VALID_WORKER_IDs[0], "fernando", INVALID_COMPANY_EMAILs[0]);
                      });
     }

@@ -13,8 +13,8 @@ import java.text.DecimalFormat;
 
 public class ProductTicket extends Ticket {
 	
-	public ProductTicket(int id) {
-		super(id);
+	public ProductTicket(int id, boolean isCustomId) {
+		super(id, isCustomId);
 	}
 	
 	@Override

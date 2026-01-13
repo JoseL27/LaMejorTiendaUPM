@@ -2,11 +2,11 @@ package es.upm.etsisi.poo;
 
 import es.upm.etsisi.poo.exceptions.DuplicateItemException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import es.upm.etsisi.poo.exceptions.InvalidDataException;
 
-public class Client extends User implements Comparable<Client> {
+
+public class Client extends User {
     
     public enum IdType {DNI, NIF,};
     
@@ -14,16 +14,17 @@ public class Client extends User implements Comparable<Client> {
     private final List<Integer> ticketIds;
     private final IdType idType;
     
-    public Client(String id, String name, String email, Cashier cashier) throws IllegalArgumentException {
+    public Client(String id, String name, String email, Cashier cashier) throws InvalidDataException {
         super(id, name, email);
-        
+		
+		if (cashier == null) throw new IllegalArgumentException();
+		
         this.managedBy = cashier;
         this.ticketIds = new ArrayList<>();
-        this.idType = getIdType(id);
-        
-        if (idType == null)
-            throw new IllegalArgumentException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
-        if (cashier == null) throw new IllegalArgumentException("Client needs an assigned cashier to be created");
+        this.idType = idTypeFromString(id);
+		
+		if (idType == null)
+            throw new InvalidDataException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
     }
     
     public void addTicket(int ticketId) throws DuplicateItemException {
@@ -31,6 +32,10 @@ public class Client extends User implements Comparable<Client> {
         
         ticketIds.add(ticketId);
     }
+	
+	public IdType getIdType() {
+		return this.idType;
+	}
     
     
     // Control DNI/NIE (mod 23)
@@ -46,7 +51,7 @@ public class Client extends User implements Comparable<Client> {
     /**
      * Si es DNI o NIE válido => devuelve DNI. Si no, si es NIF jurídica válido => NIF. Si no => null.
      */
-    public static IdType getIdType(String input) {
+    public static IdType idTypeFromString(String input) {
         String s = normalize(input);
         if (s == null) return null;
         
@@ -108,7 +113,12 @@ public class Client extends User implements Comparable<Client> {
         if (type == 'K' || type == 'L' || type == 'M') return false;
         
         String digits = s.substring(1, 8);
-        if (App.tryParseInt(digits) == null) return false;
+		
+		try {
+			Integer.parseInt(digits);
+		} catch (NumberFormatException e) {
+			return false;
+		}
         
         char control = s.charAt(8);
         if (!Character.isLetterOrDigit(control)) return false;
@@ -163,15 +173,15 @@ public class Client extends User implements Comparable<Client> {
         //Locale ROOT es para evitar alfabetos extraños
     }
     
-    
-    @Override
-        public int compareTo(Client c) {
-        return this.getName().compareTo(c.getName());
-    }
-    
     @Override
         public String toString() {
-        return String.format("Client{identifier='%s', name='%s', email='%s', cash=%s}",
-                             this.getId(), this.getName(), this.getEmail(), this.managedBy.getId());
+		String labelStr = switch (idType) {
+			case DNI -> "USER";
+			case NIF -> "COMPANY";
+			default -> "Client";
+		};
+		
+        return String.format("%s{identifier='%s', name='%s', email='%s', cash=%s}",
+                             labelStr, this.getId(), this.getName(), this.getEmail(), this.managedBy.getId());
     }
 }

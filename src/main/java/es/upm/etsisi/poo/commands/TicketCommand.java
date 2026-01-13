@@ -3,10 +3,10 @@ package es.upm.etsisi.poo.commands;
 import es.upm.etsisi.poo.*;
 import es.upm.etsisi.poo.exceptions.*;
 
-
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Represents a command that falls under the ticket category, being those:
@@ -16,17 +16,17 @@ import java.util.Arrays;
  * - ticket print (imprime factura)
  */
 public class TicketCommand implements Command {
-    
+	
     /**
      * First entrypoint to parse 'ticket' command
      * This method is responsible for parsing different subcommands.
      *
-     * @param params      The token stream to parse on each subcommand
+     * @param params The token stream to parse on each subcommand
      */
     public void eval(String[] params) throws FailedCommandException, DataException {
         // Parse
         if (!App.checkMinArgsCountWithPrint("ticket", params.length, 2)) return;
-        
+		
         // Execute
         switch (params[1].toLowerCase()) {
             case "new" -> evalNew(params);
@@ -37,65 +37,101 @@ public class TicketCommand implements Command {
             default -> System.out.println("ticket: invalid sub command");
         }
     }
-    
+	
     /**
      * Parses the 'new' subcommand of the 'ticket' command and
      * adds a new creates a new ticket for a client and managed by a cashier.
      * <p>
      * Format:
-     * ticket new [<id>] <cashId> <userId>
+* ticket new [<id>] <cashId> < userId> -[c|p|s] (default -p option)
      *
      * @param params      The stream of tokens to parse
      * @param userManager Context
      * @param inventory   Context
      */
-    private void evalNew(String[] params) throws FailedCommandException{
+    private void evalNew(String[] params) throws FailedCommandException {
         // Parse
-        if (!App.checkArgsCountWithPrint("ticket new", params.length, 4, 5))
+        if (!App.checkArgsCountWithPrint("ticket new", params.length, 4, 6))
             return;
-        
-		String cashierId = params[params.length - 2];
-		if (!Cashier.isValidId(cashierId)) {
-			throw new FailedCommandException(String.format("ticket new: error: invalid cashier id '%s' expected 'UW' followed by 7 digits\n", cashierId));
+		
+		UserManager userManager = UserManager.getInstance();
+		int parseIndex = 2;
+		
+		String ticketId;
+		int ticketIdNum;
+		boolean isCustomId = false;
+		try {
+			ticketIdNum = Integer.parseInt(params[parseIndex]);
+			ticketId = params[parseIndex++];
+			isCustomId = true;
+			
+			if (!userManager.isTicketIdUnique(ticketId)) {
+				throw new FailedCommandException(String.format("ticket new: error: ticket id '%s' allready exists", ticketId));
+			}
+		} catch (NumberFormatException e) {
+			try {
+				ticketIdNum = userManager.generateUniqueTicketId();
+			} catch (IdSpaceExhaustedException ex) {
+				throw new FailedCommandException("ticket new: error: failed to generate an id, out of ids!");
+			}
+			ticketId = Integer.toString(ticketIdNum);
+			isCustomId = false;
 		}
 		
-		String clientId = params[params.length - 1];
-		UserManager userManager = UserManager.getInstance();
-        Cashier cashier;
-        Client client;
-        int ticketId;
-        
-		// Execution
-        try{
-            cashier = userManager.findCashier(cashierId);
-            client = userManager.findClient(clientId);
-            
-            if (params.length == 5) {
-                ticketId = Integer.parseInt(params[2]);
-                
-                if (!userManager.isTicketIdUnique(ticketId)) {
-                    throw new FailedCommandException("ticket new: id already exists");
-                }
-            } else {
-                ticketId = userManager.generateUniqueTicketId();
-            }
-            
-            Ticket created = cashier.createTicket(ticketId);
-            client.addTicket(ticketId);
+		String cashierId = params[parseIndex++];
+		String clientId = params[parseIndex++];
+		
+		char ticketType = 'p';
+		if (parseIndex < params.length) {
+			
+			boolean validTicketType = false;
+			String ticketTypeStr = params[parseIndex];
+			if (ticketTypeStr.length() == 2 && ticketTypeStr.charAt(0) == '-') {
+				char typeChar = ticketTypeStr.charAt(1);
+				
+				if (typeChar == 'c' || typeChar == 'p' || typeChar == 's') {
+					ticketType = typeChar;
+					validTicketType = true;
+				}
+			}
+			
+			if (!validTicketType) {
+				throw new FailedCommandException("invalid ticket type, expected 'c', 's' or 'p'");
+			}
+		}
+		
+        try {
+            Client client = userManager.findClient(clientId);
+			Client.IdType idType = client.getIdType();
+			
+			Ticket created = null;
+			if (ticketType == 'p') {
+				created = new ProductTicket(ticketIdNum, isCustomId);
+				
+			} else if (ticketType == 's' && idType == Client.IdType.NIF) {
+				created = new ServiceTicket(ticketIdNum, isCustomId);
+				
+			} else if (ticketType == 'c' && idType == Client.IdType.NIF) {
+				created = new CombinedTicket(ticketIdNum, isCustomId);
+				
+			} else {
+				throw new FailedCommandException("ticket new: id and ticket type don't match");
+			}
+			
+			Cashier cashier = userManager.findCashier(cashierId);
+			cashier.addTicket(created);
+			
+            client.addTicket(ticketIdNum);
             System.out.print(created.summaryString());
             System.out.println("ticket new: ok");
-            
-        }catch (DuplicateItemException ex){
-            throw new FailedCommandException("Unable to add ticket to the client, " + ex.getMessage());
-        }catch (MissingItemException | IdSpaceExhaustedException ex) {
-            throw new FailedCommandException("Unable to create ticket, " + ex.getMessage());
-        } catch (NumberFormatException ex) {
-            throw new FailedCommandException("Unable to create ticket, " + params[2] + " is not a valid integer");
-        }catch (IllegalArgumentException ex){
-            throw new FailedCommandException("Unable to add ticket to the cashier, " + ex.getMessage());
+			
+        } catch (IllegalArgumentException ex) {
+            throw new FailedCommandException("Unable to create ticket: invalid argument");
+        } catch (DataException ex) {
+            throw new FailedCommandException("Unable to create new ticket: " + ex.getMessage());
         }
     }
-    
+	
     /**
      * Parses the 'add' subcommand of the 'ticket' command.
      * This function parses each field sequentially and fails to parse any arguments.
@@ -112,18 +148,29 @@ public class TicketCommand implements Command {
      */
     private void evalAdd(String[] params) throws FailedCommandException, DataException {
         // Parse
-        if (!App.checkMinArgsCountWithPrint("ticket add", params.length, 4))
+        if (!App.checkMinArgsCountWithPrint("ticket add", params.length, 5))
             return;
-        
+		
+        String ticketId = params[2];
+        String cashierId = params[3];
+        String itemId = params[4];
+		
         try {
-			int ticketId = Integer.parseInt(params[2]);
-			String cashierId = params[3];
-			String itemId = params[4];
-            int amount = Integer.parseInt(params[5]);
+            int amount = 1; 
+			int parseIndex = 5;
+			String[] personalizations = new String[0];
+			if (params.length > 5) {
+				
+				try {
+					amount = Integer.parseInt(params[parseIndex]);
+					parseIndex++;
+				} catch (NumberFormatException ex) {
+				}
+				
+                personalizations = parsePersonalizations(parseIndex, params);
+			}
 			
-			String[] personalizations = parsePersonalizations(6, params);
-			
-			InventoryItem itemToAdd = Inventory.getInstance().getItemFromStringId(itemId);
+            InventoryItem itemToAdd = Inventory.getInstance().getItemFromStringId(itemId);
             Cashier cashier = UserManager.getInstance().findCashier(cashierId);
 			
             Ticket ticket = cashier.findTicket(ticketId);
@@ -132,13 +179,13 @@ public class TicketCommand implements Command {
             System.out.print(ticket.summaryString());
             System.out.println("ticket add: ok");
 			
-        } catch(NumberFormatException ex){
+        } catch (NumberFormatException ex) {
             throw new FailedCommandException("ticket add: error: invalid integer");
-        } catch (DataException ex){
+        } catch (DataException ex) {
             throw new FailedCommandException("ticket add: error:" + ex.getMessage());
         }
     }
-    
+	
     /**
      * Parses the 'remove' subcommand of the 'ticket' command and
      * removes all appearances of a product inside the ticket.
@@ -150,31 +197,32 @@ public class TicketCommand implements Command {
      * @param userManager Context
      * @param inventory   Context
      */
-    private void evalRemove(String[] params) throws FailedCommandException{
+    private void evalRemove(String[] params) throws FailedCommandException {
         // Parse
         if (!App.checkArgsCountWithPrint("ticket remove", params.length, 5))
             return;
-        
+		
+        String cashierId = params[3];
+        String ticketId = params[2];
+		
         try {
-			String cashierId = params[3];
-            int ticketId = Integer.parseInt(params[2]);
             int itemId = Integer.parseInt(params[4]);
 			
-			// Execute
+            // Execute
             Cashier cashier = UserManager.getInstance().findCashier(cashierId);
             Ticket ticket = cashier.findTicket(ticketId);
 			
-			ticket.removeItem(itemId);
-			System.out.print(ticket.summaryString());
+            ticket.removeItem(itemId);
+            System.out.print(ticket.summaryString());
             System.out.println("ticket remove: ok");
 			
-        } catch(NumberFormatException ex) {
-			throw new FailedCommandException("ticket remove: error: invalid integer");
-		} catch(MissingItemException ex){
+        } catch (NumberFormatException ex) {
+            throw new FailedCommandException("ticket remove: error: invalid integer");
+        } catch (MissingItemException ex) {
             throw new FailedCommandException("ticket remove: error: failed to remove product: " + ex.getMessage());
-        } 
+        }
     }
-    
+	
     /**
      * Parses the 'print' subcommand and prints in standard output the summary of the ticket
      * ALSO closes the ticket!
@@ -186,41 +234,32 @@ public class TicketCommand implements Command {
      * @param userManager Context
      * @param inventory   Context
      */
-    private void evalPrint(String[] params) throws FailedCommandException{
-		// Parse
-		if (!App.checkArgsCountWithPrint("ticket print", params.length, 4))
+    private void evalPrint(String[] params) throws FailedCommandException {
+        // Parse
+        if (!App.checkArgsCountWithPrint("ticket print", params.length, 4))
             return;
-        
-        int ticketId;
-        try {
-            ticketId = Integer.parseInt(params[2]);
-        }catch(NumberFormatException ex) {
-            throw new FailedCommandException("Unable to add ticket, " + params[2] + " is not a valid integer");
+		
+        String ticketId = params[2];
+        String cashierId = params[3];
+		
+        if (!Cashier.isValidId(cashierId)) {
+            throw new FailedCommandException(String.format("ticket print: error: invalid cashier id '%s' expected 'UW' followed by 7 digits", cashierId));
         }
-        
-		String cashierId = params[3];
-		if (!Cashier.isValidId(cashierId)) {
-			throw new FailedCommandException(String.format("ticket print: error: invalid cashier id '%s' expected 'UW' followed by 7 digits", cashierId));
-		}
-        
-        // Execute
-		if (ticketId < 0) {
-			throw new FailedCommandException(String.format("ticket print: error: ticket id '%d' is invalid, expected a positive number", ticketId));
-		}
-        
+		
         try {
+			
             Cashier cashier = UserManager.getInstance().findCashier(cashierId);
             Ticket ticket = cashier.findTicket(ticketId);
             ticket.close();
             System.out.print(ticket.summaryString());
             System.out.println("ticket print: ok");
-        }catch (MissingItemException ex){
+        } catch (MissingItemException ex) {
             throw new FailedCommandException("Unable to print ticket, " + ex.getMessage());
-        }catch (DateTimeException ex){
+        } catch (DateTimeException ex) {
             throw new FailedCommandException("Unable to prit ticket, " + ex.getMessage());
         }
     }
-    
+	
     /**
      * Parses the 'list' subcommand command and
      * prints the tickets ordered by cashier id
@@ -233,19 +272,27 @@ public class TicketCommand implements Command {
      * @param inventory   Context
      */
     private void evalList(String[] params) {
-        Cashier[] cashiers = UserManager.getInstance().listCashiers();
-        Arrays.sort(cashiers, (c1, c2) -> c1.getId().compareTo(c2.getId()));
+        ArrayList<Cashier> cashiers = UserManager.getInstance().getCashiers();
+        cashiers.sort((c1, c2) -> c1.getId().compareTo(c2.getId()));
+		
         System.out.println("Ticket List:");
         for (Cashier cashier : cashiers) {
-            System.out.print(cashier.getTicketsString());
+			
+            ArrayList<Ticket> tickets = new ArrayList(cashier.getTickets());
+			
+            // NOTE(erb): no sort on purpose (expected output has reverse hashmap order)
+            for (int i = tickets.size() - 1; i >= 0; i--) {
+                System.out.printf("  %s%n", tickets.get(i).toString());
+            }
         }
+		
         System.out.println("ticket list: ok");
     }
-    
+	
     private String[] parsePersonalizations(int beginIndex, String[] params) {
         int size = params.length - beginIndex;
         String[] pers = new String[size];
-        
+		
         boolean result = true;
         int i = 0;
         while (i < size && result) {
@@ -256,7 +303,7 @@ public class TicketCommand implements Command {
             }
             i++;
         }
-        
+		
         if (!result) {
             return new String[0];
         }

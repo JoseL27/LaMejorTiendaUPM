@@ -50,20 +50,17 @@ public class UserManager implements Serializable {
 	 * @param assignedCashierId Cashier who is linked with the creation of this Client
 	 * @return The client that was created
 	 */
-	public Client addClient(String clientId, String name, String email, String assignedCashierId) throws DataException{
-        try {
-            // Make sure assignedCashierId exists within the Cashier set
-            Cashier foundCashier = this.findCashier(assignedCashierId);
-            Client newClient = new Client(clientId, name, email, foundCashier);
-            
-            // Attempt to find the client with the same ID in the cashier set
-            if (this.users.containsKey(clientId)) throw new DuplicateItemException("Client with id " + clientId + " already exists");
-            
-            this.users.put(clientId, newClient);
-            return newClient;
-        }catch (IllegalArgumentException ex){
-            throw new InvalidDataException("Error creating client: " + ex.getMessage());
-        }
+	public Client addClient(String clientId, String name, String email, String assignedCashierId) throws InvalidDataException, DuplicateItemException, MissingItemException {
+		// Make sure assignedCashierId exists within the Cashier set
+		Cashier foundCashier = this.findCashier(assignedCashierId);
+		Client newClient = new Client(clientId, name, email, foundCashier);
+		
+		// Attempt to find the client with the same ID in the cashier set
+		if (this.users.containsKey(clientId)) throw new DuplicateItemException("Client with id " + clientId + " already exists");
+		
+		this.users.put(clientId, newClient);
+		return newClient;
+        
 	}
     
 	/**
@@ -91,37 +88,17 @@ public class UserManager implements Serializable {
 	 * Returns an array of Client instances currently stored in the set.
 	 * @return Array of Client, array of zero length if there are none
 	 */
-	public Client[] listClients() {
-		if (!this.users.isEmpty()) {
-			Iterator<User> userIterator = this.users.values().iterator();
-			List<Client> clientList = new ArrayList<>();
-			Client[] clientArray;
-            
-			// Gets the list with all the clients
-			while (userIterator.hasNext()) {
-				User user = userIterator.next();
-				if (user instanceof Client){
-					clientList.add((Client)user);
-				}
+	public ArrayList<Client> getClients() {
+		Collection<User> allUsers = this.users.values();
+		ArrayList<Client> result = new ArrayList<>(allUsers.size() / 2);
+		
+		for (User user : allUsers) {
+			if (user instanceof Client){
+				result.add((Client)user);
 			}
-            
-			//Transforms the list to an array
-			clientArray = new Client[clientList.size()];
-			for (int i = 0; i < clientList.size(); i++){
-				clientArray[i] = clientList.get(i);
-			}
-            
-			return clientArray;
-		} else {
-			return new Client[0];
 		}
-	}
-    
-	/**
-	 * @return Client amount in User set
-	 */
-	public int getClientAmount() {
-		return this.listClients().length;
+		
+		return result;
 	}
     
 	// Cashier related
@@ -134,34 +111,20 @@ public class UserManager implements Serializable {
 	 * @return The cashier that was created
      * @throws DataException if the worker with the same id already exists, or the ID space for cashier is exhausted, or email format is not correct
 	 */
-	public Cashier addCashier(String workerId, String name, String email) throws DataException{
-        try {
-            // If ID space is exhausted, do not add any more Cashiers
-            int maximumCashierAmountLimitedById = UserManager.MAX_CASHIER_ID - UserManager.MIN_CASHIER_ID + 1;
-            if (this.listCashiers().length >= maximumCashierAmountLimitedById)
-                throw new IdSpaceExhaustedException("All of the ids for cashiers have been already used");
-            
-            // Attempt to find the cashier with the same ID in the cashier set
-            if (this.users.containsKey(workerId)) throw new DuplicateItemException("Cashier with id " + workerId + " already exists");
-            
-            // Update nextCashierId if needed for auto-increment
-            String number = workerId.substring(2); // Remove 'UW'
-            // If the id is all 0 the number=0
-            if (number.matches("^0+$")) number = "0";
-            // All the leading 0 are eliminated
-            else number = number.replaceAll("^0+", "");
-            
-            int cashierIdValue = Integer.parseInt(number);
-            if (cashierIdValue >= this.nextCashierId)
-                this.nextCashierId = cashierIdValue + 1;
-            
-            // Add the cashier to the set
-            Cashier newCashier = new Cashier(workerId, name, email);
-            this.users.put(workerId, newCashier);
-            return newCashier;
-        }catch (IllegalArgumentException ex){
-            throw new InvalidDataException("Error creating cashier: " + ex.getMessage());
-        }
+	public Cashier addCashier(String workerId, String name, String email) throws DuplicateItemException, InvalidDataException {
+		// Attempt to find the cashier with the same ID in the cashier set
+		if (this.users.containsKey(workerId)) { 
+			throw new DuplicateItemException("Cashier with id " + workerId + " already exists");
+		}
+		
+		int cashierIdValue = Integer.parseInt(workerId.substring(2));
+		if (cashierIdValue >= this.nextCashierId)
+			this.nextCashierId = cashierIdValue + 1;
+		
+		// Add the cashier to the set
+		Cashier newCashier = new Cashier(workerId, name, email);
+		this.users.put(workerId, newCashier);
+		return newCashier;
 	}
     
 	/**
@@ -202,73 +165,34 @@ public class UserManager implements Serializable {
 	 * Returns an array of Cashier instances currently stored in the set.
 	 * @return Array of Cashier, array of zero length if there are none
 	 */
-	public Cashier[] listCashiers() {
-		Iterator<User> userIterator = this.users.values().iterator();
-		List<Cashier> cashierList = new ArrayList<>();
-		Cashier[] cashierArray;
-        
-		// Gets the list with all the clients
-		while (userIterator.hasNext()) {
-			User user = userIterator.next();
+	public ArrayList<Cashier> getCashiers() {
+		Collection<User> allUsers = this.users.values();
+		ArrayList<Cashier> result = new ArrayList<>(allUsers.size() / 2);
+		
+		for (User user : allUsers) {
 			if (user instanceof Cashier){
-				cashierList.add((Cashier) user);
+				result.add((Cashier) user);
 			}
 		}
-        
-		//Transforms the list to an array
-		cashierArray = new Cashier[cashierList.size()];
-		for (int i = 0; i < cashierList.size(); i++){
-			cashierArray[i] = cashierList.get(i);
-		}
-        
-		return cashierArray;
+		
+		return result;
 	}
     
 	/**
 	 * Returns a list of all the tickets created by any cashier existing in the manager
 	 * @return ArrayList containing all the tickets in the system, the list will be empty if no tickets exist
 	 */
-	public List<Ticket> getAllTickets(){
-		List<Ticket> tickets = new ArrayList<>();
-		for (Cashier cashier: listCashiers()){
-			tickets.addAll(Arrays.asList(cashier.getTickets()));
+	public ArrayList<Ticket> getAllTickets(){
+		ArrayList<Ticket> result = new ArrayList<>();
+		
+		Collection<User> allUsers = this.users.values();
+		for (User user : allUsers) {
+			if (user instanceof Cashier cash){
+				result.addAll(cash.getTickets());
+			}
 		}
-		return tickets;
-	}
-    
-	/**
-	 * Returns a list of Ticket instances created by the specified Cashier ID in String
-	 * @param workerId Cashier's ID
-	 * @return Array of Ticket instances created by the specified Cashier, if the cashier has no tickets this will
-	 * return zero length array, but if the cashier does not exist, this will return null instead
-	 */
-	public Ticket[] listCashierTicketsArray(String workerId) throws MissingItemException, IllegalArgumentException{
-		if (!Cashier.isValidId(workerId)) throw new IllegalArgumentException("Invalid cashier id: " + workerId);
-        
-		Cashier cashier = (Cashier)this.users.get(workerId);
-        if (cashier == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
-        
-        return cashier.getTickets();
-	}
-    
-	/**
-	 * Returns a list of tickets IDs created by the specified Cashier ID in String
-	 * @param workerId Cashier's ID
-	 * @return String containing the tickets created by the specified Cashier
-	 */
-	public String listCashierTickets(String workerId) throws MissingItemException, IllegalArgumentException{
-        if (!Cashier.isValidId(workerId)) throw new IllegalArgumentException("Invalid cashier id: " + workerId);
-        
-		Cashier cashier = (Cashier)this.users.get(workerId);
-        if (cashier == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
-        return cashier.getTicketsString();
-	}
-    
-	/**
-	 * @return Cashier amount in User set
-	 */
-	public int getCashierAmount() {
-		return this.listCashiers().length;
+		
+		return result;
 	}
     
 	/**
@@ -276,36 +200,20 @@ public class UserManager implements Serializable {
 	 * @param ticketId ticketId to test, must be a 5-digit number
 	 * @return True if the given ID is unique, false if is not a 5-digit number or the ID is already taken
 	 */
-	public boolean isTicketIdUnique(int ticketId) {
+	public boolean isTicketIdUnique(String ticketId) {
 		boolean isUnique = true;
-		Cashier currentCashier;
-		Cashier[] cashiers = this.listCashiers();
-		int i = 0;
-		do {
-			currentCashier = cashiers[i];
-			Ticket[] cashierTicketList = currentCashier.getTickets();
-			int j = 0;
-			Ticket ticket;
-			while (isUnique && j < cashierTicketList.length) {
-				ticket = cashierTicketList[j];
-				isUnique = (ticket.getId() != ticketId);
-				j++;
+		List<Cashier> cashiers = this.getCashiers();
+		
+		for (Cashier cash : cashiers) {
+			try {
+				cash.findTicket(ticketId);
+				isUnique = false;
+			} catch (MissingItemException e) {
+				isUnique = true;
 			}
-			i++;
-		} while (isUnique && i < cashiers.length);
-		return isUnique;
-	}
-    
-	/**
-	 * Loops through all cashiers and getting the amount of ticket created by them.
-	 * @return Amount of tickets created globally
-	 */
-	private int getTicketAmount() {
-		int amount = 0;
-		for (Cashier c : this.listCashiers()) {
-			amount += c.getCreatedTicketAmount();
 		}
-		return amount;
+		
+		return isUnique;
 	}
     
 	/**
@@ -317,25 +225,22 @@ public class UserManager implements Serializable {
 	 */
 	// NOTE(enrique): Implementation Sugestion: loop through all tickets of all cashiers
 	// and find the greatest id value and add 1 to it (maybe even keep a 'greatest id value')
-	public Integer generateUniqueTicketId() throws IdSpaceExhaustedException{
-		// Check if ID space for ticket is exhausted
-		// int maximumTicketAmountLimitedById = UserManager.MAX_TICKET_ID - UserManager.MIN_TICKET_ID + 1;
-		// int globalTicketAmount = this.getGlobalCashierTicketAmount();
-		// if (globalTicketAmount >= maximumTicketAmountLimitedById)
-		//	return -1;
-        
-		// Generate
-		if (this.nextTicketId <= MAX_TICKET_ID) { // auto-increment possible
+	public int generateUniqueTicketId() throws IdSpaceExhaustedException{
+		
+		if (this.nextTicketId <= MAX_TICKET_ID) {
 			return this.nextTicketId++;
-		} else { // A ticket with the highest possible ID was found in set, fallback to generation by iteration
-			int i = UserManager.MIN_TICKET_ID;
-			int candidate;
-			do { // Generate possible ID candidate until a unique one is found
-				candidate = i++;
-			} while (!isTicketIdUnique(candidate) && i <= UserManager.MAX_TICKET_ID);
-			// Check again if the candidate is unique, or the ID space is already exhausted
-			if (!isTicketIdUnique(candidate))
+			
+		} else { 
+			// A ticket with the highest possible ID was found in set, fallback to generation by iteration
+			int candidate = UserManager.MIN_TICKET_ID;
+			while (!isTicketIdUnique(Integer.toString(candidate)) && candidate <= UserManager.MAX_TICKET_ID) {
+				candidate++;
+			}
+			
+			if (candidate >= UserManager.MAX_TICKET_ID) {
                 throw new IdSpaceExhaustedException("All of the ids for tickets have already been used");
+			}
+			
             return candidate;
 		}
 	}
@@ -351,7 +256,7 @@ public class UserManager implements Serializable {
 		// This is really fucking overengineered. I'm sorry ?_? -jy
 		// Check if ID space for cashier is exhausted
 		int maximumCashierAmountLimitedById = UserManager.MAX_CASHIER_ID - UserManager.MIN_CASHIER_ID + 1;
-		if (this.listCashiers().length >= maximumCashierAmountLimitedById)
+		if (this.getCashiers().size() >= maximumCashierAmountLimitedById)
             throw new IdSpaceExhaustedException("All of the ids for cashiers have already been used");
         
 		// Generate

@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import es.upm.etsisi.poo.*;
 import es.upm.etsisi.poo.exceptions.*;
 
+import java.util.List;
+
 public class UserManagerTest extends BaseTest {
 	private final String testDNI = ClientTest.VALID_DNIs[0];
     
@@ -129,14 +131,14 @@ public class UserManagerTest extends BaseTest {
     
     @Test
         void listClientEmpty() {
-        Client[] clients = UserManager.getInstance().listClients();
-        assertEquals(0, clients.length);
+        List<Client> clients = UserManager.getInstance().getClients();
+        assertEquals(0, clients.size());
     }
     
     @Test
         void listClient() {
         addOneClient();
-        Client[] clients = UserManager.getInstance().listClients();
-        assertEquals(1, clients.length);
+        List<Client> clients = UserManager.getInstance().getClients();
+        assertEquals(1, clients.size());
     }
 }

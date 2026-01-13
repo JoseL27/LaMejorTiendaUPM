@@ -1,11 +1,8 @@
 package es.upm.etsisi.poo.commands;
 
 import es.upm.etsisi.poo.*;
-import es.upm.etsisi.poo.exceptions.DataException;
-import es.upm.etsisi.poo.exceptions.FailedCommandException;
-import es.upm.etsisi.poo.exceptions.MissingItemException;
-
-import java.util.Arrays;
+import es.upm.etsisi.poo.exceptions.*;
+import java.util.*;
 
 /**
  * CashCommand class that parses a stream of tokens into a specific CashCommand,
@@ -20,7 +17,7 @@ import java.util.Arrays;
 
 public class CashCommand implements Command {
     @Override
-    public void eval(String[] args) throws FailedCommandException {
+		public void eval(String[] args) throws FailedCommandException {
         // Throw exception (invalid argument amount)
         if (!App.checkArgsCountWithPrint("cash", args.length, 2, 5)) return;
         switch (args[1].toLowerCase()) {
@@ -31,7 +28,7 @@ public class CashCommand implements Command {
             default		   -> System.out.println("cash: invalid sub command");
         }
     }
-
+	
     /**
      * Parses the 'add' variation of the 'Cash' command.
      * The function parses each field sequentially and short circuits if any fail.
@@ -47,13 +44,13 @@ public class CashCommand implements Command {
         // Parse
         // Throw exception (invalid argument amount)
         if (!App.checkArgsCountWithPrint("cash add", params.length, 4, 5)) return;
-
+		
         String cashierName = params[params.length-2];
         String cashierEmail = params[params.length-1];
-
+		
 		Cashier addedCash = null;
 		UserManager userManager = UserManager.getInstance();
-
+		
         try {
             if (params.length == 5) {
                 String cashierId = params[2];
@@ -61,14 +58,14 @@ public class CashCommand implements Command {
             } else {
                 addedCash = userManager.addCashier(cashierName, cashierEmail);
             }
-
+			
             System.out.println(addedCash);
             System.out.println("cash add: ok");
         }catch (DataException ex){
             throw new FailedCommandException("Cannot add cashier: " + ex.getMessage());
         }
     }
-
+	
     /**
      * List all the cashiers of the shop
      * @param params
@@ -79,18 +76,17 @@ public class CashCommand implements Command {
         // Parse
         // Throw exception (invalid argument amount)
         if (!App.checkArgsCountWithPrint("cash list", params.length, 2)) return;
-
-        Cashier[] workers = UserManager.getInstance().listCashiers();
-		Arrays.sort(workers);
 		
-        if (workers.length == 0) throw new FailedCommandException("cash list: error: no cashiers added yet"); // Throw exception (no existing cashiers)
-        System.out.println("Cash:");
+        ArrayList<Cashier> workers = UserManager.getInstance().getCashiers();
+		workers.sort((c1, c2) -> c1.getName().compareTo(c2.getName()));
+		
+		System.out.println("Cash:");
         for (Cashier cashier : workers) {
             System.out.println("  "+cashier.toString());
         }
         System.out.println("cash list: ok");
     }
-
+	
     /**
      * Remove the cashier with the id provided
      * @param params
@@ -100,7 +96,7 @@ public class CashCommand implements Command {
     private void evalRemove(String[] params) throws FailedCommandException{
         // Throw exception (invalid argument amount)
         if (!App.checkArgsCountWithPrint("cash remove", params.length, 3)) return;
-
+		
         String cashierId = params[2];
         try {
             UserManager.getInstance().removeCashier(cashierId);
@@ -109,7 +105,7 @@ public class CashCommand implements Command {
             throw new FailedCommandException("Cannot remove the cashier: " + ex.getMessage());
         }
     }
-
+	
     /**
      * List all the tickets of a cashier
      * @param params
@@ -119,18 +115,25 @@ public class CashCommand implements Command {
     private void evalTickets(String[] params) throws FailedCommandException{
         // Throw exception (invalid argument amount)
         if (!App.checkArgsCountWithPrint("cash tickets", params.length, 3)) return;
-
+		
         String cashierId = params[2];
 		System.out.println("Tickets: ");
-
+		
         try {
-            String ticketsStr = UserManager.getInstance().findCashier(cashierId).getTicketsString();
-            if (ticketsStr != null && !ticketsStr.isEmpty()) {
-                System.out.print(ticketsStr);
-            }
+			Cashier cashier = UserManager.getInstance().findCashier(cashierId);
+			
+			ArrayList<Ticket> tickets = new ArrayList(cashier.getTickets());
+			// NOTE(erb): notice comparison is inversed
+			tickets.sort((first, second) -> second.getComposedId().compareTo(first.getComposedId()));
+			
+			for(Ticket ticket : tickets) {
+				System.out.printf("  %s%n", ticket.toString());
+			}
+			
             System.out.println("cash tickets: ok");
-        }catch (MissingItemException ex){
-            throw new FailedCommandException("Cannot list the tickets for cashier " + cashierId +": " + ex.getMessage());
+			
+        } catch (MissingItemException ex){
+            throw new FailedCommandException(ex.getMessage());
         }
     }
 }
