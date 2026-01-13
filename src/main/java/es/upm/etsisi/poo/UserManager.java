@@ -26,13 +26,12 @@ public class UserManager implements Serializable {
     
 	public static UserManager getInstance() {
 		if (instance == null) {
-			if (Serialize.dataStore.containsKey("UserManager")) {
-				instance = (UserManager) Serialize.dataStore.get("UserManager");
-			} else {
+			instance = (UserManager)Serialize.get("UserManager");
+			if (instance == null) {
 				instance = new UserManager();
-				Serialize.dataStore.put("UserManager", instance);
+                Serialize.put("UserManager", instance);
 			}
-		}
+        }
 		return instance;
 	}
     

@@ -42,12 +42,11 @@ public class Inventory implements Serializable {
     
     public static Inventory getInstance() {
         if (instance == null) {
-            if (Serialize.dataStore.containsKey("Inventory")) {
-                instance = (Inventory) Serialize.dataStore.get("Inventory");
-            } else {
-                instance = new Inventory();
-                Serialize.dataStore.put("Inventory", instance);
-            }
+			instance = (Inventory)Serialize.get("Inventory");
+			if (instance == null) {
+				instance = new Inventory();
+                Serialize.put("Inventory", instance);
+			}
         }
         return instance;
     }
@@ -169,9 +168,10 @@ public class Inventory implements Serializable {
     }
     
     public int generateUniqueProductId() throws IdSpaceExhaustedException {
-        int idQuery = nextProductId;
+        int idQuery = nextProductId-1;
 		boolean foundId = false;
-		while (!foundId) {
+		while (!foundId && idQuery != Integer.MAX_VALUE) {
+			idQuery++;
 			InventoryItem prod = this.items.get(new InventoryItemId(idQuery, false));
 			foundId = (prod == null);
 		}
