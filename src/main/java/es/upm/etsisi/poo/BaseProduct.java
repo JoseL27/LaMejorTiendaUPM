@@ -1,5 +1,6 @@
 package es.upm.etsisi.poo;
 
+import es.upm.etsisi.poo.exceptions.InvalidDataException;
 import java.util.Arrays;
 import java.time.DateTimeException;
 
@@ -7,7 +8,7 @@ class BaseTicketItem extends TicketItem implements Comparable<TicketItem> {
 	private BaseProduct baseProduct;
 	private String[] personalizations;
 	
-	public BaseTicketItem(BaseProduct product, int amount, String[] personalizations) throws IllegalArgumentException {
+	public BaseTicketItem(BaseProduct product, int amount, String[] personalizations) {
 		super(product, amount);
 		this.baseProduct = product;
 		this.personalizations = personalizations;
@@ -89,14 +90,27 @@ public class BaseProduct extends Product {
 	private int maxPersonalizations;
 	private boolean personalized;
     
-    public BaseProduct(int id, String name, double price, String category, int maxPersonalizations, boolean personalized) throws IllegalArgumentException {
-        this(id, name, price, Category.valueOf(category), maxPersonalizations, personalized);
+    public BaseProduct(int id, String name, double price, String categoryStr, int maxPersonalizations, boolean personalized) throws InvalidDataException {
+        super(id, name, price);
+        
+		try {
+			this.category = Category.valueOf(categoryStr);
+		} catch (IllegalArgumentException e) {
+			throw new InvalidDataException(String.format("Product category must be one of %s", Arrays.toString(Category.values())));
+		}
+		
+		if (maxPersonalizations < 0 || maxPersonalizations > this.category.maxPersonalizations)
+            throw new InvalidDataException("Expected a number between 0 and " + this.category.maxPersonalizations + " for max personalizations, got " + maxPersonalizations);
+        
+        this.maxPersonalizations = maxPersonalizations;
+		this.personalized = personalized;
     }
 	
-    public BaseProduct(int id, String name, double price, Category category, int maxPersonalizations, boolean personalized) throws IllegalArgumentException{
+    public BaseProduct(int id, String name, double price, Category category, int maxPersonalizations, boolean personalized) throws InvalidDataException {
         super(id, name, price);
+		
         if (maxPersonalizations < 0 || maxPersonalizations > category.maxPersonalizations)
-            throw new IllegalArgumentException("Expected a number between 0 and " + category.maxPersonalizations + " for max personalizations, got " + maxPersonalizations);
+            throw new InvalidDataException("Expected a number between 0 and " + category.maxPersonalizations + " for max personalizations, got " + maxPersonalizations);
         
         this.category = category;
         this.maxPersonalizations = maxPersonalizations;
@@ -120,7 +134,7 @@ public class BaseProduct extends Product {
 	
 	
 	@Override
-		public TicketItem  getTicketItem(int amount, String[] personalizations) throws IllegalArgumentException {
+		public TicketItem  getTicketItem(int amount, String[] personalizations) {
 		return new BaseTicketItem(this, amount, personalizations);
 	}
 	
@@ -136,7 +150,11 @@ public class BaseProduct extends Product {
 	
 	@Override
 		public InventoryItem copy() {
-		return new BaseProduct(super.id, super.name, super.price, category, maxPersonalizations, personalized);
+		try {
+			return new BaseProduct(super.id, super.name, super.price, category, maxPersonalizations, personalized);
+		} catch (InvalidDataException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 	
 	@Override

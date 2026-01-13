@@ -1,6 +1,7 @@
 package es.upm.etsisi.poo;
 
 import es.upm.etsisi.poo.exceptions.MissingItemException;
+import es.upm.etsisi.poo.exceptions.InvalidDataException;
 
 import java.util.*;
 
@@ -11,23 +12,23 @@ public class Cashier extends User {
     /**
      * Creates new cashier with the id, name and email given in the parameters
      */
-    public Cashier(String id, String name, String email) throws IllegalArgumentException{
+    public Cashier(String id, String name, String email) throws InvalidDataException {
         // Should handle: valid id format, valid upm email, none of the arguments is null
         super(id, name, email);
         this.tickets = new HashMap<>();
 		
         if (!isValidId(id)) { 
-			throw new IllegalArgumentException("Invalid cashier id: " + id);
+			throw new InvalidDataException("Invalid cashier id: " + id);
 		}
         if (!isCompanyEmail(email)) { 
-			throw new IllegalArgumentException("Invalid cashier email: " + email);
+			throw new InvalidDataException("Invalid cashier email: " + email);
 		}
     }
 	
     /**
      * Creates a new ticket the id given in the parameter.
      */
-    public void addTicket(Ticket ticketToAdd) throws IllegalArgumentException {
+    public void addTicket(Ticket ticketToAdd) {
         this.tickets.put(ticketToAdd.getComposedId(), ticketToAdd);
     }
 	

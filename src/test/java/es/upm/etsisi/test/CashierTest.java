@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import es.upm.etsisi.poo.Cashier;
+import es.upm.etsisi.poo.exceptions.*;
 
 public class CashierTest extends BaseTest {
     
@@ -35,8 +36,15 @@ public class CashierTest extends BaseTest {
         "@upm.es",
     };
     
-    public static final Cashier VALID_CASHIER = 
-        new Cashier(VALID_WORKER_IDs[0], "persona", VALID_COMPANY_EMAILs[0]);
+    public static final Cashier VALID_CASHIER = createValidCashier();
+	
+	private static Cashier createValidCashier() {
+		try {
+			return new Cashier(VALID_WORKER_IDs[0], "persona", VALID_COMPANY_EMAILs[0]);
+		} catch (InvalidDataException e) {
+			throw new Error(e);
+		}
+	}
     
 	@Test
         void validateId() {
@@ -67,14 +75,14 @@ public class CashierTest extends BaseTest {
     
     @Test
         void constructorFailId() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidDataException.class, () -> {
                          new Cashier(INVALID_WORKER_IDs[0], "fernando", VALID_COMPANY_EMAILs[0]);
                      });
     }
     
     @Test
         void constructorFailEmail() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidDataException.class, () -> {
                          new Cashier(VALID_WORKER_IDs[0], "fernando", INVALID_COMPANY_EMAILs[0]);
                      });
     }

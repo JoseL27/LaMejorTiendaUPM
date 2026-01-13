@@ -44,20 +44,17 @@ public class UserManager {
 	 * @param assignedCashierId Cashier who is linked with the creation of this Client
 	 * @return The client that was created
 	 */
-	public Client addClient(String clientId, String name, String email, String assignedCashierId) throws DataException{
-        try {
-            // Make sure assignedCashierId exists within the Cashier set
-            Cashier foundCashier = this.findCashier(assignedCashierId);
-            Client newClient = new Client(clientId, name, email, foundCashier);
-            
-            // Attempt to find the client with the same ID in the cashier set
-            if (this.users.containsKey(clientId)) throw new DuplicateItemException("Client with id " + clientId + " already exists");
-            
-            this.users.put(clientId, newClient);
-            return newClient;
-        }catch (IllegalArgumentException ex){
-            throw new InvalidDataException("Error creating client: " + ex.getMessage());
-        }
+	public Client addClient(String clientId, String name, String email, String assignedCashierId) throws InvalidDataException, DuplicateItemException, MissingItemException {
+		// Make sure assignedCashierId exists within the Cashier set
+		Cashier foundCashier = this.findCashier(assignedCashierId);
+		Client newClient = new Client(clientId, name, email, foundCashier);
+		
+		// Attempt to find the client with the same ID in the cashier set
+		if (this.users.containsKey(clientId)) throw new DuplicateItemException("Client with id " + clientId + " already exists");
+		
+		this.users.put(clientId, newClient);
+		return newClient;
+        
 	}
     
 	/**
@@ -108,24 +105,20 @@ public class UserManager {
 	 * @return The cashier that was created
      * @throws DataException if the worker with the same id already exists, or the ID space for cashier is exhausted, or email format is not correct
 	 */
-	public Cashier addCashier(String workerId, String name, String email) throws DataException{
-        try {
-            // Attempt to find the cashier with the same ID in the cashier set
-            if (this.users.containsKey(workerId)) { 
-				throw new DuplicateItemException("Cashier with id " + workerId + " already exists");
-			}
-            
-			int cashierIdValue = Integer.parseInt(workerId.substring(2));
-            if (cashierIdValue >= this.nextCashierId)
-                this.nextCashierId = cashierIdValue + 1;
-            
-            // Add the cashier to the set
-            Cashier newCashier = new Cashier(workerId, name, email);
-            this.users.put(workerId, newCashier);
-            return newCashier;
-        }catch (IllegalArgumentException ex){
-            throw new InvalidDataException("Error creating cashier: " + ex.getMessage());
-        }
+	public Cashier addCashier(String workerId, String name, String email) throws DuplicateItemException, InvalidDataException {
+		// Attempt to find the cashier with the same ID in the cashier set
+		if (this.users.containsKey(workerId)) { 
+			throw new DuplicateItemException("Cashier with id " + workerId + " already exists");
+		}
+		
+		int cashierIdValue = Integer.parseInt(workerId.substring(2));
+		if (cashierIdValue >= this.nextCashierId)
+			this.nextCashierId = cashierIdValue + 1;
+		
+		// Add the cashier to the set
+		Cashier newCashier = new Cashier(workerId, name, email);
+		this.users.put(workerId, newCashier);
+		return newCashier;
 	}
     
 	/**

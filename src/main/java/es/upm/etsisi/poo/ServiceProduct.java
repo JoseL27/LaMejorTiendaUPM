@@ -6,11 +6,11 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
-class ServiceTicketItem extends TicketItem implements Comparable<TicketItem> {
+class ServiceTicketItem extends TicketItem {
 	
 	private ServiceProduct serviceProduct;
 	
-	public ServiceTicketItem(ServiceProduct product) throws IllegalArgumentException {
+	public ServiceTicketItem(ServiceProduct product) {
 		super(product, 1);
 		this.serviceProduct = product;
 	}
@@ -42,14 +42,6 @@ class ServiceTicketItem extends TicketItem implements Comparable<TicketItem> {
 		return super.item.toString();
 	}
 	
-    @Override
-		public int compareTo(TicketItem ticketItem){
-		int result = -1;
-		if (ticketItem != null && ticketItem.getItem() instanceof ServiceProduct){
-			result = this.item.getId() - ticketItem.getItem().getId();
-		}
-		return result;
-    }
 }
 
 
@@ -66,7 +58,7 @@ public class ServiceProduct extends InventoryItem {
     private ServiceCategory category;
     private LocalDateTime expirationDate;
 	
-    public ServiceProduct(int id, String categoryStr, LocalDateTime expirationDate) throws IllegalArgumentException {
+    public ServiceProduct(int id, String categoryStr, LocalDateTime expirationDate) throws InvalidDataException {
         super(id);
 		
 		assert categoryStr != null : "Category string can't be null";
@@ -74,17 +66,15 @@ public class ServiceProduct extends InventoryItem {
 		
 		
 		try {
-			ServiceProduct.ServiceCategory category = ServiceProduct.ServiceCategory.valueOf(categoryStr);
-			this.category = category;
+			this.category = ServiceCategory.valueOf(categoryStr);
 		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException(String.format("Service category must be one of %s", 
-															 Arrays.toString(ServiceProduct.ServiceCategory.values())));
+			throw new InvalidDataException(String.format("Service category must be one of %s", Arrays.toString(ServiceCategory.values())));
 		}
 		
         this.expirationDate = expirationDate;
     }
 	
-    public ServiceProduct(int id, ServiceCategory category, LocalDateTime expirationDate) throws IllegalArgumentException {
+    public ServiceProduct(int id, ServiceCategory category, LocalDateTime expirationDate) throws InvalidDataException {
         super(id);
 		
 		assert category != null : "Category can't be null";
@@ -110,7 +100,11 @@ public class ServiceProduct extends InventoryItem {
 	
 	@Override
 		public InventoryItem copy() {
-		return new ServiceProduct(super.id, category, expirationDate);
+		try {
+			return new ServiceProduct(super.id, category, expirationDate);
+		} catch (InvalidDataException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 	
 	@Override
@@ -121,7 +115,7 @@ public class ServiceProduct extends InventoryItem {
 	}
 	
 	@Override
-		public TicketItem getTicketItem(int amount, String[] personalization) throws IllegalArgumentException {
+		public TicketItem getTicketItem(int amount, String[] personalization) {
 		return new ServiceTicketItem(this);
 	}
 	

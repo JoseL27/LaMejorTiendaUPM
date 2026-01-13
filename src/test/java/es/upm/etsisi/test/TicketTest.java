@@ -1,13 +1,7 @@
 package es.upm.etsisi.test;
 
-import es.upm.etsisi.poo.App;
-import es.upm.etsisi.poo.BaseProduct;
-import es.upm.etsisi.poo.Ticket;
-import es.upm.etsisi.poo.ProductTicket;
-import es.upm.etsisi.poo.TimedProduct;
-import es.upm.etsisi.poo.exceptions.DuplicateItemException;
-import es.upm.etsisi.poo.exceptions.FullCollectionException;
-import es.upm.etsisi.poo.exceptions.MissingItemException;
+import es.upm.etsisi.poo.*;
+import es.upm.etsisi.poo.exceptions.*;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -216,7 +210,7 @@ public class TicketTest extends BaseTest {
             TimedProduct tp = new TimedProduct(20, "Event", 50.0, 3, "MEETING", App.now().plusDays(10));
 			
 			// 4 > maxParticipants(3) => no añade nada
-			assertThrows(IllegalArgumentException.class, () -> t.addItem(tp, 4, new String[0]));
+			assertThrows(InvalidDataException.class, () -> t.addItem(tp, 4, new String[0]));
             assertTrue(t.isEmpty());
         }
 		

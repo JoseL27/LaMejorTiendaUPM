@@ -111,11 +111,7 @@ public class Inventory {
      */
     public Product updateProductName(int id, String name) throws DataException {
         Product selectedProduct = this.getProduct(id);
-        try {
-            selectedProduct.setName(name);
-        } catch (IllegalArgumentException ex){
-            throw new DataException("Unable to update name: " + ex.getMessage());
-        }
+		selectedProduct.setName(name);
         return selectedProduct;
     }
     
@@ -126,13 +122,9 @@ public class Inventory {
      * @param price Product price (must be greater than 0)
      * @return true if the product's price is updated correctly, false in other case
      */
-    public Product updateProductPrice(int id, double price) throws DataException{
+    public Product updateProductPrice(int id, double price) throws DataException {
         Product selectedProduct = this.getProduct(id);
-        try{
-            selectedProduct.setPrice(price);
-        }catch (IllegalArgumentException ex){
-            throw new DataException("Unable to update price: " + ex.getMessage());
-        }
+		selectedProduct.setPrice(price);
         return selectedProduct;
     }
     
@@ -143,13 +135,9 @@ public class Inventory {
      * @param category Product Category
      * @return true if the product's category is updated correctly, false in other case
      */
-    public BaseProduct updateProductCategory(int id, String category) throws DataException{
+    public BaseProduct updateProductCategory(int id, String category) throws DataException {
         BaseProduct selectedProduct = this.getBaseProduct(id);
-        try {
-            selectedProduct.setCategory(category);
-        }catch (IllegalArgumentException ex){
-            throw new DataException("Unable to update category, " + category + " is not a valid category");
-        }
+		selectedProduct.setCategory(category);
         return selectedProduct;
     }
     
@@ -244,7 +232,7 @@ public class Inventory {
         return result;
     }
     
-    public Product getProduct(int id) throws DataException {
+    public Product getProduct(int id) throws MissingItemException, DataException {
         Product result = null;
         InventoryItemId itemId = new InventoryItemId(id, true);
         InventoryItem prod = this.items.get(itemId);

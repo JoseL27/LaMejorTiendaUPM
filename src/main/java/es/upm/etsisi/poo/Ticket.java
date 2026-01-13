@@ -57,9 +57,10 @@ public abstract class Ticket {
      * To create a ticket with a "random id" use randomId() function
      * then check if the id is unique in the store and create it using this constructor.
      */
-    public Ticket(int id, boolean isIdCustom) throws IllegalArgumentException {
-        if (id < 0) throw new IllegalArgumentException("Ticket id should be a not negative number");
-		this.ticketItems = new ArrayList<TicketItem>();
+    public Ticket(int id, boolean isIdCustom) {
+		if (id < 0) throw new IllegalArgumentException("Ticket id should be a not negative number");
+		
+        this.ticketItems = new ArrayList<TicketItem>();
         this.id = id;
         this.isOpen = true;
         this.dateOpened = App.now();
@@ -188,10 +189,10 @@ public abstract class Ticket {
         return result;
     }
 	
-    public void addItem(InventoryItem item, int amount, String[] personalizations) throws DataException, IllegalArgumentException, DateTimeException {
+    public void addItem(InventoryItem item, int amount, String[] personalizations) throws DataException, DateTimeException {
 		
 		if (!this.validateItemKind(item)) {
-			throw new IllegalArgumentException("This Ticket only accepts products");
+			throw new InvalidDataException("This Ticket only accepts products");
 		}
 		
 		TicketItem infoToAdd = item.getTicketItem(amount, personalizations);

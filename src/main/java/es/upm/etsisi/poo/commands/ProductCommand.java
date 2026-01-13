@@ -65,10 +65,10 @@ public class ProductCommand implements Command {
 			System.out.println(service);
 			System.out.println("prod add: ok");
 			
-        } catch (IllegalArgumentException e) {
-            throw new FailedCommandException("prod add: failed to add service: wrong argument");
+        } catch (DateTimeParseException e) {
+            throw new FailedCommandException("Failed to parse date from text "+e.getParsedString());
         } catch (DataException e) {
-            throw new FailedCommandException("prod add: failed to add service: " + e.getMessage());
+            throw new FailedCommandException("Failed to service: " + e.getMessage());
         }
     }
     
@@ -118,9 +118,9 @@ public class ProductCommand implements Command {
                                                                      productPrice, productMaxPers, specifiedMaxPers);
             System.out.println(createdProduct);
             System.out.println("prod add: ok");
-        }catch (NumberFormatException ex) {
+        }catch (IllegalArgumentException ex) {
             throw new FailedCommandException("Unable to add product, invalid integer value in arguments");
-        }catch(DataException | IllegalArgumentException ex) {
+        }catch(DataException ex) {
             throw new FailedCommandException("Unable to add the product: " + ex.getMessage());
         }
 	}

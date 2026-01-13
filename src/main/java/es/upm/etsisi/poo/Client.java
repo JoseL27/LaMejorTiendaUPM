@@ -2,9 +2,9 @@ package es.upm.etsisi.poo;
 
 import es.upm.etsisi.poo.exceptions.DuplicateItemException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import es.upm.etsisi.poo.exceptions.InvalidDataException;
+
 
 public class Client extends User {
     
@@ -14,17 +14,17 @@ public class Client extends User {
     private final List<Integer> ticketIds;
     private final IdType idType;
     
-    public Client(String id, String name, String email, Cashier cashier) throws IllegalArgumentException {
+    public Client(String id, String name, String email, Cashier cashier) throws InvalidDataException {
         super(id, name, email);
 		
-		if (cashier == null) throw new IllegalArgumentException("Cashier can't be null");
+		if (cashier == null) throw new IllegalArgumentException();
 		
         this.managedBy = cashier;
         this.ticketIds = new ArrayList<>();
         this.idType = idTypeFromString(id);
 		
 		if (idType == null)
-            throw new IllegalArgumentException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
+            throw new InvalidDataException("Invalid client id: " + id + ", please enter a valid NIF/NIE");
     }
     
     public void addTicket(int ticketId) throws DuplicateItemException {

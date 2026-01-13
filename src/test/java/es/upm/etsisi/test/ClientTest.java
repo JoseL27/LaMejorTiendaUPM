@@ -4,6 +4,8 @@ package es.upm.etsisi.test;
 
 import es.upm.etsisi.poo.Client;
 import es.upm.etsisi.poo.Cashier;
+import es.upm.etsisi.poo.exceptions.*;
+
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -82,8 +84,16 @@ public class ClientTest extends BaseTest {
         "H820488A9",
     };
     
-    public static final Client VALID_CLIENT = 
-        new Client(VALID_NIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
+    public static final Client VALID_CLIENT = createValidClient();
+	
+	
+	private static Client createValidClient() {
+		try {
+			return new Client(VALID_NIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
+		} catch (InvalidDataException e) {
+			throw new Error(e);
+		}
+	}
     
     void testClientId(String id, Client.IdType expectedIdType) {
         Client.IdType idType = Client.idTypeFromString(id);
@@ -121,7 +131,7 @@ public class ClientTest extends BaseTest {
     
     @Test
         void constructorFailIdDNI() { 
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidDataException.class, () -> {
                          new Client(INVALID_DNIs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
                      });
         
@@ -130,7 +140,7 @@ public class ClientTest extends BaseTest {
     
     @Test
         void constructorFailIdNIF() { 
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidDataException.class, () -> {
                          new Client(INVALID_NIFs[0], "jose", "josqlito@correo.com", CashierTest.VALID_CASHIER);
                      });
     }
@@ -145,12 +155,14 @@ public class ClientTest extends BaseTest {
     
     @Test
         void toStringFormat() {
-        Cashier cs = new Cashier("UW9999999", "andres", "andres@upm.es");
-        Client cl = new Client("X0586929S", "jose", "josqlito@correo.com", cs);
-        
-        String expected = String.format("USER{identifier='%s', name='%s', email='%s', cash=%s}",
-                                        cl.getId(), cl.getName(), cl.getEmail(), cs.getId());
-        assertEquals(expected, cl.toString());
+		assertDoesNotThrow(() -> {
+							   Cashier cs = new Cashier("UW9999999", "andres", "andres@upm.es");
+							   Client cl = new Client("X0586929S", "jose", "josqlito@correo.com", cs);
+							   
+							   String expected = String.format("USER{identifier='%s', name='%s', email='%s', cash=%s}",
+															   cl.getId(), cl.getName(), cl.getEmail(), cs.getId());
+							   assertEquals(expected, cl.toString());
+						   });
     }
     
 }
