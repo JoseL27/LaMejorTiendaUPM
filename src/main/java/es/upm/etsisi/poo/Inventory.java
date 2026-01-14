@@ -1,10 +1,15 @@
 package es.upm.etsisi.poo;
 
-import es.upm.etsisi.poo.exceptions.*;
-
 import java.io.Serializable;
-import java.util.*;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashMap;
+
+import es.upm.etsisi.poo.exceptions.DataException;
+import es.upm.etsisi.poo.exceptions.DuplicateItemException;
+import es.upm.etsisi.poo.exceptions.FullCollectionException;
+import es.upm.etsisi.poo.exceptions.IdSpaceExhaustedException;
+import es.upm.etsisi.poo.exceptions.MissingItemException;
 
 class InventoryItemId implements Serializable {
     public int id;
@@ -168,16 +173,17 @@ public class Inventory implements Serializable {
     }
     
     public int generateUniqueProductId() throws IdSpaceExhaustedException {
-        int idQuery = nextProductId-1;
+        int idQuery = nextProductId - 1;
 		boolean foundId = false;
 		while (!foundId && idQuery != Integer.MAX_VALUE) {
-			idQuery++;
-			InventoryItem prod = this.items.get(new InventoryItemId(idQuery, false));
+			idQuery += 1;
+			final InventoryItem prod = this.items.get((new InventoryItemId(idQuery, true/*false*/)));
 			foundId = (prod == null);
 		}
 		
 		if (foundId) {
 			nextProductId = idQuery;
+            //System.out.println("next product id updated to " + nextProductId);
 		} else {
 			throw new IdSpaceExhaustedException("No more left ids in inventory");
 		}
