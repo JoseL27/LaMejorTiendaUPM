@@ -1,3 +1,6 @@
+# UPM Tienda persistence data
+tienda.upm
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
