@@ -2,14 +2,16 @@
 left to right direction
 
 class App {
+  - {static} clock: Clock
   + App()
   + main(String[])
   + run(Scanner)
   + run(Scanner, boolean)
+  + {static} now(): LocalDateTime
   -firstParse(String)
   -{static}echo(String[])
-  -{static}help(String[])
-  -{static}parser(String): String[]
+  -{static}help()
+  -{static}parser(String)
   -{static}auxParser(String, String[])
   -{static}cutter(String[]): String[]
   -{static}printInvalidDataType(String, String, String)
@@ -20,21 +22,68 @@ class App {
   -{static}checkArgsCountWithPrint(String, int, int): boolean
 }
 
+interface Command {
+  + eval(String[])
+}
+
+class ClientCommand implements Command {
+  - evalAdd(String[])
+  - evalRemove(String[])
+  - evalList()
+}
+
+class CashCommand implements Command {
+  - evalAddCash(String[])
+  - evalRemove(String[])
+  - evalList(String[])
+  - evalTickets(String[])
+}
+
+class TicketCommand implements Command {
+  - evalNew(String[])
+  - evalAdd(String[])
+  - evalRemove(String[])
+  - evalPrint(String[])
+  - evalList(String[])
+  - parsePersonalizations(int, String[]): String[]
+}
+
+class ProductCommand implements Command {
+  - evalAdd(String[])
+  - evalAddBase(String[])
+  - evalAddTimed(String[])
+  - evalAddService(String[])
+  - evalUpdate(String[])
+  - evalRemove(String[])
+  - evalList(String[])
+}
+
 abstract class InventoryItem{
  - id: int
 
  + InventoryItem(int)
  + getId(): int
- + duplicateOf(InventoryItem): boolean
- + toString(): String
  + isValidId(int): boolean
+ + {abstract} copy(): InventoryItem
+ + {abstract} getTicketItem(int, String[]): TicketItem
+ + {abstract} getInventoryId(): InventoryItemId
 }
+
+class InventoryItemId{
+ + id: int
+ + isProduct: boolean
+
+ + InventoryItemId(int, boolean)
+}
+
 abstract class Product extends InventoryItem{
   + {static} PRODUCT_MAX_NAME_LENGTH: int
   - name: String
   - price: double
 
   + Product(int, String, double):
+  + isValidName(String): boolean
+  + isValidPrice(double): boolean
   + getName(): String
   + getPrice(): Double
   + setName(String)
@@ -55,7 +104,8 @@ class ServiceProduct extends InventoryItem{
  - category: ServiceCategory
 
  + ServiceProduct(int,ServiceCategory,LocalDateTime)
- + {static} newFromId(String, ServiceCategory, LocalDateTime): ServiceProduct
+ + ServiceProduct(int,String,LocalDateTime)
+ + {static} isIdString(String): boolean
  + getCategory(): ServiceCategory
  + getExpirationDate(): LocalDateTime
 }
@@ -67,18 +117,21 @@ enum Category {
   + BOOK	   	0.10, false
   + ELECTRONICS	0.03, false
 
-  + getDiscountPercent(): float
-  + getMaxPersonalizations(): int
+  + discountPercent: float
+  + maxPersonalizations: int
 }
 
 class BaseProduct extends Product {
+  + {static} PERSONALIZATION_EXTRA_PERCENT
   - category: Category
   - maxPersonalizations: int
+  - personalized: boolean
 
-  + BaseProduct(int, String, double, Category, int):
+  + BaseProduct(int, String, double, Category, int, boolean)
+  + BaseProduct(int, String, double, String, int, boolean)
   + getCategory(): Category
   + setCategory(Category)
-  + toString(): String
+  + toString(String[]): String
 }
 
 enum TimedType {
@@ -92,86 +145,120 @@ enum TimedType {
 }
 
 class TimedProduct extends Product {
+  + {static} EXPIRATION_DATE_FORMAT: DateTimeFormatter
   + {static} TIMED_PRODUCT_MAX_PEOPLE: int
   - type: TimedType
-  - amount: int
   - participants: int
   - expirationDate: LocalDateTime
 
   + TimedProduct(int, String, double, int, TimedType, LocalDateTime)
+  + TimedProduct(int, String, double, int, String, LocalDateTime)
   + getType(): TimedType
-  + getAmount(): int
-  + setAmount(int)
   + getMaxParticipants(): int
-  + toString(): String
-}
-
-class ProductInfo {
-  - amount: int
-  - personalizations: String[]
-
-  + ProductInfo(Product, int, String[]):
-  + getProduct(): Product
-  + getAmount(): int
-  + getPersonalizations(): String[]
-  + duplicateOf(ProductInfo): boolean
-  + compareTo(ProductInfo): int
+  + getExpirationDate(): LocalDateTime
+  + toString(int): String
 }
 
 class Inventory {
   + {static} MAX_PRODUCTS
   - productAmount: int
+  - nexProductId: int
+  - nextServiceId: int
+  + instance: Inventory
 
-  + {static} isValidId(int): boolean
-  + {static} isValidName(String): boolean
-  - isValidPrice(double): boolean
+  + {static}getInstance(): Inventory
+  - Inventory()
 
   + createBaseProduct(int, String, Category, double, int): BaseProduct
   + createTimedProduct(): TimedProduct
-  + readProductIndex(int): int
-  + readProduct(int): Product
+  + createServiceProduct(): ServiceProduct
   + updateProductName(int, String): Product
   + updateProductPrice(int, double): Product
   + updateProductCategory(int, Category): BaseProduct
-  + deleteProduct(int): boolean
-
-  + listProducts(): Product[]
+  + deleteItem(int): InventoryItem
+  + getItems(): Collection<InventoryItem>
   + generateUniqueProductId(): int
+  + addItem(InventoryItem): InventoryItem
+  + getItemFromStringId(String): InventoryItem
+  + getProduct(int): Product
+  + getBaseProduct(int): BaseProduct
 }
 
-class Ticket {
+abstract class Ticket {
   + {static} MAX_PRODUCTS: int
-  + {static} PERSONALIZATION_EXTRA_PERCENT: float
   + {static} ID_DATE_FORMAT: SimpleDateFormat
+  + {static} DECIMAL_FORMAT: DecimalFormat
 
-  - id: String
-  - boolean: isOpen
+  - totalAmount: int
+  - id: int
+  - composedId: String
   - dateOpened: Date
   - dateClosed: Date
+  - isOpen: boolean
 
-  + Ticket(int)
-  + getDateOpened(): Date
+  + Ticket(int, boolean)
+  + getId(): int
   + getDateClosed(): Date
   + getComposedId(): String
   + isOpen(): boolean
   + isEmpty(): boolean
-  + resetProductInfos()
   + close()
+  + {abstract} validateItemKind(InventoryItem): boolean
+  + {abstract} summaryString(): String
 
-  + addProduct(Product, int, String[]): boolean
-  + removeProduct(int): Product
-  + summaryString(): String
-
-  - findDuplicateProductInfo(ProductInfo): ProductInfo
-  - appendProductInfo(ProductInfo): boolean
-  - categoriesProductCount(): int[]
-  - compareTo(Ticket): int
-
-  + {static} randomId(): int
-  + {static} isValidId(): boolean
+  + addItem(InventoryItem, int, String[])
+  + removeItem(int)
+  - findDuplicateItem(TicketItem): TicketItem
 }
 
-Abstract class User {
+class ProductTicket extends Ticket{
+  + ProductTicket(int, boolean)
+  - categoriesProductCount(): int[]
+}
+
+class ServiceTicket extends Ticket{
+  + ServiceTicket(int, boolean)
+}
+
+class CombinedTicket extends Ticket{
+  + CombinedTicket(int, boolean)
+  - categoriesProductCount(): int[]
+}
+
+abstract class TicketItem{
+  - amount: int
+
+  + TicketItem(InventoryItem, int)
+  + getItem(): InventoryItem
+  + getAmount(): int
+  + addAmount(int)
+  + equals(TicketItem): boolean
+  + getItemDiscount(int[]): double
+  + getDiscountPercentOverall(int[]): double
+
+  + {abstract} validate()
+  + {abstract} toString(): String
+  + {abstract} getPrice(): double
+  + {abstract} copy(): TicketItem
+}
+
+class BaseTicketItem extends TicketItem{
+  - personalizations: String[]
+
+  + BaseTicketItem(BaseProduct, int, String[])
+}
+
+class TimedTicketItem extends TicketItem{
+  - peopleAmount: int
+
+  + TimedTicketItem(TimedProduct, int)
+}
+
+class ServiceTicketItem extends TicketItem{
+  + ServiceTicketItem(ServiceProduct)
+}
+
+abstract class User {
   - id: String
   - name: String
   - email: String
@@ -180,14 +267,12 @@ Abstract class User {
   + getId(): String
   + getName(): String
   + getEmail(): String
-  + equals(Object): boolean
 }
 
 enum IdType{
  + DNI
  + NIF
 }
-
 class Client extends User{
  + {static} MOD23_LUT: String
  + {static} NIF_CONTROL_LETTERS: String
@@ -195,35 +280,29 @@ class Client extends User{
  + {static} NIF_LETTER_ONLY: String
  + {static} NIF_EITHER: String
  + managedBy: Cashier
- + ticketIds: List<Integer>
  + idType: IdType
 
  + Client(String, String, String, Cashier)
- + addTicket(String)
- + getIdType(String): IdType
- - {static}isValidDni(String): boolean
- - {static}isValidNif(String): boolean
- - {static}computeNifControlDigit(String): int
- - {static}matchesNifControl(char,char,int,char): boolean
- - {static}normalize(String): String
- + compareTo(Client): int
- + toString(): String
+ + addTicket(int)
+ + getIdType(): IdType
+ + {static} idTypeFromString(String): IdType
+ - {static} isValidDni(String): boolean
+ - {static} isValidNif(String): boolean
+ - {static} computeNifControlDigit(String): int
+ - {static} matchesNifControl(char,char,int,char): boolean
+ - {static} normalize(String): String
 }
 
 class Cashier extends User{
   + {static} COMPANY_DOMAIN: String
 
   + Cashier(String, String, String)
-  + createTicket(int): boolean
-  + findTicket(int): Ticket
-  + getTickets(): Ticket[]
-  + getTicketsString(): String
-  + getCreatedTicketAmount(): int
+  + addTicket(Ticket)
+  + findTicket(String): Ticket
+  + getTickets(): Collection<Ticket>
 
   + {static} isCompanyEmail(String): boolean
   + {static} isValidId(String): boolean
-  + compareTo(Cashier): int
-  + toString(): String
 }
 
 class UserManager {
@@ -234,84 +313,58 @@ class UserManager {
 
   - nextCashierId: int
   - nextTicketId: int
+  - instance: UserManager
 
+  + getInstance(): UserManager
   - UserManager()
-  + addClient(String, String, String, Cashier): boolean
-  + removeClient(String): boolean
+  + addClient(String, String, String, String): Client
+  + removeClient(String)
   + findClient(String): Client
-  + listClients(): Client[]
+  + getClients(): ArrayList<Client>
   + getClientAmount(): int
 
-  + addCashier(String, String, String): boolean
-  + addCashier(String, String): boolean
-  + removeCashier(String): boolean
+  + addCashier(String, String, String): Cashier
+  + addCashier(String, String): Cashier
+  + removeCashier(String)
   + findCashier(String): Cashier
-  + listCashiers(): String
-  + listCashierTickets(String): String
-  + listCashierTicketsArray(String): String
-  + getCashierAmount(): int
+  + getCashiers(): ArrayList<Cashier>
+  + getAllTickets(): ArrayList<Ticket>
 
-  + getAllTickets(): List<Ticket>
   + isTicketIdUnique(int): boolean
-  + getTicketAmount(): int
-  + generateUniqueTicketId(): Integer
+  + generateUniqueTicketId(): int
   + generateUniqueCashierId(): String
 }
 
-interface Command {
-  + eval(String[], UserManager, Inventory)
-}
-
-class ClientCommand implements Command {
-  - evalAdd(String[], UserManager, Inventory)
-  - evalRemove(String[], UserManager, Inventory)
-  - evalList(String[], UserManager, Inventory)
-}
-
-class CashCommand implements Command {
-  - evalAddCash(String[], UserManager, Inventory)
-  - evalRemove(String[], UserManager, Inventory)
-  - evalList(String[], UserManager, Inventory)
-  - evalTickets(String[], UserManager, Inventory)
-}
-
-class TicketCommand implements Command {
-  - evalNew(String[], UserManager, Inventory)
-  - evalAdd(String[], UserManager, Inventory)
-  - evalRemove(String[], UserManager, Inventory)
-  - evalPrint(String[], UserManager, Inventory)
-  - evalList(String[], UserManager, Inventory)
-  - parsePersonalizations(int, String[]): String[]
-}
-
-class ProductCommand implements Command {
-  - evalAddBase(String[], UserManager, Inventory)
-  - evalAddTimed(String[], UserManager, Inventory)
-  - evalUpdate(String[], UserManager, Inventory)
-  - evalRemove(String[], UserManager, Inventory)
-  - evalList(String[], UserManager, Inventory)
+class Serialize{
+  - dataStore: Map<String, Serializable>
+  + put(String, Serializable)
+  + get(String): Serializable
+  + save(String)
+  + load(String)
 }
 
 Inventory *--> InventoryItem
+Inventory *--> InventoryItemId
 
 App --> Inventory
-ProductInfo o--> InventoryItem
-Ticket *--> ProductInfo
-Ticket ..> Product
-Ticket ..> TimedProduct
-Ticket ..> BaseProduct
-Ticket ..> InventoryItem
+ProductTicket o--> TicketItem
+ServiceTicket o--> TicketItem
+CombinedTicket o--> TicketItem
+
+TicketItem o--> InventoryItem
+BaseTicketItem o--> BaseProduct
+TimedTicketItem o--> TimedProduct
+ServiceTicketItem o--> ServiceProduct
 
 UserManager *--> User
-UserManager ..> Client
-UserManager ..> Cashier
-UserManager ..> Ticket
 
 Cashier *--> Ticket
 Client o--> Ticket
 Client --> Cashier
 
-App --> UserManager
 App --> Command
+
+Serialize o--> Inventory
+Serialize o--> UserManager
 
 @enduml
