@@ -115,8 +115,14 @@ public class UserManager implements Serializable {
 		if (this.users.containsKey(workerId)) { 
 			throw new DuplicateItemException("Cashier with id " + workerId + " already exists");
 		}
-		
-		int cashierIdValue = Integer.parseInt(workerId.substring(2));
+
+        int cashierIdValue;
+        try{
+            cashierIdValue = Integer.parseInt(workerId.substring(2));
+        } catch (IndexOutOfBoundsException | NumberFormatException ex) {
+            throw new InvalidDataException("Invalid worker id: " + workerId + " expected format UWXXXXXXX");
+        }
+
 		if (cashierIdValue >= this.nextCashierId)
 			this.nextCashierId = cashierIdValue + 1;
 		
