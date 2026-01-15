@@ -2,14 +2,16 @@
 left to right direction
 
 class App {
+  - {static} clock: Clock
   + App()
   + main(String[])
   + run(Scanner)
   + run(Scanner, boolean)
+  + {static} now(): LocalDateTime
   -firstParse(String)
   -{static}echo(String[])
-  -{static}help(String[])
-  -{static}parser(String): String[]
+  -{static}help()
+  -{static}parser(String)
   -{static}auxParser(String, String[])
   -{static}cutter(String[]): String[]
   -{static}printInvalidDataType(String, String, String)
@@ -18,6 +20,42 @@ class App {
   -{static}checkMinArgsCountWithPrint(String, int, int): boolean
   -{static}checkArgsCountWithPrint(String, int, int, int): boolean
   -{static}checkArgsCountWithPrint(String, int, int): boolean
+}
+
+interface Command {
+  + eval(String[])
+}
+
+class ClientCommand implements Command {
+  - evalAdd(String[])
+  - evalRemove(String[])
+  - evalList()
+}
+
+class CashCommand implements Command {
+  - evalAddCash(String[])
+  - evalRemove(String[])
+  - evalList(String[])
+  - evalTickets(String[])
+}
+
+class TicketCommand implements Command {
+  - evalNew(String[])
+  - evalAdd(String[])
+  - evalRemove(String[])
+  - evalPrint(String[])
+  - evalList(String[])
+  - parsePersonalizations(int, String[]): String[]
+}
+
+class ProductCommand implements Command {
+  - evalAdd(String[])
+  - evalAddBase(String[])
+  - evalAddTimed(String[])
+  - evalAddService(String[])
+  - evalUpdate(String[])
+  - evalRemove(String[])
+  - evalList(String[])
 }
 
 abstract class InventoryItem{
@@ -29,6 +67,14 @@ abstract class InventoryItem{
  + toString(): String
  + isValidId(int): boolean
 }
+
+class InventoryItemId{
+ + id: int
+ + isProduct: boolean
+
+ + InventoryItemId(int, boolean)
+}
+
 abstract class Product extends InventoryItem{
   + {static} PRODUCT_MAX_NAME_LENGTH: int
   - name: String
@@ -106,18 +152,6 @@ class TimedProduct extends Product {
   + toString(): String
 }
 
-class ProductInfo {
-  - amount: int
-  - personalizations: String[]
-
-  + ProductInfo(Product, int, String[]):
-  + getProduct(): Product
-  + getAmount(): int
-  + getPersonalizations(): String[]
-  + duplicateOf(ProductInfo): boolean
-  + compareTo(ProductInfo): int
-}
-
 class Inventory {
   + {static} MAX_PRODUCTS
   - productAmount: int
@@ -139,39 +173,86 @@ class Inventory {
   + generateUniqueProductId(): int
 }
 
-class Ticket {
+abstract class Ticket {
   + {static} MAX_PRODUCTS: int
   + {static} PERSONALIZATION_EXTRA_PERCENT: float
   + {static} ID_DATE_FORMAT: SimpleDateFormat
+  + {static} DECIMAL_FORMAT: DecimalFormat
 
-  - id: String
-  - boolean: isOpen
+  - totalAmount: int
+  - id: int
+  - composedId: String
   - dateOpened: Date
   - dateClosed: Date
+  - isOpen: boolean
 
-  + Ticket(int)
-  + getDateOpened(): Date
+  + Ticket(int, boolean)
   + getDateClosed(): Date
   + getComposedId(): String
   + isOpen(): boolean
   + isEmpty(): boolean
-  + resetProductInfos()
   + close()
+  + {abstract} validateItemKind(InventoryItem): boolean
+  + {abstract} summaryString(): String
 
-  + addProduct(Product, int, String[]): boolean
-  + removeProduct(int): Product
-  + summaryString(): String
-
-  - findDuplicateProductInfo(ProductInfo): ProductInfo
-  - appendProductInfo(ProductInfo): boolean
-  - categoriesProductCount(): int[]
-  - compareTo(Ticket): int
-
-  + {static} randomId(): int
-  + {static} isValidId(): boolean
+  + addItem(InventoryItem, int, String[])
+  + removeItem(int)
+  - findDuplicateItem(TicketItem): TicketItem
 }
 
-Abstract class User {
+class ProductTicket extends Ticket{
+  + ProductTicket(int, boolean)
+  - categoriesProductCount(): int[]
+}
+
+class ServiceTicket extends Ticket{
+  + ServiceTicket(int, boolean)
+}
+
+class CombinedTicket extends Ticket{
+  + CombinedTicket(int, boolean)
+  - categoriesProductCount(): int[]
+}
+
+abstract class TicketItem{
+  - item: InventoryItem
+  - amount: int
+
+  + TicketItem(InventoryItem, int)
+  + getItem(): InventoryItem
+  + getAmount(): int
+  + addAmount(int)
+  + equals(TicketItem): boolean
+  + getItemDiscount(): double
+  + getDiscountPercentOverall(): double
+
+  + {abstract} validate()
+  + {abstract} toString(): String
+  + {abstract} getPrice(): double
+  + {abstract} copy(): TicketItem
+}
+
+class BaseTicketItem extends TicketItem{
+  + personalizations: String[]
+
+  + BaseTicketItem(BaseProduct, int, String[])
+  + compareTo(TicketItem): int
+  + equals(TicketItem): boolean
+}
+
+class TimedTicketItem extends TicketItem{
+  + peopleAmount: int
+
+  + TimedTicketItem(TimedProduct, int)
+  + compareTo(TicketItem): int
+}
+
+class ServiceTicketItem extends TicketItem{
+  + ServiceTicketItem(ServiceProduct)
+  + getDiscountPercentOverall(int[]): double
+}
+
+abstract class User {
   - id: String
   - name: String
   - email: String
@@ -258,49 +339,24 @@ class UserManager {
   + generateUniqueCashierId(): String
 }
 
-interface Command {
-  + eval(String[], UserManager, Inventory)
-}
-
-class ClientCommand implements Command {
-  - evalAdd(String[], UserManager, Inventory)
-  - evalRemove(String[], UserManager, Inventory)
-  - evalList(String[], UserManager, Inventory)
-}
-
-class CashCommand implements Command {
-  - evalAddCash(String[], UserManager, Inventory)
-  - evalRemove(String[], UserManager, Inventory)
-  - evalList(String[], UserManager, Inventory)
-  - evalTickets(String[], UserManager, Inventory)
-}
-
-class TicketCommand implements Command {
-  - evalNew(String[], UserManager, Inventory)
-  - evalAdd(String[], UserManager, Inventory)
-  - evalRemove(String[], UserManager, Inventory)
-  - evalPrint(String[], UserManager, Inventory)
-  - evalList(String[], UserManager, Inventory)
-  - parsePersonalizations(int, String[]): String[]
-}
-
-class ProductCommand implements Command {
-  - evalAddBase(String[], UserManager, Inventory)
-  - evalAddTimed(String[], UserManager, Inventory)
-  - evalUpdate(String[], UserManager, Inventory)
-  - evalRemove(String[], UserManager, Inventory)
-  - evalList(String[], UserManager, Inventory)
+class Serialize{
+  - dataStore: Map<String, Serializable>
+  + put(String, Serializable)
+  + get(String): Serializable
+  + save(String)
+  + load(String)
 }
 
 Inventory *--> InventoryItem
+Inventory *--> InventoryItemId
 
 App --> Inventory
-ProductInfo o--> InventoryItem
-Ticket *--> ProductInfo
-Ticket ..> Product
-Ticket ..> TimedProduct
-Ticket ..> BaseProduct
-Ticket ..> InventoryItem
+ProductTicket o--> TicketItem
+ServiceTicket o--> TicketItem
+CombinedTicket o--> TicketItem
+BaseTicketItem o--> BaseProduct
+TimedTicketItem o--> TimedProduct
+ServiceTicketItem o--> ServiceProduct
 
 UserManager *--> User
 UserManager ..> Client
@@ -313,5 +369,7 @@ Client --> Cashier
 
 App --> UserManager
 App --> Command
+
+
 
 @enduml
