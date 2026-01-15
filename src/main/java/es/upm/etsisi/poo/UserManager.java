@@ -12,7 +12,7 @@ import java.util.*;
 public class UserManager implements Serializable {
 	// using hashmap here since it will make my life easier, also there is no explicit limit on the amount of users -jy
 	private Map<String, User> users;
-    
+
 	public static final int MIN_CASHIER_ID = 0;
 	public static final int MAX_CASHIER_ID = 9999999;
 	private int nextCashierId = MIN_CASHIER_ID;
@@ -26,14 +26,14 @@ public class UserManager implements Serializable {
     
 	public static UserManager getInstance() {
 		if (instance == null) {
-			instance = (UserManager)Serialize.get("UserManager");
-			if (instance == null) {
-				instance = new UserManager();
-                Serialize.put("UserManager", instance);
-			}
+            instance = new UserManager();
         }
 		return instance;
 	}
+
+    public static void load(UserManager newUserManager){
+        instance = newUserManager;
+    }
     
 	private UserManager() {
 		this.users = new HashMap<>();

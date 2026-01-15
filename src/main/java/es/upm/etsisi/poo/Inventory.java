@@ -42,13 +42,13 @@ public class Inventory implements Serializable {
     
     public static Inventory getInstance() {
         if (instance == null) {
-			instance = (Inventory)Serialize.get("Inventory");
-			if (instance == null) {
-				instance = new Inventory();
-                Serialize.put("Inventory", instance);
-			}
+            instance = new Inventory();
         }
         return instance;
+    }
+
+    public static void load(Inventory newInventory){
+        instance = newInventory;
     }
     
     private Inventory() {
