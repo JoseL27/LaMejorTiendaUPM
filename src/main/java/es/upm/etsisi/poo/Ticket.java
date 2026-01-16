@@ -193,7 +193,7 @@ public abstract class Ticket implements Serializable {
     public void addItem(InventoryItem item, int amount, String[] personalizations) throws DataException, DateTimeException {
 		
 		if (!this.validateItemKind(item)) {
-			throw new InvalidDataException("This Ticket only accepts products");
+			throw new InvalidDataException("This Ticket does not accept " + item.getClass().getSimpleName());
 		}
 		
 		TicketItem infoToAdd = item.getTicketItem(amount, personalizations);
