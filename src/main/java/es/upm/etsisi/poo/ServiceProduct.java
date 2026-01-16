@@ -133,5 +133,4 @@ public class ServiceProduct extends InventoryItem {
 		}
 		return false;
 	}
-	
 }

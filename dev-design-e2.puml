@@ -164,7 +164,7 @@ class Inventory {
   - productAmount: int
   - nexProductId: int
   - nextServiceId: int
-  + instance: Inventory
+  - instance: Inventory
 
   + {static}getInstance(): Inventory
   - Inventory()

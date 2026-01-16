@@ -171,5 +171,4 @@ public class TimedProduct extends Product {
         sb.append("}");
         return sb.toString();
     }
-    
 }

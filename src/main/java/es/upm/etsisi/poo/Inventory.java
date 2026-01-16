@@ -43,7 +43,7 @@ public class Inventory implements Serializable {
     private int nextProductId;
     private int nextServiceId;
     
-    public static Inventory instance;
+    private static Inventory instance;
     
     public static Inventory getInstance() {
         if (instance == null) {
@@ -225,25 +225,7 @@ public class Inventory implements Serializable {
 		
 		return item;
 	}
-    
-    public ServiceProduct getService(int id) throws DataException {
-        ServiceProduct result = null;
-        InventoryItemId itemId = new InventoryItemId(id, false);
-        InventoryItem service = this.items.get(itemId);
-        
-        if (service != null) {
-            if (service instanceof Product) {
-                result = (ServiceProduct)service;
-            } else {
-                throw new DataException("Product with id " + id + " is not a product");
-            }
-        } else {
-            throw MissingItemException.fromId("Product", id);
-        }
-        
-        return result;
-    }
-    
+
     public Product getProduct(int id) throws MissingItemException, DataException {
         Product result = null;
         InventoryItemId itemId = new InventoryItemId(id, true);
@@ -275,6 +257,4 @@ public class Inventory implements Serializable {
         
         return result;
     }
-	
-    
 }

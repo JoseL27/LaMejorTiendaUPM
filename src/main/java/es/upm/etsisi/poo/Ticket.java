@@ -221,5 +221,4 @@ public abstract class Ticket implements Serializable {
 			}
 		}
     }
-	
 }

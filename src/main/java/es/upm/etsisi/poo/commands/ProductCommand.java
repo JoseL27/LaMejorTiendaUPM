@@ -3,7 +3,6 @@ package es.upm.etsisi.poo.commands;
 import es.upm.etsisi.poo.*;
 import es.upm.etsisi.poo.exceptions.DataException;
 import es.upm.etsisi.poo.exceptions.FailedCommandException;
-import es.upm.etsisi.poo.exceptions.MissingItemException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

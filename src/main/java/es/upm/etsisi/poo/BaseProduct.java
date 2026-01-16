@@ -118,9 +118,6 @@ public class BaseProduct extends Product {
     }
     
     
-	public int getMaxPersonalizations() {
-		return this.maxPersonalizations;
-	}
     public Category getCategory() {
         return category;
     }
