@@ -66,7 +66,7 @@ public class TicketCommand implements Command {
 			isCustomId = true;
 			
 			if (!userManager.isTicketIdUnique(ticketId)) {
-				throw new FailedCommandException(String.format("ticket new: error: ticket id '%s' allready exists", ticketId));
+				throw new FailedCommandException(String.format("ticket new: error: ticket id '%s' already exists", ticketId));
 			}
 		} catch (NumberFormatException e) {
 			try {
@@ -80,7 +80,7 @@ public class TicketCommand implements Command {
 		
 		String cashierId = params[parseIndex++];
 		String clientId = params[parseIndex++];
-		
+
 		char ticketType = 'p';
 		if (parseIndex < params.length) {
 			
@@ -103,9 +103,9 @@ public class TicketCommand implements Command {
         try {
             Client client = userManager.findClient(clientId);
 			Client.IdType idType = client.getIdType();
-			
+
 			Ticket created = null;
-			if (ticketType == 'p') {
+			if (ticketType == 'p' && idType == Client.IdType.DNI) {
 				created = new ProductTicket(ticketIdNum, isCustomId);
 				
 			} else if (ticketType == 's' && idType == Client.IdType.NIF) {
@@ -115,7 +115,7 @@ public class TicketCommand implements Command {
 				created = new CombinedTicket(ticketIdNum, isCustomId);
 				
 			} else {
-				throw new FailedCommandException("ticket new: id and ticket type don't match");
+				throw new FailedCommandException("ticket new: id and ticket type (" + ticketType + ") don't match");
 			}
 			
 			Cashier cashier = userManager.findCashier(cashierId);
