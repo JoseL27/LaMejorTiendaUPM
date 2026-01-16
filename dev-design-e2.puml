@@ -347,6 +347,8 @@ Inventory *--> InventoryItem
 Inventory *--> InventoryItemId
 
 App --> Inventory
+App --> UserManager
+App --> Serialize
 ProductTicket o--> TicketItem
 ServiceTicket o--> TicketItem
 CombinedTicket o--> TicketItem
