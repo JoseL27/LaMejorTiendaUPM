@@ -75,7 +75,6 @@ public class App {
 				Serialize.load(saveFile);
 			} catch (Exception e) {
 				System.out.println("Error: unable to load previous data.");
-				System.out.println(e.getMessage());
 			}
 		}
 		
