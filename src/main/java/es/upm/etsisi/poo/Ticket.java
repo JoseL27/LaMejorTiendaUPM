@@ -29,7 +29,7 @@ public abstract class Ticket implements Serializable {
      */
 	public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.0###");
 	
-	protected ArrayList<TicketItem> ticketItems;
+	public ArrayList<TicketItem> ticketItems;
 	
     /**
      * The total summed amount of all ticketItems

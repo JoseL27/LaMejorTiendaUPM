@@ -276,9 +276,23 @@ public class TicketCommand implements Command {
 			
             Cashier cashier = UserManager.getInstance().findCashier(cashierId);
             Ticket ticket = cashier.findTicket(ticketId);
-            ticket.close();
-            System.out.print(ticket.summaryString());
-            System.out.println("ticket print: ok");
+            int service=0;
+            int product=0;
+            if(ticket instanceof CombinedTicket){
+                for(TicketItem info: ticket.ticketItems){
+                    if(info.getItem() instanceof Product ) product++;
+                    if(info.getItem()instanceof ServiceProduct) service++;
+                }
+            }
+            if(ticket instanceof ProductTicket || ticket instanceof ServiceTicket
+             || (ticket instanceof CombinedTicket && service!=0 && product!=0)){
+                ticket.close();
+                System.out.print(ticket.summaryString());
+                System.out.println("ticket print: ok");
+            }else{
+                throw new MissingItemException(String.format(" insufficient item to close '%s'", ticketId));
+            }
+
         } catch (MissingItemException ex) {
             throw new FailedCommandException("Unable to print ticket, " + ex.getMessage());
         } catch (DateTimeException ex) {
