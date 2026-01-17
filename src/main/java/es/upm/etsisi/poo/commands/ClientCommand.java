@@ -38,7 +38,7 @@ public class ClientCommand implements Command {
 			case "add"    -> evalAdd(params);
 			case "remove" -> evalRemove(params);
 			case "list"   -> evalList();
-			default -> System.err.println("Subcommand not recognised");
+			default -> System.out.println("client: invalid sub command");
 		}
 	}
     
