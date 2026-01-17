@@ -1,6 +1,7 @@
 package es.upm.etsisi.test.commands;
 
 import es.upm.etsisi.poo.App;
+import es.upm.etsisi.poo.Cashier;
 import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.UserManager;
 import es.upm.etsisi.poo.commands.CashCommand;
@@ -47,8 +48,8 @@ public class CashCommandTest extends StdoutCapturer {
         List<String> captured = getStrippedCapturedStdout();
         assertDoesNotThrow(() -> {
             this.command.eval(parse("cash"));
+            printCapturedToSystemOut();
         });
-        printCapturedToSystemOut();
         assertFalse(captured.isEmpty());
     }
 
@@ -58,8 +59,8 @@ public class CashCommandTest extends StdoutCapturer {
         List<String> captured = getStrippedCapturedStdout();
         assertDoesNotThrow(() -> {
             this.command.eval(parse("cash ado"));
+            printCapturedToSystemOut();
         });
-        printCapturedToSystemOut();
         assertFalse(captured.isEmpty());
     }
 
@@ -74,11 +75,11 @@ public class CashCommandTest extends StdoutCapturer {
         List<String> captured = getStrippedCapturedStdout();
         assertDoesNotThrow(() -> {
             this.command.eval(parse("cash add UW1234567"));
+            printCapturedToSystemOut();
         });
         assertThrows(MissingItemException.class, () -> {
             UserManager.getInstance().findCashier("UW1234567");
         });
-        printCapturedToSystemOut();
         assertFalse(captured.isEmpty());
     }
 
@@ -87,6 +88,7 @@ public class CashCommandTest extends StdoutCapturer {
         // Command should fail throwing a FailedCommandException
         assertThrows(FailedCommandException.class, () -> {
             this.command.eval(parse("cash add PP1234567 \"Invalid Cashier\" ishouldnotexist@upm.es"));
+            printCapturedToSystemOut();
         });
         assertThrows(MissingItemException.class, () -> {
             UserManager.getInstance().findCashier("PP1234567");
@@ -98,11 +100,11 @@ public class CashCommandTest extends StdoutCapturer {
         // Command should fail throwing a FailedCommandException
         assertThrows(FailedCommandException.class, () -> {
             this.command.eval(parse("cash add UW1234567 \"Invalid Cashier\" ishouldnotexist@example.com"));
+            printCapturedToSystemOut();
         });
         assertThrows(MissingItemException.class, () -> {
             UserManager.getInstance().findCashier("UW1234567");
         });
-        printCapturedToSystemOut();
     }
 
     @Test
@@ -117,20 +119,20 @@ public class CashCommandTest extends StdoutCapturer {
         );
         assertDoesNotThrow(() -> {
             this.command.eval(parse("cash add UW1234567 \"pepecurro3\" pepe0@upm.es"));
+            printCapturedToSystemOut();
         });
         captured = getStrippedCapturedStdout();
         assertLinesMatch(expected, captured);
-        printCapturedToSystemOut();
 
         // UW*******
         clearCapturedStdout();
         assertDoesNotThrow(() -> {
             this.command.eval(parse("cash add \"pepecurro2\" pepe0@upm.es"));
+            printCapturedToSystemOut();
         });
         captured = getStrippedCapturedStdout();
         String regex1 = "Cash\\{identifier='UW\\d\\d\\d\\d\\d\\d\\d', name='pepecurro2', email='pepe0@upm.es'\\}";
         assertTrue(captured.getFirst().matches(regex1));
-        printCapturedToSystemOut();
 
         // UW1234569
         clearCapturedStdout();
@@ -140,10 +142,10 @@ public class CashCommandTest extends StdoutCapturer {
         );
         assertDoesNotThrow(() -> {
             this.command.eval(parse("cash add UW1234569 \"pepecurro1\" pepe0@upm.es"));
+            printCapturedToSystemOut();
         });
         captured = getStrippedCapturedStdout();
         assertLinesMatch(expected, captured);
-        printCapturedToSystemOut();
     }
 
     // cash list
@@ -155,10 +157,10 @@ public class CashCommandTest extends StdoutCapturer {
         List<String> expected;
         assertDoesNotThrow(() -> {
             this.command.eval(parse("cash list"));
+            printCapturedToSystemOut();
         });
         expected = getStrippedCapturedStdout();
         assertLinesMatch(expected, captured);
-        printCapturedToSystemOut();
     }
 
     @Test
@@ -182,10 +184,10 @@ public class CashCommandTest extends StdoutCapturer {
         // cash list
         assertDoesNotThrow(() -> {
             this.command.eval(parse("cash list"));
+            printCapturedToSystemOut();
         });
         expected = getStrippedCapturedStdout();
         assertLinesMatch(expected, captured);
-        printCapturedToSystemOut();
     }
 
     // cash remove
@@ -193,16 +195,16 @@ public class CashCommandTest extends StdoutCapturer {
     void RemoveCashier_InvalidID() {
         assertThrows(FailedCommandException.class, () -> {
            this.command.eval(parse("cash remove 123456789"));
+            printCapturedToSystemOut();
         });
-        printCapturedToSystemOut();
     }
 
     @Test
     void RemoveCashier_NonExistentCashier() {
         assertThrows(FailedCommandException.class, () -> {
             this.command.eval(parse("cash remove UW1234567"));
+            printCapturedToSystemOut();
         });
-        printCapturedToSystemOut();
     }
 
     @Test
@@ -212,10 +214,17 @@ public class CashCommandTest extends StdoutCapturer {
         List<String> captured;
         List<String> expected = Arrays.asList("cash remove: ok");
         assertDoesNotThrow(() -> {
+            Cashier c = UserManager.getInstance().findCashier("UW1234569");
+            assertEquals("UW1234569", c.getId());
+        });
+        assertDoesNotThrow(() -> {
             this.command.eval(parse("cash remove UW1234569"));
+            printCapturedToSystemOut();
+        });
+        assertThrows(MissingItemException.class, () -> {
+            Cashier c = UserManager.getInstance().findCashier("UW1234569");
         });
         captured = getStrippedCapturedStdout();
-        printCapturedToSystemOut();
         assertLinesMatch(expected, captured);
     }
 
@@ -225,8 +234,8 @@ public class CashCommandTest extends StdoutCapturer {
         List<String> captured = getStrippedCapturedStdout();
         assertDoesNotThrow(() -> {
             this.command.eval(parse("cash tickets"));
+            printCapturedToSystemOut();
         });
-        printCapturedToSystemOut();
         assertFalse(captured.isEmpty());
     }
 
@@ -234,16 +243,16 @@ public class CashCommandTest extends StdoutCapturer {
     void TicketsCashier_InvalidCashierID() {
         assertThrows(FailedCommandException.class, () -> {
             this.command.eval(parse("cash tickets PP1234567"));
+            printCapturedToSystemOut();
         });
-        printCapturedToSystemOut();
     }
 
     @Test
     void TicketsCashier_NonExistentCashier() {
         assertThrows(FailedCommandException.class, () -> {
             this.command.eval(parse("cash tickets UW1234567"));
+            printCapturedToSystemOut();
         });
-        printCapturedToSystemOut();
     }
 
     @Test
@@ -257,7 +266,7 @@ public class CashCommandTest extends StdoutCapturer {
         clearCapturedStdout();
         assertDoesNotThrow(() -> {
             this.command.eval(parse("cash tickets UW1234567"));
+            printCapturedToSystemOut();
         });
-        printCapturedToSystemOut();
     }
 }
