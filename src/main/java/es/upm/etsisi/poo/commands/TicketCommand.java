@@ -80,9 +80,10 @@ public class TicketCommand implements Command {
 		
 		String cashierId = params[parseIndex++];
 		String clientId = params[parseIndex++];
-
+		
 		char ticketType = 'p';
-		if (parseIndex < params.length) {
+		boolean specifiedTicketType = (parseIndex < params.length);
+		if (specifiedTicketType) {
 			
 			boolean validTicketType = false;
 			String ticketTypeStr = params[parseIndex];
@@ -103,7 +104,7 @@ public class TicketCommand implements Command {
         try {
             Client client = userManager.findClient(clientId);
 			Client.IdType idType = client.getIdType();
-
+			
 			Ticket created = null;
 			if (ticketType == 'p' && idType == Client.IdType.DNI) {
 				created = new ProductTicket(ticketIdNum, isCustomId);
@@ -115,7 +116,8 @@ public class TicketCommand implements Command {
 				created = new CombinedTicket(ticketIdNum, isCustomId);
 				
 			} else {
-				throw new FailedCommandException("ticket new: id and ticket type (" + ticketType + ") don't match");
+				String msg = getTicketNewMismatchErrorMsg(idType, ticketType);
+				throw new FailedCommandException(msg);
 			}
 			
 			Cashier cashier = userManager.findCashier(cashierId);
@@ -131,6 +133,30 @@ public class TicketCommand implements Command {
             throw new FailedCommandException("Unable to create new ticket: " + ex.getMessage());
         }
     }
+	
+	private String getTicketNewMismatchErrorMsg(Client.IdType idType, char ticketType) {
+		String validTypesForId = switch (idType) {
+			case Client.IdType.NIF -> "Combined (-c) or Service (-s)";
+			case Client.IdType.DNI -> "Product (-p) (default)";
+			default -> "Invalid";
+		};
+		
+		String userTypeName = switch (idType) {
+			case Client.IdType.NIF -> "Company";
+			case Client.IdType.DNI -> "Regular";
+			default -> "Invalid";
+		};
+		
+		String ticketTypeName = switch (ticketType) {
+			case 'p' -> "Product (default)";
+			case 's' -> "Service";
+			case 'c' -> "Combined";
+			default -> "Invalid";
+		};
+		
+		return String.format("ticket new: error: %s client's can only create %s tickets. Tried to create %s.", 
+							 userTypeName, validTypesForId, ticketTypeName);
+	}
 	
     /**
      * Parses the 'add' subcommand of the 'ticket' command.
