@@ -112,6 +112,59 @@ public class TicketTest extends BaseTest {
         }
     }
 	
+	
+	
+    @Nested
+		class AddProduct_ServiceProduct {
+		
+		@Test
+			void addService_NoColisionWithBaseProductSameId() throws Exception {
+			BaseProduct p = new BaseProduct(1, "Alpha", 1.0, "CLOTHES", 0, false);
+			ServiceProduct s = new ServiceProduct(1, "INSURANCE", App.now().plusHours(1));
+			
+			// NOTE(erb): first service then product
+			final Ticket t1 = new CombinedTicket(1, true);
+			assertDoesNotThrow(() -> t1.addItem(s, 1, new String[0]));
+			assertDoesNotThrow(() -> t1.addItem(p, 1, new String[0]));
+			
+			assertTrue(t1.summaryString().contains("Alpha"));
+			assertTrue(t1.summaryString().contains("INSURANCE"));
+			
+			
+			// NOTE(erb): first product then service
+			final Ticket t2 = new CombinedTicket(1, true);
+			assertDoesNotThrow(() -> t2.addItem(p, 1, new String[0]));
+			assertDoesNotThrow(() -> t2.addItem(s, 1, new String[0]));
+			
+			assertTrue(t2.summaryString().contains("Alpha"));
+			assertTrue(t2.summaryString().contains("INSURANCE"));
+		}
+		
+		
+		@Test
+			void addService_ServiceAllreadyAdded_throws() throws Exception {
+			ServiceProduct s = new ServiceProduct(1, "INSURANCE", App.now().plusHours(1));
+			
+			// NOTE(erb): combined ticket
+			final Ticket ct = new CombinedTicket(1, true);
+			
+			assertDoesNotThrow(() -> ct.addItem(s, 1, new String[0]));
+			assertTrue(ct.summaryString().contains("INSURANCE"));
+			
+			assertThrows(DuplicateItemException.class, () -> ct.addItem(s, 1, new String[0]));
+			
+			
+			// NOTE(erb): service ticket
+			final Ticket st = new ServiceTicket(1, true);
+			
+			assertDoesNotThrow(() -> st.addItem(s, 1, new String[0]));
+			assertTrue(st.summaryString().contains("INSURANCE"));
+			
+			assertThrows(DuplicateItemException.class, () -> st.addItem(s, 1, new String[0]));
+		}
+	}
+	
+	
     @Nested
 		class AddProduct_BaseProduct {
 		
