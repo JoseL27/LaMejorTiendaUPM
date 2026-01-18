@@ -268,10 +268,6 @@ public class TicketCommand implements Command {
         String ticketId = params[2];
         String cashierId = params[3];
 		
-        if (!Cashier.isValidId(cashierId)) {
-            throw new FailedCommandException(String.format("ticket print: error: invalid cashier id '%s' expected 'UW' followed by 7 digits", cashierId));
-        }
-		
         try {
 			
             Cashier cashier = UserManager.getInstance().findCashier(cashierId);
