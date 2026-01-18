@@ -36,8 +36,9 @@ public abstract class TicketItem implements Comparable<TicketItem>, Serializable
 	}
 	
 	public boolean equals(TicketItem other) {
-		return (other != null && this.getClass() == other.getClass() &&
-				this.item.getId() == other.getItem().getId());
+		return (other != null && 
+				this.item.getClass().equals(other.item.getClass()) &&
+				this.item.getInventoryId().equals(other.getItem().getInventoryId()));
 	}
 	
 	// NOTE(erb): no discount by default
