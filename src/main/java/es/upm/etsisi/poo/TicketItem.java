@@ -36,7 +36,7 @@ public abstract class TicketItem implements Comparable<TicketItem>, Serializable
 	}
 	
 	public boolean equals(TicketItem other) {
-		return (other != null && 
+		return (other != null && this.getClass() == other.getClass() &&
 				this.item.getId() == other.getItem().getId());
 	}
 	
