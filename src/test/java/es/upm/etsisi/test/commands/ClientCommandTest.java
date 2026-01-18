@@ -3,6 +3,7 @@ package es.upm.etsisi.test.commands;
 import es.upm.etsisi.poo.*;
 import es.upm.etsisi.poo.commands.CashCommand;
 import es.upm.etsisi.poo.commands.ClientCommand;
+import es.upm.etsisi.poo.exceptions.DuplicateItemException;
 import es.upm.etsisi.poo.exceptions.FailedCommandException;
 import es.upm.etsisi.poo.exceptions.MissingItemException;
 import es.upm.etsisi.test.StdoutCapturer;
@@ -221,25 +222,53 @@ public class ClientCommandTest extends StdoutCapturer {
         assertEquals(5, UserManager.getInstance().getClients().size());
     }
 
+    @Test
+    void AddClient_ExistingClient() {
+        AddClient_5client();
+        clearCapturedStdout();
+        assertDoesNotThrow(() -> {
+            Client c = UserManager.getInstance().findClient("55630667S");
+            assertEquals("55630667S", c.getId());
+        });
+        assertThrows(FailedCommandException.class, () -> {
+            this.command.eval(parse("client add \"Pepe3\" 55630667S pepe1@upm.es UW1234567"));
+            printCapturedToSystemOut();
+        });
+    }
+
+    @Test
+    void AddClient_ExistingEnterprise() {
+        AddClient_5client();
+        clearCapturedStdout();
+        assertDoesNotThrow(() -> {
+            Client c = UserManager.getInstance().findClient("P1145148A");
+            assertEquals("P1145148A", c.getId());
+        });
+        assertThrows(FailedCommandException.class, () -> {
+            this.command.eval(parse("client add \"La bomba transportes\" P1145148A lebomb@c4.com UW1234567"));
+            printCapturedToSystemOut();
+        });
+    }
+
     // client list
     void ListClient_empty() {
-        List<String> captured = Arrays.asList(
+        List<String> expected = Arrays.asList(
                 "Client:",
                 "client list: ok"
         );
-        List<String> expected;
+        List<String> captured;
         assertDoesNotThrow(() -> {
             this.command.eval(parse("client list"));
             printCapturedToSystemOut();
         });
-        expected = getStrippedCapturedStdout();
+        captured = getStrippedCapturedStdout();
         assertLinesMatch(expected, captured);
     }
 
     void ListClient_5Clients() {
         this.AddClient_5client();
         clearCapturedStdout();
-        List<String> captured = Arrays.asList(
+        List<String> expected = Arrays.asList(
                 "Client:",
                 "  COMPANY{identifier='P1145148A', name='La bomba transportes', email='lebomb@c4.com', cash=UW1234567}",
                 "  USER{identifier='Y8682724P', name='Pepe1', email='pepe3@upm.es', cash=UW1234567}",
@@ -248,12 +277,12 @@ public class ClientCommandTest extends StdoutCapturer {
                 "  COMPANY{identifier='B12345674', name='pepe2', email='pepe5@upm.es', cash=UW1234567}",
                 "client list: ok"
         );
-        List<String> expected;
+        List<String> captured;
         assertDoesNotThrow(() -> {
             this.command.eval(parse("client list"));
             printCapturedToSystemOut();
         });
-        expected = getStrippedCapturedStdout();
+        captured = getStrippedCapturedStdout();
         assertLinesMatch(expected, captured);
     }
 

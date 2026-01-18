@@ -5,6 +5,7 @@ import es.upm.etsisi.poo.Cashier;
 import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.UserManager;
 import es.upm.etsisi.poo.commands.CashCommand;
+import es.upm.etsisi.poo.exceptions.DuplicateItemException;
 import es.upm.etsisi.poo.exceptions.FailedCommandException;
 import es.upm.etsisi.poo.exceptions.MissingItemException;
 import es.upm.etsisi.test.StdoutCapturer;
@@ -148,24 +149,38 @@ public class CashCommandTest extends StdoutCapturer {
         assertLinesMatch(expected, captured);
     }
 
+    @Test
+    void AddCashier_SameID() {
+        AddCashier_3Cashiers();
+        clearCapturedStdout();
+        assertDoesNotThrow(() -> {
+            Cashier c = UserManager.getInstance().findCashier("UW1234567");
+            assertEquals("UW1234567", c.getId());
+        });
+        assertThrows(FailedCommandException.class, () -> {
+            this.command.eval(parse("cash add UW1234567 \"pepecurro3\" pepe0@upm.es"));
+            printCapturedToSystemOut();
+        });
+    }
+
     // cash list
     void ListCashier_empty() {
-        List<String> captured = Arrays.asList(
+        List<String> expected = Arrays.asList(
                 "Cash:",
                 "cash list: ok"
         );
-        List<String> expected;
+        List<String> captured;
         assertDoesNotThrow(() -> {
             this.command.eval(parse("cash list"));
             printCapturedToSystemOut();
         });
-        expected = getStrippedCapturedStdout();
+        captured = getStrippedCapturedStdout();
         assertLinesMatch(expected, captured);
     }
 
     @Test
     void ListCashier_2cashiers() {
-        List<String> captured = Arrays.asList(
+        List<String> expected = Arrays.asList(
                 "Cash:",
                 "  Cash{identifier='UW1234569', name='pepecurro1', email='pepe0@upm.es'}",
                 "  Cash{identifier='UW1234567', name='pepecurro3', email='pepe0@upm.es'}",
@@ -173,7 +188,7 @@ public class CashCommandTest extends StdoutCapturer {
         );
 
         // Add UW1234567, UW1234569
-        List<String> expected;
+        List<String> captured;
         assertDoesNotThrow(() -> {
             this.command.eval(parse("cash add UW1234567 \"pepecurro3\" pepe0@upm.es"));
             this.command.eval(parse("cash add UW1234569 \"pepecurro1\" pepe0@upm.es"));
@@ -186,7 +201,7 @@ public class CashCommandTest extends StdoutCapturer {
             this.command.eval(parse("cash list"));
             printCapturedToSystemOut();
         });
-        expected = getStrippedCapturedStdout();
+        captured = getStrippedCapturedStdout();
         assertLinesMatch(expected, captured);
     }
 
