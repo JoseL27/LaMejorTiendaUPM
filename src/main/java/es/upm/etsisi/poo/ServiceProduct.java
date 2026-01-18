@@ -26,9 +26,9 @@ class ServiceTicketItem extends TicketItem {
 	}
 	
 	@Override
-		public void validate() throws DateTimeException {
+		public void validate() throws InvalidDataException {
 		if (this.serviceProduct.getExpirationDate().isBefore(App.now())) {
-			throw new DateTimeException(String.format("Service %s is past its expiration date", this.serviceProduct.toString()));
+			throw new InvalidDataException(String.format("Service %s is past its expiration date", this.serviceProduct.toString()));
 		}
 	}
 	

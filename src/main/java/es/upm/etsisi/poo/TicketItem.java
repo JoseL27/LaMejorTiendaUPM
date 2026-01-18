@@ -57,7 +57,7 @@ public abstract class TicketItem implements Comparable<TicketItem>, Serializable
 		return -1;
 	}
 	
-	public abstract void validate() throws DateTimeException;
+	public abstract void validate() throws InvalidDataException;
 	public abstract String toString();
 	public abstract double getPrice();
 	public abstract TicketItem copy();

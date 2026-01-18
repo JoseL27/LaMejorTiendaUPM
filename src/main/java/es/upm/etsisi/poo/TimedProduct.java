@@ -24,9 +24,9 @@ class TimedTicketItem extends TicketItem {
 	}
 	
 	@Override
-		public void validate() throws DateTimeException {
+		public void validate() throws InvalidDataException {
 		if (this.timedProduct.getExpirationDate().isBefore(App.now())) {
-			throw new DateTimeException(String.format("Product %s is past its expiration date", this.timedProduct.toString()));
+			throw new InvalidDataException(String.format("Product %s is past its expiration date", this.timedProduct.toString()));
 		}
 	}
 	
