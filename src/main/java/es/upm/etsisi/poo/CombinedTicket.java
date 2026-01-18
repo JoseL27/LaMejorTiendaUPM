@@ -1,6 +1,8 @@
 /* date = December 31st 2025 10:29 am */
 package es.upm.etsisi.poo;
 
+import es.upm.etsisi.poo.exceptions.InvalidDataException;
+
 
 public class CombinedTicket extends Ticket {
 	public CombinedTicket(int id, boolean isCustomId) {
@@ -10,6 +12,32 @@ public class CombinedTicket extends Ticket {
 	@Override
 		public boolean validateItemKind(InventoryItem item) {
 		return (item instanceof Product || item instanceof ServiceProduct); // or just true
+	}
+	
+	
+	@Override 
+		public void close() throws InvalidDataException {
+		if (this.isOpen()) {
+			
+			int service = 0;
+			int product = 0;
+			
+			for (TicketItem tItem : this.ticketItems) {
+				
+				if(tItem.getItem() instanceof Product) { 
+					product++;
+				}
+				if(tItem.getItem()instanceof ServiceProduct) {
+					service++;
+				}
+			}
+			
+			if (service == 0 || product == 0) {
+				throw new InvalidDataException("must have at least one product and one service to close Combined Ticket");
+			}
+			
+			super.close();
+		}
 	}
 	
 	@Override
