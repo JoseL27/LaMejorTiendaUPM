@@ -5,38 +5,34 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 
-import es.upm.etsisi.poo.exceptions.DataException;
-import es.upm.etsisi.poo.exceptions.DuplicateItemException;
-import es.upm.etsisi.poo.exceptions.FullCollectionException;
-import es.upm.etsisi.poo.exceptions.IdSpaceExhaustedException;
-import es.upm.etsisi.poo.exceptions.MissingItemException;
+import es.upm.etsisi.poo.exceptions.*;
 
 class InventoryItemId implements Serializable {
-    public int id;
-    public boolean isProduct;
-    
-    public InventoryItemId(int id, boolean isProduct) {
-        this.id = id;
-        this.isProduct = isProduct;
-    }
-    
-    @Override
-        public int hashCode() {
-        if (isProduct) {
-            return id;
-        } else {
-            return -id;
-        }
-    }
-    
-    @Override
-        public boolean equals(Object obj) {
-        return (obj != null && obj.getClass() == this.getClass() && this.hashCode() == obj.hashCode());
-    }
+	public int id;
+	public boolean isProduct;
+	
+	public InventoryItemId(int id, boolean isProduct) {
+		this.id = id;
+		this.isProduct = isProduct;
+	}
+	
+	@Override
+		public int hashCode() {
+		if (isProduct) {
+			return id;
+		} else {
+			return -id;
+		}
+	}
+	
+	@Override
+		public boolean equals(Object obj) {
+		return (obj != null && obj.getClass() == this.getClass() && this.hashCode() == obj.hashCode());
+	}
 }
 
 public class Inventory implements Serializable {
-    
+	
     public static final int MAX_PRODUCTS = 200; // E1: no more than 200 products
     
     private HashMap<InventoryItemId, InventoryItem> items;
@@ -86,13 +82,21 @@ public class Inventory implements Serializable {
      *
      * @return The product that was created, or null if the creation failed
      */
-    public TimedProduct createTimedProduct(int id, String name, double price, int people, String typeStr, LocalDateTime expirationDate) throws DataException, IllegalArgumentException {
+    public TimedProduct createTimedProduct(int id, String name, double price, int people, String typeStr, LocalDateTime expirationDate) throws DataException, InvalidDataException {
 		if (expirationDate.isBefore(App.now())) {
 			throw new IllegalArgumentException("Expiration can not be in the past, got " + 
 											   expirationDate.format(TimedProduct.EXPIRATION_DATE_FORMAT));
 		}
 		
         TimedProduct prodToAdd = new TimedProduct(id, name, price, people, typeStr, expirationDate);
+		
+		TimedProduct.TimedType type = prodToAdd.getType();
+		LocalDateTime prepDoneTime = App.now().plusHours(type.hoursForPreparing);
+		if (prepDoneTime.isAfter(expirationDate)) {
+			throw new InvalidDataException(String.format("need at least %d hours to prepare for this %s\n",
+														 type.hoursForPreparing, type.toString().toLowerCase()));
+		}
+		
         return (TimedProduct)addItem(prodToAdd);
     }
     
@@ -101,10 +105,10 @@ public class Inventory implements Serializable {
      *
      * @return The product that was created, or null if the creation failed
      */
-    public ServiceProduct createServiceProduct(String categoryStr, LocalDateTime expirationDate) throws DataException, IllegalArgumentException {
+    public ServiceProduct createServiceProduct(String categoryStr, LocalDateTime expirationDate) throws DataException, InvalidDataException {
 		if (expirationDate.isBefore(App.now())) {
-			throw new IllegalArgumentException("Expiration can not be in the past, got " + 
-											   expirationDate.format(ServiceProduct.EXPIRATION_DATE_FORMAT));
+			throw new InvalidDataException("Expiration can not be in the past, got " + 
+										   expirationDate.format(ServiceProduct.EXPIRATION_DATE_FORMAT));
 		}
 		
 		ServiceProduct service = new ServiceProduct(nextServiceId++, categoryStr, expirationDate);
@@ -145,7 +149,7 @@ public class Inventory implements Serializable {
      * @param category Product Category
      * @return true if the product's category is updated correctly, false in other case
      */
-    public BaseProduct updateProductCategory(int id, String category) throws DataException {
+    public BaseProduct updateBaseProductCategory(int id, String category) throws DataException {
         BaseProduct selectedProduct = this.getBaseProduct(id);
 		selectedProduct.setCategory(category);
         return selectedProduct;
@@ -154,13 +158,17 @@ public class Inventory implements Serializable {
     /**
      * @return the delete item
      */
-    public InventoryItem deleteItem(int id) throws MissingItemException{
-        InventoryItem deleted = this.items.remove(new InventoryItemId(id, true));
+    public InventoryItem deleteItemFromStrId(String strId) throws MissingItemException {
+		boolean isProduct = true;
+		if (ServiceProduct.isIdString(strId)) {
+			strId = strId.substring(0, strId.length() - 1);
+			isProduct = false;
+		}
+		int idNum = Integer.parseInt(strId);
+		
+        InventoryItem deleted = this.items.remove(new InventoryItemId(idNum, isProduct));
         if (deleted == null) {
-            deleted = this.items.remove(new InventoryItemId(id, false));
-        }
-        if (deleted == null) {
-            throw MissingItemException.fromId("Product", id);
+            throw MissingItemException.fromId((isProduct ? "Product" : "Service"), idNum);
         }
         return deleted;
     }
@@ -225,7 +233,7 @@ public class Inventory implements Serializable {
 		
 		return item;
 	}
-
+	
     public Product getProduct(int id) throws MissingItemException, DataException {
         Product result = null;
         InventoryItemId itemId = new InventoryItemId(id, true);
