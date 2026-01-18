@@ -4,9 +4,7 @@ import es.upm.etsisi.poo.exceptions.*;
 
 import java.io.Serializable;
 import java.time.DateTimeException;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.text.DecimalFormat;
@@ -127,7 +125,7 @@ public abstract class Ticket implements Serializable {
 */
 	public abstract String summaryString();
 	
-    public void close() throws DateTimeException {
+    public void close() throws InvalidDataException {
 		if (this.isOpen) {
 			
 			ArrayList<TicketItem> aux = new ArrayList<>(this.ticketItems.size());
@@ -155,14 +153,14 @@ public abstract class Ticket implements Serializable {
      * @param id the id of the product to attempt to remove
      * @return the removed product if it was found or null if it wasn't
      */
-    public void removeItem(int id) throws MissingItemException {
+    public void removeItem(InventoryItem item) throws MissingItemException {
 		TicketItem foundInfo = null;
 		TicketItem currentInfo = null;
 		
         Iterator<TicketItem> iterator = ticketItems.iterator();
         while (foundInfo == null && iterator.hasNext()) {
 			currentInfo = iterator.next();
-            if (id == currentInfo.getItem().getId()) {
+            if (item.getInventoryId().equals(currentInfo.getItem().getInventoryId())) {
                 foundInfo = currentInfo;
             }
         }
