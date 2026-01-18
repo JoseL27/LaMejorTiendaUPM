@@ -5,7 +5,6 @@ import es.upm.etsisi.poo.Cashier;
 import es.upm.etsisi.poo.Command;
 import es.upm.etsisi.poo.UserManager;
 import es.upm.etsisi.poo.commands.CashCommand;
-import es.upm.etsisi.poo.exceptions.DuplicateItemException;
 import es.upm.etsisi.poo.exceptions.FailedCommandException;
 import es.upm.etsisi.poo.exceptions.MissingItemException;
 import es.upm.etsisi.test.StdoutCapturer;

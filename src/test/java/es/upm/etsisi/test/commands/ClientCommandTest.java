@@ -3,7 +3,6 @@ package es.upm.etsisi.test.commands;
 import es.upm.etsisi.poo.*;
 import es.upm.etsisi.poo.commands.CashCommand;
 import es.upm.etsisi.poo.commands.ClientCommand;
-import es.upm.etsisi.poo.exceptions.DuplicateItemException;
 import es.upm.etsisi.poo.exceptions.FailedCommandException;
 import es.upm.etsisi.poo.exceptions.MissingItemException;
 import es.upm.etsisi.test.StdoutCapturer;

@@ -1,15 +1,12 @@
 package es.upm.etsisi.test.commands;
 
 import es.upm.etsisi.poo.*;
-import es.upm.etsisi.poo.commands.CashCommand;
 import es.upm.etsisi.poo.commands.ProductCommand;
 
 import es.upm.etsisi.poo.exceptions.FailedCommandException;
 import es.upm.etsisi.poo.exceptions.MissingItemException;
 import es.upm.etsisi.test.StdoutCapturer;
 import org.junit.jupiter.api.*;
-
-import es.upm.etsisi.test.BaseTest;
 
 import java.lang.reflect.Method;
 import java.time.LocalDate;
