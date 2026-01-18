@@ -39,7 +39,7 @@ class BaseTicketItem extends TicketItem implements Comparable<TicketItem> {
 	}
 	
 	@Override
-		public void validate() throws DateTimeException {
+		public void validate() throws InvalidDataException {
 		// NOTE(erb): do nothing at validation
 	}
 	
@@ -122,10 +122,25 @@ public class BaseProduct extends Product {
         return category;
     }
     
-    public void setCategory(String category) {
-        this.category = Category.valueOf(category);
-    }
-    public boolean getPersonalized() {
+    public void setCategory(String categoryStr) throws InvalidDataException{
+		
+		Category categoryUpd = null;
+		
+		try {
+			categoryUpd = Category.valueOf(categoryStr);
+		} catch (IllegalArgumentException e) {
+			throw new InvalidDataException(String.format("Product category must be one of %s", Arrays.toString(Category.values())));
+		}
+        
+		if (maxPersonalizations > categoryUpd.maxPersonalizations) {
+            throw new InvalidDataException(String.format("Max personalizations is set to allow more personalizations (%d) than this category allows (%d)", 
+														 this.maxPersonalizations, categoryUpd.maxPersonalizations));
+		}
+		
+		this.category = categoryUpd;
+	}
+	
+	public boolean getPersonalized() {
 		return this.personalized;
 	}
 	
@@ -155,11 +170,11 @@ public class BaseProduct extends Product {
 	}
 	
 	@Override
-        public String toString() {
+		public String toString() {
 		return toString(null);
 	}
 	
-    public String toString(String[] personalizations) {
+	public String toString(String[] personalizations) {
 		StringBuilder sb = new StringBuilder();
 		
 		String className = "Product";
@@ -184,7 +199,7 @@ public class BaseProduct extends Product {
 		}
 		
 		sb.append("}");
-        return sb.toString();
-    }
-    
+		return sb.toString();
+	}
+	
 }
