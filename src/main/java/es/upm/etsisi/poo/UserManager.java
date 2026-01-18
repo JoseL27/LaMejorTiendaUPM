@@ -68,8 +68,8 @@ public class UserManager implements Serializable {
 	 * @return True if the Client was successfully deleted, false if the Client was not found
 	 */
 	public void removeClient(String clientId) throws MissingItemException{
-		User removedClient = this.users.remove(clientId);
-        if (removedClient == null) throw new MissingItemException("Client with id " + clientId + " not found");
+		Client client = this.findClient(clientId);
+		this.users.remove(client.getId());
 	}
     
 	/**
@@ -78,9 +78,17 @@ public class UserManager implements Serializable {
 	 * @return Client instance in the set if found, null if not found
 	 */
 	public Client findClient(String clientId) throws MissingItemException{
-		Client result = (Client)this.users.get(clientId);
-        if (result == null) throw new MissingItemException("Client with id " + clientId + " not found");
-        return result;
+		Client result = null;
+		User user = this.users.get(clientId);
+		
+		if (user != null && user instanceof Client client) {
+			result = client;
+		} 
+		
+		if (result == null) { 
+			throw new MissingItemException("Client with id " + clientId + " not found");
+		}
+		return result;
 	}
     
 	/**
@@ -115,14 +123,14 @@ public class UserManager implements Serializable {
 		if (this.users.containsKey(workerId)) { 
 			throw new DuplicateItemException("Cashier with id " + workerId + " already exists");
 		}
-
+		
         int cashierIdValue;
         try{
             cashierIdValue = Integer.parseInt(workerId.substring(2));
         } catch (IndexOutOfBoundsException | NumberFormatException ex) {
             throw new InvalidDataException("Invalid worker id: " + workerId + " expected format UWXXXXXXX");
         }
-
+		
 		if (cashierIdValue >= this.nextCashierId)
 			this.nextCashierId = cashierIdValue + 1;
 		
@@ -150,8 +158,8 @@ public class UserManager implements Serializable {
 	 * @throws MissingItemException if the cashier is not found
 	 */
 	public void removeCashier(String workerId) throws MissingItemException{
-		User removedCashier = this.users.remove(workerId);
-        if (removedCashier == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
+		Cashier cash = findCashier(workerId);
+		this.users.remove(cash.getId());
 	}
     
 	/**
@@ -161,8 +169,17 @@ public class UserManager implements Serializable {
      * @throws MissingItemException if the cashier is not found
 	 */
 	public Cashier findCashier(String workerId) throws MissingItemException{
-        Cashier result = (Cashier)this.users.get(workerId);
-        if (result == null) throw new MissingItemException("Cashier with id " + workerId + " not found");
+		Cashier result = null;
+		User user = this.users.get(workerId);
+		
+		if (user != null && user instanceof Cashier cash) {
+			result = cash;
+		} 
+		
+		if (result == null) { 
+			throw new MissingItemException("Cashier with id " + workerId + " not found");
+		}
+		
 		return result;
 	}
     
