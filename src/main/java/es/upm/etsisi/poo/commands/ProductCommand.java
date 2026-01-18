@@ -51,7 +51,7 @@ public class ProductCommand implements Command {
     }
     
     // FORMAT: prod add <expiration: yyyy-MM-dd > <category>
-    public void evalAddService(String[] params) throws FailedCommandException{
+    public void evalAddService(String[] params) throws FailedCommandException {
         if (!App.checkArgsCountWithPrint("prod add", params.length, 4)) return;
         
         String dateStr = params[2];
@@ -131,14 +131,12 @@ public class ProductCommand implements Command {
 	 * @param inventory The manager containing all the info on products, if the command succeeds, the product will be created here
 	 */
 	public void evalAddTimed(String[] params) throws FailedCommandException {
-		if (params.length != 6 && params.length != 7){
-			throw new FailedCommandException("prod " + params[1] + ": invalid number of parameters, got " + params.length + ", expected 6 or 7");
-		}
-        
+		if (!App.checkArgsCountWithPrint("prod add:", params.length, 6, 7)) return;
+		
         // Parsing
         int parseIndex = 1;
         Inventory inventory = Inventory.getInstance();
-
+		
 		String typeParam = params[parseIndex++];
         String typeString = typeParam.replaceAll("add", "").toUpperCase();
         
@@ -160,16 +158,9 @@ public class ProductCommand implements Command {
 			LocalDateTime expirationDate = LocalDate.parse(params[parseIndex++]).atStartOfDay();
 			int maxPeople = Integer.parseInt(params[parseIndex]);
 			
+			// Execution
 			TimedProduct addedProduct = inventory.createTimedProduct(id, name, price, maxPeople, typeString, expirationDate);
 			
-			// Execution
-			TimedProduct.TimedType type = addedProduct.getType();
-			LocalDateTime prepDoneTime = App.now().plusHours(type.hoursForPreparing);
-			if (prepDoneTime.isAfter(expirationDate)) {
-				throw new FailedCommandException(String.format("prod add: error: you need at least %d hours to prepare for this %s\n",
-                                                               type.hoursForPreparing, type.toString().toLowerCase()));
-			}
-            
 			System.out.println(addedProduct);
 			System.out.printf("prod %s: ok\n", typeParam);
 		}catch (NumberFormatException ex) {
@@ -212,7 +203,7 @@ public class ProductCommand implements Command {
 				}
 				case "category" -> {
 					String productCategory = params[4];
-					updatedProduct = inventory.updateProductCategory(productId, productCategory);
+					updatedProduct = inventory.updateBaseProductCategory(productId, productCategory);
 				}
 				case "price" -> {
 					int productPrice;
@@ -243,32 +234,18 @@ public class ProductCommand implements Command {
 	 */			
 	public void evalRemove(String[] params) throws FailedCommandException{
 		if (!App.checkArgsCountWithPrint("prod remove", params.length, 3)) return;
-		int productId;
-		try {
-			productId = Integer.parseInt(params[2]);
-		}catch (NumberFormatException ex){
-			throw new FailedCommandException("Unable to remove product, " + params[2] + " is not a valid integer");
-		}
 		
 		Inventory inventory = Inventory.getInstance();
-		InventoryItem item = null; 
 		
 		try {
-			item = inventory.deleteItem(productId);
+			InventoryItem item = inventory.deleteItemFromStrId(params[2]);
 			
+			// Retrieves the active tickets from the system (Products should not be removed from closed tickets)
+			List<Ticket> tickets = UserManager.getInstance().getAllTickets();
 			
-			// NOTE(erb): this only removes 'Products' from tickets and NOT service products
-			// TODO(erb): update this to remove service products
-			if (item instanceof Product) {
-				Product productToRemove = (Product)item;
-				
-				// Retrieves the active tickets from the system (Products should not be removed from closed tickets)
-				List<Ticket> tickets = UserManager.getInstance().getAllTickets();
-				
-				for (Ticket ticket: tickets) {
-					if (ticket.isOpen()) {
-						ticket.removeItem(productToRemove.getId());
-					}
+			for (Ticket ticket: tickets) {
+				if (ticket.isOpen()) {
+					ticket.removeItem(item);
 				}
 			}
 			

@@ -232,19 +232,19 @@ public class TicketCommand implements Command {
         String ticketId = params[2];
 		
         try {
-            int itemId = Integer.parseInt(params[4]);
+			InventoryItem item = Inventory.getInstance().getItemFromStringId(params[4]);
 			
             // Execute
             Cashier cashier = UserManager.getInstance().findCashier(cashierId);
             Ticket ticket = cashier.findTicket(ticketId);
 			
-            ticket.removeItem(itemId);
+            ticket.removeItem(item);
             System.out.print(ticket.summaryString());
             System.out.println("ticket remove: ok");
 			
         } catch (NumberFormatException ex) {
             throw new FailedCommandException("ticket remove: error: invalid integer");
-        } catch (MissingItemException ex) {
+        } catch (DataException ex) {
             throw new FailedCommandException("ticket remove: error: failed to remove product: " + ex.getMessage());
         }
     }
@@ -276,28 +276,13 @@ public class TicketCommand implements Command {
 			
             Cashier cashier = UserManager.getInstance().findCashier(cashierId);
             Ticket ticket = cashier.findTicket(ticketId);
-            int service=0;
-            int product=0;
-            if(ticket instanceof CombinedTicket){
-                for(TicketItem info: ticket.ticketItems){
-                    if(info.getItem() instanceof Product ) product++;
-                    if(info.getItem()instanceof ServiceProduct) service++;
-                }
-            }
-            if(ticket instanceof ProductTicket || ticket instanceof ServiceTicket
-             || (ticket instanceof CombinedTicket && service!=0 && product!=0)){
-                ticket.close();
-                System.out.print(ticket.summaryString());
-                System.out.println("ticket print: ok");
-            }else{
-                throw new MissingItemException(String.format(" insufficient item to close '%s'", ticketId));
-            }
-
-        } catch (MissingItemException ex) {
+			ticket.close();
+			System.out.print(ticket.summaryString());
+			System.out.println("ticket print: ok");
+			
+        } catch (DataException ex) {
             throw new FailedCommandException("Unable to print ticket, " + ex.getMessage());
-        } catch (DateTimeException ex) {
-            throw new FailedCommandException("Unable to prit ticket, " + ex.getMessage());
-        }
+        } 
     }
 	
     /**
