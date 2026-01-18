@@ -10,6 +10,7 @@ import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TicketTest extends BaseTest {
@@ -91,8 +92,8 @@ public class TicketTest extends BaseTest {
 		
         @Test
 			void composedId_whenClosedNonCustom_isIdThenCloseDate() {
-            Ticket t = new ProductTicket(7, false);
-            t.close(); // sin productos, debe cerrar
+            final Ticket t = new ProductTicket(7, false);
+            assertDoesNotThrow(() -> t.close()); // sin productos, debe cerrar
 			
 			assertFalse(t.isOpen());
 			assertNotNull(t.getDateClosed());
@@ -103,7 +104,7 @@ public class TicketTest extends BaseTest {
         @Test
 			void composedId_whenClosedCustom_isIdThenCloseDate() {
             Ticket t = new ProductTicket(7, true);
-            t.close(); // sin productos, debe cerrar
+            assertDoesNotThrow(() -> t.close()); // sin productos, debe cerrar
 			
 			assertFalse(t.isOpen());
 			assertNotNull(t.getDateClosed());
@@ -247,14 +248,15 @@ public class TicketTest extends BaseTest {
 			
             t.addItem(p, 1, new String[0]);
 			
-			assertDoesNotThrow(() -> t.removeItem(10));
+			assertDoesNotThrow(() -> t.removeItem(p));
             assertTrue(t.isEmpty());
         }
 		
         @Test
-			void removeProduct_nonExisting_returnsFalse() {
+			void removeProduct_nonExisting_returnsFalse() throws Exception {
             Ticket t = new ProductTicket(1, true);
-			assertThrows(MissingItemException.class, () -> t.removeItem(999));
+			BaseProduct p = new BaseProduct(10, "Alpha", 10.0, "CLOTHES", 0, false);
+			assertThrows(MissingItemException.class, () -> t.removeItem(p));
         }
 		
         @Test
@@ -266,17 +268,46 @@ public class TicketTest extends BaseTest {
             t.addItem(p1, 100, new String[0]);
             assertThrows(FullCollectionException.class, () -> t.addItem(p2, 1, new String[0]));
 			
-			assertDoesNotThrow(() -> t.removeItem(10));
+			assertDoesNotThrow(() -> t.removeItem(p1));
             assertDoesNotThrow(() -> t.addItem(p2, 100, new String[0]));
         }
-    }
+		
+		
+		@Test
+			void removeItem_ServiceWhenRemovingProductSameIdNumber() throws Exception {
+			Ticket t = new CombinedTicket(1, true);
+			
+            ServiceProduct s = new ServiceProduct(1, "INSURANCE", App.now().plusHours(1));
+			assertDoesNotThrow(() -> t.addItem(s, 1, new String[0]));
+			
+			BaseProduct p = new BaseProduct(1, "Alpha", 1.0, "CLOTHES", 0, false);
+			assertThrows(MissingItemException.class, () -> t.removeItem(p));
+			
+			assertTrue(t.summaryString().contains("INSURANCE")); // NOTE(erb): wasn't deleted
+		}
+		
+		
+		@Test
+			void removeItem_ProductWhenRemovingServiceSameIdNumber() throws Exception {
+			Ticket t = new CombinedTicket(1, true);
+			
+			BaseProduct p = new BaseProduct(1, "Alpha", 1.0, "CLOTHES", 0, false);
+			assertDoesNotThrow(() -> t.addItem(p, 1, new String[0]));
+			
+            ServiceProduct s = new ServiceProduct(1, "INSURANCE", App.now().plusHours(1));
+			assertThrows(MissingItemException.class, () -> t.removeItem(s));
+			
+			assertTrue(t.summaryString().contains("Alpha")); // NOTE(erb): wasn't deleted
+		}
+		
+	}
 	
-    @Nested
+	@Nested
 		class TryClose {
 		
-        @Test
+		@Test
 			void close_withExpiredTimedProduct_throws_andKeepsOpen() throws Exception {
-            Ticket t = new ProductTicket(1, true);
+			Ticket t = new ProductTicket(1, true);
 			
 			TimedProduct.TimedType type = TimedProduct.TimedType.MEETING;
 			
@@ -286,41 +317,94 @@ public class TicketTest extends BaseTest {
 								   t.addItem(expired, 1, new String[0]);
 							   });
 			
-            // Expira en el pasado; además getExpirationDate resta horas, así que sigue siendo pasado.
+			// Expira en el pasado; además getExpirationDate resta horas, así que sigue siendo pasado.
 			AppTest.setAppTime(App.now().plusDays(type.hoursForPreparing * 2));
 			
-            assertThrows(DateTimeException.class, t::close);
-            assertTrue(t.isOpen());
-        }
+			assertThrows(InvalidDataException.class, t::close);
+			assertTrue(t.isOpen());
+		}
 		
-        @Test
+		@Test
 			void close_ok_closesAndSetsDateClosed() throws Exception {
-            Ticket t = new ProductTicket(1, true);
-            TimedProduct ok = new TimedProduct(20, "Ok", 10.0, 10, TimedProduct.TimedType.MEETING, App.now().plusDays(30));
+			final Ticket t = new ProductTicket(1, true);
+			TimedProduct ok = new TimedProduct(20, "Ok", 10.0, 10, TimedProduct.TimedType.MEETING, App.now().plusDays(30));
 			
-            t.addItem(ok, 1, new String[0]);
-            t.close();
+			assertDoesNotThrow(() -> {
+								   t.addItem(ok, 1, new String[0]);
+								   t.close();
+							   });
 			
 			assertFalse(t.isOpen());
 			assertNotNull(t.getDateClosed());
 			assertEquals(closedComposedId(1), t.getComposedId());
-        }
+		}
 		
-        @Test
+		@Test
 			void close_makesDefensiveCopy_productsNotAffectedByExternalMutation() throws Exception {
-            Ticket t = new ProductTicket(1, true);
-            BaseProduct p = new BaseProduct(10, "Alpha", 10.0, "CLOTHES", 5, true);
-            String[] pers = new String[]{"X"};
+			final Ticket t = new ProductTicket(1, true);
+			final BaseProduct p = new BaseProduct(10, "Alpha", 10.0, "CLOTHES", 5, true);
+			final String[] pers = new String[]{"X"};
 			
-            t.addItem(p, 1, pers);
-            t.close(); // clona productos y personalizaciones
 			
-            // mutaciones externas
-            p.setName("MUTATED");
+			assertDoesNotThrow(() -> {
+								   t.addItem(p, 1, pers);
+								   t.close(); // clona productos y personalizaciones
+							   });
 			
-            String s = t.summaryString();
-            assertTrue(s.contains("name:'Alpha'"), s+"\nRESULT: El ticket debería conservar el nombre original tras cerrar");
-        }
-    }
+			// mutaciones externas
+			p.setName("MUTATED");
+			
+			String s = t.summaryString();
+			assertTrue(s.contains("name:'Alpha'"), s+"\nRESULT: El ticket debería conservar el nombre original tras cerrar");
+		}
+		
+		
+		@Test
+			void close_ok_emptyServiceTicket() throws Exception {
+			final Ticket t = new ServiceTicket(1, true);
+			
+			assertDoesNotThrow(() -> t.close()); // clona productos y personalizaciones
+			
+		}
+		
+		@Test
+			void close_combinedWithoutProduct_throws_andKeepsOpen() throws Exception {
+			final Ticket t = new CombinedTicket(1, true);
+			
+			final ServiceProduct service = new ServiceProduct(20, "INSURANCE", App.now().plusHours(1));
+			
+			assertDoesNotThrow(() -> t.addItem(service, 1, new String[0]));
+			
+			assertThrows(InvalidDataException.class, t::close);
+			assertTrue(t.isOpen());
+		}
+		
+		@Test
+			void close_combinedWithoutService_throws_andKeepsOpen() throws Exception {
+			final Ticket t = new CombinedTicket(1, true);
+			
+			final BaseProduct p = new BaseProduct(10, "Alpha", 10.0, "CLOTHES", 5, true);
+			
+			assertDoesNotThrow(() -> t.addItem(p, 1, new String[0]));
+			
+			assertThrows(InvalidDataException.class, t::close);
+			assertTrue(t.isOpen());
+		}
+		
+		
+		@Test
+			void close_ok_combined() throws Exception {
+			final Ticket t = new CombinedTicket(1, true);
+			
+			final BaseProduct p = new BaseProduct(10, "Alpha", 10.0, "CLOTHES", 5, true);
+			final ServiceProduct service = new ServiceProduct(20, "INSURANCE", App.now().plusHours(1));
+			
+			assertDoesNotThrow(() -> t.addItem(service, 1, new String[0]));
+			assertDoesNotThrow(() -> t.addItem(p, 1, new String[0]));
+			
+			assertDoesNotThrow(t::close);
+			assertFalse(t.isOpen());
+		}
+	}
 	
 }

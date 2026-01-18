@@ -77,14 +77,41 @@ public class InventoryTest extends BaseTest {
 	@Test
         void removeProductTest() {
 		final int productId = 1;
+		final Inventory inv = Inventory.getInstance();
         assertDoesNotThrow(() -> {
-                               Inventory.getInstance().createBaseProduct(productId, "Camiseta talla:M UPM", "CLOTHES", 15, 0, false);
-                               Inventory.getInstance().deleteItem(productId);
+                               BaseProduct p = inv.createBaseProduct(productId, "Camiseta talla:M UPM", "CLOTHES", 15, 0, false);
+                               inv.deleteItemFromStrId(Integer.toString(1));
                            });
         
         assertThrows(MissingItemException.class, () -> {
-                         Inventory.getInstance().getProduct(productId);
+                         inv.getProduct(productId);
                      });
+	}
+	
+	
+	@Test
+        void removeServiceWhenRemovingProductSameIdNumber() {
+		final Inventory inv = Inventory.getInstance();
+		
+        assertDoesNotThrow(() -> {
+							   ServiceProduct s = inv.createServiceProduct("INSURANCE", App.now().plusHours(1));
+							   inv.getItemFromStringId("1S"); // NOTE(erb): service id starts at 1
+                           });
+        assertThrows(MissingItemException.class, () -> inv.deleteItemFromStrId("1"));
+        assertDoesNotThrow(() -> inv.getItemFromStringId("1S")); // NOTE(erb): wasn't deleted
+	}
+	
+	
+	@Test
+        void removeProductWhenRemovingServiceSameIdNumber() {
+		final Inventory inv = Inventory.getInstance();
+		
+        assertDoesNotThrow(() -> {
+							   BaseProduct p = inv.createBaseProduct(1, "Camiseta talla:M UPM", "CLOTHES", 15, 0, false);
+							   inv.getItemFromStringId("1");
+                           });
+        assertThrows(MissingItemException.class, () -> inv.deleteItemFromStrId("1S"));
+        assertDoesNotThrow(() -> inv.getItemFromStringId("1")); // NOTE(erb): wasn't deleted
 	}
     
 	// Failures
@@ -134,7 +161,7 @@ public class InventoryTest extends BaseTest {
                          Inventory.getInstance().getProduct(productId);
                      });
 	}
-    
+	
 	@Test
         void updateInvalidNameLengthTest() throws InvalidDataException {
         final Inventory inventory = Inventory.getInstance();
@@ -153,6 +180,53 @@ public class InventoryTest extends BaseTest {
                      });
         assertDoesNotThrow(() -> {
                                assertEquals(prod.toString(), inventory.getProduct(prod.getId()).toString()); // Name didn't change
+                           });
+	}
+    
+	@Test
+        void updateInvalidBaseCategory() throws InvalidDataException {
+        final Inventory inventory = Inventory.getInstance();
+		final BaseProduct prod = new BaseProduct(1, "Libro POO",  25, "BOOK", 0, false);
+        assertDoesNotThrow(() -> {
+                               inventory.createBaseProduct(prod.getId(), 
+                                                           prod.getName(), 
+                                                           prod.getCategory().toString(), 
+                                                           prod.getPrice(), 
+                                                           0, false);
+                           });
+        
+        assertThrows(InvalidDataException.class, () -> {
+                         inventory.updateBaseProductCategory(prod.getId(), "JIBERISH");
+                     });
+		
+        assertDoesNotThrow(() -> {
+                               assertEquals(prod.toString(), inventory.getProduct(prod.getId()).toString()); // Category didn't change
+                           });
+	}
+    
+	
+	@Test
+        void updateBaseCategoryBreakingMaxPersCount() throws InvalidDataException {
+        final Inventory inventory = Inventory.getInstance();
+		
+		// NOTE(erb): CLOTHES allows 5 personalizations, we are setting a max of 4 (correct)
+		int maxPersonalizations = 4;
+		final BaseProduct prod = new BaseProduct(1, "Libro POO",  25, "CLOTHES", maxPersonalizations, true);
+        assertDoesNotThrow(() ->  {
+							   inventory.createBaseProduct(prod.getId(), 
+														   prod.getName(), 
+														   prod.getCategory().toString(), 
+														   prod.getPrice(), 
+														   maxPersonalizations, true);
+                           });
+        
+		// NOTE(erb): ELECTRONICS allows only 2 personalizations, which is less than the max we set 4.
+        assertThrows(InvalidDataException.class, () -> {
+                         inventory.updateBaseProductCategory(prod.getId(), "ELECTRONICS");
+                     });
+		
+        assertDoesNotThrow(() -> {
+                               assertEquals(prod.toString(), inventory.getProduct(prod.getId()).toString()); // Category didn't change
                            });
 	}
     
@@ -189,7 +263,21 @@ public class InventoryTest extends BaseTest {
         }
         
         assertThrows(FullCollectionException.class, () -> {
-                         assertNull(inventory.createBaseProduct(696969, "Libro POO", "BOOK", 25, 0, false));
+                         inventory.createBaseProduct(696969, "Libro POO", "BOOK", 25, 0, false);
                      });
+		
+		assertEquals(inventory.getItems().size(), Inventory.MAX_PRODUCTS);
+	}
+	
+	
+	@Test
+        void addTimedAfterWithoutEnoughHours() {
+		final Inventory inventory = Inventory.getInstance();
+		
+        assertThrows(InvalidDataException.class, () -> {
+						 inventory.createTimedProduct(696969, "timed thing", 25, 10, "MEETING", App.now().plusHours(1));
+                     });
+		
+		assertEquals(inventory.getItems().size(), 0);
 	}
 }

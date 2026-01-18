@@ -64,6 +64,18 @@ public class UserManagerTest extends BaseTest {
         normalAddCashier();
         assertDoesNotThrow(() -> { UserManager.getInstance().removeCashier("UW0000000"); });
     };
+	
+    @Test
+        void removeClientWhenRemovingCashier() {
+        addOneClient();
+        assertThrows(MissingItemException.class, () -> { UserManager.getInstance().removeCashier(testDNI); });
+    };
+	
+    @Test
+        void removeCashierWhenRemovingClient() {
+        normalAddCashier();
+        assertThrows(MissingItemException.class, () -> { UserManager.getInstance().removeClient("UW0000000"); });
+    };
     
     @Test
         void findNonExistentCashier() {
