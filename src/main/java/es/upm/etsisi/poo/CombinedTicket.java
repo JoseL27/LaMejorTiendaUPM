@@ -128,7 +128,6 @@ public class CombinedTicket extends Ticket {
 		int[] table = new int[BaseProduct.Category.values().length];
 		for (TicketItem info : ticketItems) {
 			
-			// TODO(enrique): Think of a more OOP way to do this.
 			if (info.getItem() instanceof BaseProduct baseProduct) {
 				int index = (int)baseProduct.getCategory().ordinal();
 				table[index] += info.getAmount();

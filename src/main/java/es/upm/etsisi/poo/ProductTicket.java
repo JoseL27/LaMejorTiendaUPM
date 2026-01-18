@@ -86,7 +86,6 @@ public class ProductTicket extends Ticket {
 		
 		for (TicketItem info : ticketItems) {
 			
-			// TODO(enrique): Think of a more OOP way to do this.
 			if (info.getItem() instanceof BaseProduct baseProduct) {
 				int index = (int)baseProduct.getCategory().ordinal();
 				table[index] += info.getAmount();

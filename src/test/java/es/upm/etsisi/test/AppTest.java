@@ -106,9 +106,7 @@ public class AppTest extends BaseTest {
         fullAppTest(E3_TEST_DATE, "test-io/e3/in.txt", "test-io/e3/out.txt");
 	}
     
-    // TODO(erb): test all commands through runCommand()
-	
-	// ======================================================================
+    // ======================================================================
 	// UTILS
 	// ======================================================================
 	
