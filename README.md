@@ -8,16 +8,20 @@
 
 OBLIGATORIO MAIN SIEMPRE COMPILANDO
 
-# E2 Version
-Ticket, inventory, Client/Cashier module.
+# E3 Version
+Ticket, inventory, local persistence, User/Cashier module.
 
-This program should allow the end user to create/update/delete/list products. Create/remove/list registered cashiers and
-clients. 
+This program should allow the end user to create/update/delete/list products, and create/remove/list registered
+and users. 
 
-Using the products created, the end user should also have the ability to create a new ticket, adding in any product with
-any amount (E1: less or equal than 100), remove products, or print the ticket (listing all products in ticket, applying
-discounts, and showing to the end user product information, discounts applied, total price, discount amount, and final
-price).
+Using the products created, the end user should also have the ability to create a new ticket and associate it with a
+cashier, adding in any product with any amount (E1: less or equal than 100), remove products, or print the ticket.
+
+Printing the ticket consists of: listing all products in ticket, applying discounts, and showing to the end user product
+information, discounts applied,
+total price, discount amount, and final price.
+
+The ticket may limit what kind of product is allowed to be added in the ticket.
 
 # Users
 
@@ -29,11 +33,13 @@ in the program design.**
 
 ## Cashier
 
-A client is another kind of user which creates the ticket for the client.
+A client is a user which creates the ticket for the client.
 
-A cashier is identified by their Worker ID (Starting with UW and a 7-digit number), name, and its company E-mail address (Ending in domain `@upm.es`)
+A cashier is identified by their Worker ID (Starting with UW and a 7-digit number), name, and its company E-mail address
+(Ending in domain `@upm.es`)
 
-- ID (Worker ID), must have format `UW#######`, starting with the `UW` prefix and 7 numbers
+- ID (Worker ID), must have format `UW#######`, starting with the `UW` prefix and 7 numbers. ID should be generated
+randomly if omitted during `cash add` command
 - Name
 - Company E-mail address (Must en in domain `@upm.es`)
 
@@ -58,14 +64,18 @@ also removed.**
 
 ## Client
 
-A client is a kind of user, which a cashier must register before creating any ticket.
+A client is a user which is associated to one or more ticket. A cashier must register the client before creating any
+ticket.
 
-A client is identified by their national ID number (Spain: DNI), name, and (personal) E-mail address. During the registration, the cashier who registered the client should be stored inside the Client as an attribute.
+The client is split into two categories: Natural Person identified by DNI/NIE, and Enterprise identified by CIF.
 
-- ID (National ID) (Must be non-null, should have at least one character)
+A client is identified by their national ID number (Spain: DNI/NIE/CIF), name, and (personal or enterprise) E-mail address.
+During the registration, the cashier who registered the client should be stored inside the Client as an attribute.
+
+- ID (Spanish National ID)
 - Name
 - E-Mail address, any E-mail address is possible
-- Cashier which registered the client, cashierID must be valid
+- Cashier who registered the client
 
 ## Client commands
     + client add "<name>" <id> <email> <cashierID>
@@ -75,81 +85,133 @@ A client is identified by their national ID number (Spain: DNI), name, and (pers
     
     + client remove <id>
       Removes a client from the registry.
-      Note: this would NOT remove any ticket associated to the client.
+      This would NOT remove any ticket associated to the client.
 
     + client list
       Lists all registered client's information (id, name, email, cashier) ordered alphabetically by name.
 
 # Products
-The products are split into two kinds, products with expiry time, and normal products.
+The products are split into three kinds: Timed Products, Normal Products, and Service Products.
+
+A custom ID can be specified for Normal Products and Timed Products. If omitted, the Product ID should be generated
+automatically, following the same behaviour as Cashier.
+
+Product A and Product B are different if they have different IDs.
+
+For E1: No more than 200 different products in inventory
 
 **Note: price calculation will be detailed in the [Ticket](#tickets) section**
+
+*Observation: there are two possible interpretation from the original E2 statement:*
+> Para los cajeros, será un código compuesto por
+> un duo de letras “UW” (UPM Worker) más 7 dígitos aleatorios, este podrá generarse
+> internamente si no se pasa como parámetro en su creación
+>
+> ...
+>
+> Los productos registrados en la aplicación podrán registrarse con un identificador o se generará de manera
+> automática internamente al igual que los cajeros
+
+This can mean:
+- Both the cashier and product should **generate its ID automatically if omitted during `prod add` or `cash add`.**
+Cashier should generate ID randomly, but since Product ID's automatic generation algorithm is NOT explicitly specified,
+the automatic ID generation process is up to us.
+- Both the cashier and product should **generate its ID automatically with random numbers** if omitted during `prod add`
+or `cash add`, knowing that from the E1 restriction, there will be no more than 200 different products, and the numeric ID
+space for Cashier is UW0000000 - UW9999999.
 
 ## Normal products
 
 Normal products could refer to any object, such as T-Shirts, books, pens and mugs.
 
-Attributes: ID, Name, Price, Category, Customization Amount (Customizations would be a list of strings, Customization
-amount refers to the size of the list).
-
-- ID must be positive (0 should be invalid)
-- Name must be less than 100 characters (E1 Restriction)
-- Price (per piece) must be positive (0 is invalid)
+- ID, must be positive (0 is valid)
+- Name, must be less than 100 characters (E1 Restriction)
+- Price (per piece), must be positive (0 is invalid)
 - Category fixed with discount rates: MERCH(0%), STATIONERY(5%), CLOTHES(7%), BOOK(10%), ELECTRONICS(3%)
 - Amount of customizations (0 or undefined means non-customizable product), once set then it could not be altered.
-Product A and Product B are different if they have different IDs.
 
-For E1: No more than 200 different products
+Customizations would be a list of strings known when adding the product to a ticket, Customization amount refers to the
+maximum size of the Customizations list.
 
-Any normal product now has the option to be customized, when adding the product to the inventory, the end user may
-specify how many customizations a product can have. And using `ticket add --p` command to specify what customization
-will be present in the product.
+After the product is registered in the inventory, the end user will be unable to alter the number of customization that
+any product can bear.
+
+Any normal product has the option to be customized, when adding the product to the inventory, the end user may
+specify how many customizations a product can have during `prod add`. And use `ticket add --p` command to specify what
+customization will be present in the product at checkout.
 
 Adding a customization to a normal product during `ticket add` will add 10% to the cost of the product (1 customization
-= 10% added cost, 2 = 20%, 3 = 30%, until the Customization Amount limit specified during the product registration in
-Inventory). Any customizable product (normal product registered in the inventory with customization amount > 0) can be
-added to ticket with or without any customizations.
-
-After the product is registered in the inventory, the end user will be unable to alter the number of customization that any product can bear.
+= 10% added cost to the price/unit, 2 = 20%, 3 = 30%, until the Customization Amount limit specified during the product
+registration in Inventory). Any customizable product (normal product registered in the inventory with customization
+amount > 0) can be added to ticket with or without any customizations.
 
 ## Timed product
 
-Timed products (or product with time limitation) is usually a kind of service, which could not be added before a certain time to the ticket.
+Timed products (or product with time limitation) is usually a kind of service, which could not be added before a certain
+time to the ticket.
 
-A timed product is a product in inventory which has an expiration date and a preparation period. After passing the expiration date, the product could not be added to any ticket.
-The preparation period is a time period placed before the expiration date, during this period, the product could not be added to any ticket. There are two kinds of product with time limitation, **food** which has a preparation period of 72 hours, and **meetings** which has 12 hours.
+A timed product is a product with an expiration date and a preparation period. After passing the expiration date, the
+product could not be added to any ticket.
+
+The preparation period is a time period placed before the expiration date, during this period, the product could not be
+added to any ticket. There are two kinds of product with time limitation, **food** which has a preparation period of 72
+hours, and **meetings** which has 12 hours.
 
 For example: a food catering service with pizza and pasta, with specified expiration date of 24th November 2025 @ 00:00.
 Such service may be added at any time before 21st November 2025 @ 00:00.
 During 21st and 24th, this product is in the preparation period and could not be added to any ticket.
 
-- ID must be positive (0 should be invalid)
-- Name must be less than 100 characters (E1 Restriction)
-- Price (per person) must be positive (0 is invalid)
+- ID, must be positive (0 is valid)
+- Name, must be less than 100 characters (E1 Restriction)
+- Price (per person), must be positive (0 is invalid)
 - Maximum amount of participants (must be less or equal than 100)
 - Expiration date
-- Product A and Product B are different if they have different IDs.
 
-Preparation period is dependent on the kind of product (food: 72h or meeting: 12h). 
+Preparation period is dependent on the type of the Timed Product (food: 72h or meeting: 12h).
+
+When creating a new Timed Product, its expiration date must be checked before registering at the Inventory, creating a
+Timed Product which is already in its preparation period or after being expired is NOT ALLOWED.
+
+## Service Product
+
+A Service is a Product which can only be offered to an Enterprise, and has an expiration date.
+
+After its expiration date, the service could not be added to any Ticket.
+
+The Service Product only has the following attributes:
+
+- ID, auto-incremented (Starting at 1), non-customizable numeric ID with a suffix character 'S' (E.g. 1S, 2S)
+- Category (INSURANCE, TRANSPORT, SPECTACLE)
+- Expiration date
+
+Services have **no price**, treat the price as 0 in Ticket. Price calculation for services is not calculated in this
+program.
+
+When creating a new Service, its expiration date must be checked before registering at the Inventory, creating a
+Service after its expiration date should not be allowed.
 
 ## Commands for Products:
 	+ prod add [<id>] "<name>" <category> <price> [<MaxPersonalizationAmount>]
 	  Add a new normal product to the inventory. The product may be personalized specifying the maximum
       amount for the customization string list. Set to 0 if not specified.
-      ID is now optional. ID will be generated automatically if omitted.
+      ID is optional. ID will be generated automatically if omitted.
+
+    + prod add <expiration: yyyy-MM-dd> <service category>
+      Add a new service to the inventory. ID will be generated automatically (Auto-increment).
+      <expiration> should follow strictly by the yyyy-mm-dd format (e.g. 2025-11-25)
 
     + prod addFood [<id>] "<name>" <price> <expiration: yyyy-MM-dd> <maxPeople>
       Add a new timed product (Food) to the inventory. This kind of product has a preparation period of 72h.
       <expiration> should follow strictly by the yyyy-mm-dd format (e.g. 2025-11-25)
-      ID is now optional. ID will be generated automatically if omitted.
+      ID is optional. ID will be generated automatically if omitted.
     
     + prod addMeeting [<id>] "<name>" <price> <expiration: yyyy-MM-dd> <maxPeople>
       Add a new timed product (Meeting) to the inventory. This kind of product has a preparation period of 12h.
       <expiration> should follow strictly by the yyyy-mm-dd format (e.g. 2025-11-25)
-      ID is now optional. ID will be generated automatically if omitted.
+      ID is optional. ID will be generated automatically if omitted.
 
 	+ prod list
-      List all registered products (normal products and products with time limitations)
+      List all registered products (normal products, timed product and services), ordered by ID
 	
 	+ prod update <id> <field> <value>
   	  Update specific attributes of a specific product, checking restrictions on values.
@@ -158,35 +220,57 @@ Preparation period is dependent on the kind of product (food: 72h or meeting: 12
       does not have an category field.
 
 	+ prod remove <id>
-      Remove products, eliminate appearances in ticket <-- Unspecified but we should assume this behaviour to prevent inconsistencies
+      Remove products, eliminate appearances in ticket in opened tickets <-- Unspecified but we should assume this behaviour to prevent inconsistencies
 
 # Tickets
 
-A list containing products, product amount, and if applicable, customizations (Normal product), participants (Timed Product only).
+A list containing products, product amount (or participants in case of Timed Products), and 
+customizations (only applicable to Normal product)
 
-The ticket will be associated to one of 3 states:
+A Ticket will have 3 states:
 - EMPTY (The ticket is empty, no products were added, and more products can be added)
 - OPEN (The ticket contains at least one product, and more products can be added)
 - CLOSE (No more products can be added to this ticket)
 
+A Ticket can limit the product type it can accept by specifying one of the following flags during `ticket new`:
+- Product Only (`-p` flag, default): Only accept Timed Product, and Normal Products
+- Service Only (`-s` flag): Only accept Services
+- Combined (`-p` flag): Accept both Product and Services.
+
+**A combined ticket can only close if it has both Product and Service added.**
+
+A natural person client's ticket can only have Product Only (`-p`) tickets. Enterprises can have Service Only (`-s`),
+or Combined Tickets (`-c`).
+
+The Product Only ticket should be the default ticket to create for Natural Person client and Enterprises when the flag
+is omitted.
+
 Once a ticket is closed, the end user should be able to print the ticket again specifying the corresponding Cashier ID
 and Ticket ID.
 
-**For E1: No more than 100 items (sum of all amount of products contained in ticket's product list <= 100)**
+A timed product with the same ID could not be added again to the same ticket.
+
+**For E1: No more than 100 different items (sum of all added product counts) should be allowed inside the ticket.**
+
+I.e. Add `50 Product A` in ticket (50 items), add `50 Product B` (50 items) in ticket. Now that the total items in
+the ticket is **100 (50 Prod. A + 50 Prod. B)**, **no more items** are allowed to be added.
 
 A timed product with any arbitrary amount of participants in the ticket should be counted as 1 item. For example, a
 pizza catering service with 30 participants (50 max.) should be counted as one item in the ticket.
 
-A timed product with the same ID could not be added again to the same ticket.
+## Price calculations
 
-Ticket price calculation: if there are 2 or more products of the same category, the product in question should be
-discounted at the rate (percentage) mentioned in Product Category.
+For any normal product, the price would be simply its price per piece multiplied by the amount in Ticket. If the Product
+is customizable and customization is specified during `ticket add`, the price for the customized piece would be 10% more
+than its normal price per piece, adding 10% for each customization present. If no customization is specified
+during `ticket add`, then sell as normal product (0% added cost).
 
-If a product is customizable but during `ticket add` no customization is added, sell as a normal product without any
-additional costs (0 customization = 0% added cost)
+If there are 2 or more products of the same category, the product in question should be discounted at the rate
+(percentage) mentioned in Product Category. The discount is applied on a piece by piece basis.
+Adding the same product twice (amount > 1) is also eligible for a category discount.
 
 **Important: customized product should be eligible for category discounts. The price to subtract is the price of the
-product after the added cost due to customizations, multiplied by the category discount percentage**
+product after the added cost due to customizations, multiplied by the category discount percentage.**
 
 ```
 customizationPercent = numCustomizations * 10% (numCustomizations: amount of customization strings specified during ticket add)
@@ -198,13 +282,9 @@ finalProductPrice = productPriceWithCustomization - (productPriceWithCustomizati
                                                       Cost to discount according to product category
 ```
 
-**For E1: No more than 100 different items (sum of all added product counts) should be allowed inside the ticket.**
-
-I.e. Add `50 Product A` in ticket (50 items), add `50 Product B` (50 items) in ticket. Now that the total items in the ticket is **100 (50 Prod. A + 50 Prod. B)**, **no more items** are allowed to be added.
-
 ## Ticket ID
 
-All tickets are now identified with an ID. During ticket creation (`ticket new` command), the ID will be generated
+All tickets are identified with an ID. During ticket creation (`ticket new` command), the ID will be generated
 automatically if not specified. The automatically generated ID will have the following format:
 `YY-MM-dd-HH:mm-#####` where YY:year (2 digit), MM:month (2 digit), dd:day (2 digit), HH:hour (24-hour format),
 mm:minute, #####: random 5-digit number.
@@ -232,8 +312,8 @@ the ticket ID specified. But closing the ticket will still append the closing da
 Observation 2: looking at the E2 specification, it looks like the ID is implemented with a string, it is uncertain
 if the ticket ID should allow non-numeric IDs (Such as `21263s`, closing -> `21263s-25-11-19-16:41`)
 
-Observation 3: to print any closed ticket, it is uncertain if the end user should specify the full
-ticket ID with the closing date, or any part matching the ID unambiguously should suffice.
+Observation 3: to print or reference any closed ticket by its ID, it is uncertain if the end user should specify the
+full ticket ID with the closing date, or any part matching the ID unambiguously should suffice.
 For example:
 
 - Generated ID: `25-11-16-11:53-00721-25-11-19-16:41`, or `25-11-16-11:53-00721`, even `25-11-16-11:53` or `00721`
@@ -241,8 +321,9 @@ For example:
 - Custom ID: `157194-25-11-19-16:41`, or `157194`, even `25-11-19-16:41` if unambiguous
 
 ## Commands for Ticket
-	+ ticket new [<ID>] <CashierID> <ClientID>
-  	  Create new empty ticke and associate it to a valid cashier and client.
+	+ ticket new [<ID>] <CashierID> <ClientID> -[c|p|s]
+  	  Create new empty ticket and associate it to a valid cashier and client.
+      -[c|p|s] restricts the kind of product which the ticket can accept. If omitted default to -p (Product Only) 
       ID will be generated automatically if omitted.
   
 	+ ticket add <ticketID> <cashierID> <productID> <quantity> [--p<customization> --p<customization2> ... --p<customizationN>]
@@ -256,9 +337,9 @@ For example:
       <cashierID> must be the cashier ID which the ticket was associated during the ticket creation. 
 
 	+ ticket print <ticketID> <cashierID>
-	  Prints current ticket with product information and discount.
+	  Prints current ticket with product information and discount. And closes the ticket.
       Calculate total price, discount amount, and discounted total price.
-      Product listing should be in alphabetical order. And closes the ticket.
+      Product listing should be in alphabetical order.
 
     + ticket list
       Lists all tickets IDs created and their states, ordered by Cashier's ID.
@@ -287,19 +368,19 @@ tUPM> echo "saba SABA さば ˢᵃᵇᵃ"
 
 tUPM> help
 Commands:
-  client add "<nombre>" <DNI> <email> <cashId>
+  client add "<nombre>" (<DNI>|<NIF>) <email> <cashId>
   client remove <DNI>
   client list
   cash add [<id>] "<nombre>"<email>
   cash remove <id>
   cash list
   cash tickets <id>
-  ticket new [<id>] <cashId> <userId>
+  ticket new [<id>] <cashId> <userId> -[c|p|s] (default -p option)
   ticket add <ticketId><cashId> <prodId> <amount> [--p<txt> --p<txt>] 
   ticket remove <ticketId><cashId> <prodId> 
   ticket print <ticketId> <cashId> 
   ticket list
-  prod add <id> "<name>" <category> <price>
+  prod add ([<id>] "<name>" <category> <price> [<maxPers>]) || ("<name>" <category> )
   prod update <id> NAME|CATEGORY|PRICE <value>
   prod addFood [<id>] "<name>" <price> <expiration:yyyy-MM-dd> <max_people>
   prod addMeeting [<id>] "<name>" <price> <expiration:yyyy-MM-dd> <max_people>
@@ -339,19 +420,19 @@ tUPM> echo "Hola mundo"
 
 tUPM> help
 Commands:
-  client add "<nombre>" <DNI> <email> <cashId>
+  client add "<nombre>" (<DNI>|<NIF>) <email> <cashId>
   client remove <DNI>
   client list
   cash add [<id>] "<nombre>"<email>
   cash remove <id>
   cash list
   cash tickets <id>
-  ticket new [<id>] <cashId> <userId>
+  ticket new [<id>] <cashId> <userId> -[c|p|s] (default -p option)
   ticket add <ticketId><cashId> <prodId> <amount> [--p<txt> --p<txt>] 
   ticket remove <ticketId><cashId> <prodId> 
   ticket print <ticketId> <cashId> 
   ticket list
-  prod add <id> "<name>" <category> <price>
+  prod add ([<id>] "<name>" <category> <price> [<maxPers>]) || ("<name>" <category> )
   prod update <id> NAME|CATEGORY|PRICE <value>
   prod addFood [<id>] "<name>" <price> <expiration:yyyy-MM-dd> <max_people>
   prod addMeeting [<id>] "<name>" <price> <expiration:yyyy-MM-dd> <max_people>
@@ -383,19 +464,19 @@ Notice the newline between each command's result/output and the `tUPM> ` prompt.
 
 ```
 Commands:
-  client add "<nombre>" <DNI> <email> <cashId>
+  client add "<nombre>" (<DNI>|<NIF>) <email> <cashId>
   client remove <DNI>
   client list
   cash add [<id>] "<nombre>"<email>
   cash remove <id>
   cash list
   cash tickets <id>
-  ticket new [<id>] <cashId> <userId>
+  ticket new [<id>] <cashId> <userId> -[c|p|s] (default -p option)
   ticket add <ticketId><cashId> <prodId> <amount> [--p<txt> --p<txt>] 
   ticket remove <ticketId><cashId> <prodId> 
   ticket print <ticketId> <cashId> 
   ticket list
-  prod add <id> "<name>" <category> <price>
+  prod add ([<id>] "<name>" <category> <price> [<maxPers>]) || ("<name>" <category> )
   prod update <id> NAME|CATEGORY|PRICE <value>
   prod addFood [<id>] "<name>" <price> <expiration:yyyy-MM-dd> <max_people>
   prod addMeeting [<id>] "<name>" <price> <expiration:yyyy-MM-dd> <max_people>
@@ -409,9 +490,13 @@ Categories: MERCH, STATIONERY, CLOTHES, BOOK, ELECTRONICS
 Discounts if there are ≥2 units in the category: MERCH 0%, STATIONERY 5%, CLOTHES 7%, BOOK 10%, ELECTRONICS 3%.
 ```
 
-Beware of the single space at the start of each command's format, and the newline between the command list and category discount information.
+Beware of the single space at the start of each command's format, and the newline between the command list and category
+discount information.
 
 Beware of the full-width quote symbol at `echo “<text>” `.
+
+Keep in mind that for `cash add`, `ticket add`, `ticket remove`, some fields have no space separation in the help text,
+this is probably a mistake, the fields in the real command is separated with spaces.
 
 ## Cashier commands
 
@@ -427,6 +512,8 @@ Cash{identifier='UW8961116', name='pepecurro2', email='pepe0@upm.es'}
 cash add: ok
 ```
 
+When ID is omitted, ID should be a random number
+
 ### `cash add UW1234569 "pepecurro1" pepe0@upm.es` (Add cashier UW1234569)
 ```
 Cash{identifier='UW1234569', name='pepecurro1', email='pepe0@upm.es'}
@@ -441,8 +528,6 @@ Cash:
   Cash{identifier='UW1234567', name='pepecurro3', email='pepe0@upm.es'}
 cash list: ok
 ```
-
-When ID is omitted, ID should be a random number
 
 ### `cash remove UW1234569` (Remove a cashier)
 ```
@@ -509,6 +594,44 @@ Client:
 client list: ok
 ```
 
+## Enterprise Client commands
+
+### `client add "pepe2" B12345674 pepe5@upm.es UW1234567` (Add new enterprise client)
+```
+COMPANY{identifier='B12345674', name='pepe2', email='pepe5@upm.es', cash=UW1234567}
+client add: ok
+```
+
+### `client add "La bomba transportes" P1145148A lebomb@c4.com UW1234567` (Add another enterprise client)
+```
+COMPANY{identifier='P1145148A', name='La bomba transportes', email='lebomb@c4.com', cash=UW1234567}
+client add: ok
+```
+
+### `client list` (List both client and enterprise)
+```
+Client:
+  COMPANY{identifier='P1145148A', name='La bomba transportes', email='lebomb@c4.com', cash=UW1234567}
+  USER{identifier='98948334B', name='Pepe2', email='pepe2@upm.es', cash=UW1234567}
+  USER{identifier='55630667S', name='Pepe3', email='pepe1@upm.es', cash=UW1234567}
+  COMPANY{identifier='B12345674', name='pepe2', email='pepe5@upm.es', cash=UW1234567}
+client list: ok
+```
+
+### `client remove P1145148A` (Remove enterprise)
+```
+client remove: ok
+```
+
+### `client list` (Verify removal of P1145148A)
+```
+Client:
+  USER{identifier='98948334B', name='Pepe2', email='pepe2@upm.es', cash=UW1234567}
+  USER{identifier='55630667S', name='Pepe3', email='pepe1@upm.es', cash=UW1234567}
+  COMPANY{identifier='B12345674', name='pepe2', email='pepe5@upm.es', cash=UW1234567}
+client list: ok
+```
+
 ## Product commands
 
 ### `prod add 1 "Libro POO" BOOK 25` (Add normal product: book)
@@ -523,15 +646,31 @@ prod add: ok
 prod add: ok
 ```
 
+### `prod add "Camiseta talla:M UPM" CLOTHES 15` (Add normal product without ID)
+```
+{class:Product, id:0, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
+```
+
+Note: auto-increment will try and find the first (and lowest) product ID available. 
+Since during previous `prod add` used ID 1 and 2. This command will take the product ID 0.
+Next `prod add` without ID should now take the ID of 3.
+
 ### `prod list` (List normal products)
 ```
 Catalog:
+  {class:Product, id:0, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
   {class:Product, id:1, name:'Libro POO', category:BOOK, price:25.0}
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
 prod list: ok
 ```
 
 Beware of the double space before each product's information
+
+### `prod add 3 "Libro POO repetido Error" BOOK 25` (Add a test book for remove test)
+```
+{class:Product, id:3, name:'Libro POO repetido Error', category:BOOK, price:25.0}
+prod add: ok
+```
 
 ### `prod update 1 NAME "Libro POO V2"` (Update book name)
 ```
@@ -545,19 +684,35 @@ prod update: ok
 prod update: ok
 ```
 
-Note: `prod update` for **cagetory** does not appear in E1. But it should also follow the same response by printing
-the updated product information, and displaying `prod update: ok` if the update is successful
-
-### `prod add 3 "Libro POO repetido Error" BOOK 25` (Add a test book for remove test)
+### `prod update 3 CATEGORY CLOTHES` (Update test book category)
 ```
-{class:Product, id:3, name:'Libro POO repetido Error', category:BOOK, price:25.0}
-prod add: ok
+{class:Product, id:3, name:'Libro POO repetido Error', category:CLOTHES, price:25.0}
+prod update: ok
+```
+
+### `prod list` (Check updated product information)
+```
+Catalog:
+  {class:Product, id:0, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
+  {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}
+  {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
+  {class:Product, id:3, name:'Libro POO repetido Error', category:CLOTHES, price:25.0}
+prod list: ok
 ```
 
 ### `prod remove 3` (Remove test book)
 ```
 {class:Product, id:3, name:'Libro POO repetido Error', category:BOOK, price:25.0}
 prod remove: ok
+```
+
+### `prod list` (Confirm test book was removed)
+```
+Catalog:
+  {class:Product, id:0, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
+  {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}
+  {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
+prod list: ok
 ```
 
 ### `prod addMeeting 23456 "Reunion Rotonda" 12 2025-11-21 100` (Add a meeting with 100 participants max)
@@ -586,6 +741,7 @@ prod addFood: ok
 ### `prod list` (List all normal products, food and meetings)
 ```
 Catalog:
+  {class:Product, id:0, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
   {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}
   {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
   {class:Meeting, id:23456, name:'Reunion Rotonda', price:0.0, date of Event:2025-11-21, max people allowed:100}
@@ -593,8 +749,6 @@ Catalog:
   {class:Food, id:23459, name:'Restaurante Asador', price:0.0, date of Event:2025-11-21, max people allowed:40}
 prod list: ok
 ```
-
-Beware of the double space before each entry.
 
 ### `prod add 5 "Camiseta talla:M UPM" CLOTHES 15 3` (Add personalizable clothes)
 ```
@@ -608,9 +762,38 @@ prod add: ok
 prod add: ok
 ```
 
+### `prod add 2026-12-21 INSURANCE` (Add insurance service)
+```
+{class:ProductService, id:1, category:INSURANCE, expiration:Mon Dec 21 00:00:00 CET 2026}
+prod add: ok
+```
+
+### `prod add 2026-12-24 TRANSPORT` (Add transport service)
+```
+{class:ProductService, id:2, category:TRANSPORT, expiration:Thu Dec 24 00:00:00 CET 2026}
+prod add: ok
+```
+
+### `prod list` (List all services and products)
+```
+Catalog:
+  {class:Product, id:0, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
+  {class:ProductService, id:1, category:INSURANCE, expiration:Mon Dec 21 00:00:00 CET 2026}
+  {class:Product, id:1, name:'Libro POO V2', category:BOOK, price:30.0}
+  {class:ProductService, id:2, category:TRANSPORT, expiration:Thu Dec 24 00:00:00 CET 2026}
+  {class:Product, id:2, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0}
+  {class:ProductPersonalized, id:5, name:'Camiseta talla:M UPM', category:CLOTHES, price:15.0, maxPersonal:3}
+  {class:ProductPersonalized, id:6, name:'Camiseta talla:L UPM', category:CLOTHES, price:20.0, maxPersonal:4}
+  {class:Meeting, id:23456, name:'Reunion Rotonda', price:12.0, date of Event:2026-12-21, max people allowed:100}
+  {class:Meeting, id:23457, name:'Graduacion ETSISI', price:40.0, date of Event:2026-12-21, max people allowed:30}
+  {class:Food, id:23459, name:'Restaurante Asador', price:50.0, date of Event:2026-12-21, max people allowed:40}
+prod list: ok
+```
+
 ## Ticket command
 
-**Observation: the local system time is probably set to 2025/11/24 18:21**
+**Observation: the local system time is probably set to 2025/11/24 18:21**. TImedProduct expiry date
+are inconsistent. The output should not be taken as the correct output. But only as a template example.
 
 After ANY ticket command, the program should print the ticket in its entirety (calling ticket print, but
 without closing the ticket).
@@ -1023,6 +1206,90 @@ Ticket : 212128-25-11-14-18:21
   Total discount: 10.184999
   Final Price: 135.315
 ticket print: ok
+```
+
+### `ticket new 212129 UW1234567 B12345674 -s` (Create a Service only Ticket)
+```
+Ticket : 212129
+ticket new: ok
+```
+
+### `ticket add 212129 UW1234567 1S` (Add insurance service to ticket)
+```
+Ticket : 212129
+Services Included: 
+  {class:ProductService, id:1, category:INSURANCE, expiration:Mon Dec 21 00:00:00 CET 2026}
+ticket add: ok
+```
+
+### `ticket add 212129 UW1234567 2S` (Add transport service to ticket)
+```
+Ticket : 212129
+Services Included: 
+  {class:ProductService, id:1, category:INSURANCE, expiration:Mon Dec 21 00:00:00 CET 2026}
+  {class:ProductService, id:2, category:TRANSPORT, expiration:Thu Dec 24 00:00:00 CET 2026}
+ticket add: ok
+```
+
+### `ticket print 212129 UW1234567` (Print service only ticket)
+```
+Ticket : 212129-25-11-14-18:21
+Services Included: 
+  {class:ProductService, id:1, category:INSURANCE, expiration:Mon Dec 21 00:00:00 CET 2026}
+  {class:ProductService, id:2, category:TRANSPORT, expiration:Thu Dec 24 00:00:00 CET 2026}
+ticket add: ok
+```
+
+### `ticket new 212130 UW1234567 B12345674 -c` (Create a combined ticket)
+```
+Ticket : 212130
+ticket new: ok
+```
+
+### `ticket add 212130 UW1234567 1S` (Add insurance service to ticket)
+```
+Ticket : 212130
+Services Included:
+  {class:ProductService, id:1, category:INSURANCE, expiration:Mon Dec 21 00:00:00 CET 2026} 
+ticket add: ok
+```
+
+### `ticket add 212130 UW1234567 2S` (Add transport service to ticket)
+```
+Ticket : 212130
+Services Included:
+  {class:ProductService, id:1, category:INSURANCE, expiration:Mon Dec 21 00:00:00 CET 2026}
+  {class:ProductService, id:2, category:TRANSPORT, expiration:Thu Dec 24 00:00:00 CET 2026} 
+ticket add: ok
+```
+
+### `ticket add 212130 UW1234567 23456 20` (Add meeting to ticket)
+```
+Ticket : 212130
+Services Included:
+  {class:ProductService, id:1, category:INSURANCE, expiration:Mon Dec 21 00:00:00 CET 2026}
+  {class:ProductService, id:2, category:TRANSPORT, expiration:Thu Dec 24 00:00:00 CET 2026}
+Product Included
+  {class:Meeting, id:23456, name:'Reunion Rotonda', price:240.0, date of Event:2025-12-21, max people allowed:100, actual people in event:20}
+  Total price: 240.0
+  Extra Discount from services:72.0 **discount -72.0
+  Total discount: 72.0
+  Final Price: 168.0
+ticket add: ok
+```
+### `ticket print 212130 UW1234567` (Print and close combined ticket)
+```
+Ticket : 212130-25-11-14-18:21
+Services Included:
+  {class:ProductService, id:1, category:INSURANCE, expiration:Mon Dec 21 00:00:00 CET 2026}
+  {class:ProductService, id:2, category:TRANSPORT, expiration:Thu Dec 24 00:00:00 CET 2026}
+Product Included
+  {class:Meeting, id:23456, name:'Reunion Rotonda', price:240.0, date of Event:2025-12-21, max people allowed:100, actual people in event:20}
+  Total price: 240.0
+  Extra Discount from services:72.0 **discount -72.0
+  Total discount: 72.0
+  Final Price: 168.0
+ticket add: ok
 ```
 
 ## Exit command
