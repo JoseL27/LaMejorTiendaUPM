@@ -1,13 +1,5 @@
 # La Mejor Tienda UPM 
 
-## Como hacer una tarea
-1. Programar
-2. Documentar codigo
-3. Probar funcionalidad
-4. Branches y Pull Requests revisados por 2
-
-OBLIGATORIO MAIN SIEMPRE COMPILANDO
-
 # E2 Version
 Ticket, inventory, Client/Cashier module.
 
